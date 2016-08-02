@@ -1,0 +1,10 @@
+/AbstractLinearOptimizer.class
+/LinearConstraint.class
+/LinearObjectiveFunction.class
+/LinearOptimizer.class
+/NoFeasibleSolutionException.class
+/Relationship.class
+/SimplexSolver.class
+/SimplexTableau.class
+/UnboundedSolutionException.class
+/package.html

@@ -1,0 +1,10 @@
+/AbstractEstimator.class
+/EstimatedParameter.class
+/EstimationException.class
+/EstimationProblem.class
+/Estimator.class
+/GaussNewtonEstimator.class
+/LevenbergMarquardtEstimator.class
+/SimpleEstimationProblem.class
+/WeightedMeasurement.class
+/package.html
