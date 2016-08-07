@@ -8,7 +8,7 @@ import util.*;
 
 public class CategoricalDistribution implements PosteriorDistribution<double[],double[],Integer> {
 	double[] thetas;
-	public boolean prior_is_on_H = false;
+	public boolean prior_is_on_H = true;
 	int[][] permutations;
 	
 	PriorDistribution<double[],double[],Integer> prior;
@@ -20,7 +20,14 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 	public static double S_LIMIT = 1e-5;
 	
 	public static Integer[] bucket(Vector<boolean[]> samples, int[] select) {
-		Integer[] buckets = new Integer[(int)Math.pow(2, select.length)];
+		if( select.length == 0) {
+			return new Integer[0];
+		}
+		int pow = (int)(Math.pow(2, select.length));
+		Integer[] buckets = new Integer[pow];
+		for(int i = 0; i < buckets.length; i++) {
+			buckets[i] = new Integer(0);
+		}
 		for( boolean[] s : samples) {
 			int bucket = 0;
 			for( int i = 0; i < select.length; i++) {
@@ -34,38 +41,78 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		new int[]{0},
 		new int[]{1},
 		new int[]{2},
-		new int[]{3},
-		new int[]{1,2,3},//5
+		new int[]{3}, //sb 0.80
+		new int[]{1,2,3},//sb 2
 		new int[]{0,2,3},
-		new int[]{0,1,3},//7
+		new int[]{0,1,3},
 		new int[]{0,1,2},
-		new int[]{1,2,3,0},
-		new int[]{0,3},
+		new int[]{1,2,3,0}, //sb 2
+		new int[]{0,3}, //sb 1.5
 		new int[]{1,3},
 		new int[]{2,3},
 	};
 	
 	public static void main(String[] args) {
+		int num_bins = 1024;
+		int samples_per_bin = 1024;
 		int[] buckets = new int[16];
 		Vector<boolean[]> samples = new Vector<boolean[]>();
 		
 		CategoricalDistribution cat = new CategoricalDistribution();
 		cat.prior_is_on_H = true;
 		
-		for( int i = 0; i < 256; i++) {
+		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,0})/Math.log(2));
+		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0})/Math.log(2));
+		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0,0,0,0})/Math.log(2));
+		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,1,1,0,0,0,0,0,0})/Math.log(2));
+		//System.exit(0);
+		
+		//cat.setNumberOfCategories(8);
+		/*
+		int mult = 0;
+		int o = 0;
+		Integer[] ii2 = new Integer[]{o,o,mult,mult
+				,o,o,o,o
+				//,o,o,o,o,o,o,o,o
+				};
+		cat.setNumberOfCategories(ii2.length);
+		Vector<double[]> vdd = cat.getEntropyPDF(ii2,num_bins*samples_per_bin, num_bins);
+		double ddp = 0;
+		for( int i = 0; i < vdd.size(); i++) {
+			double[] dd = vdd.get(i);
+			ddp += dd[1];
+			System.out.println(""+dd[0]/Math.log(2)+", "+dd[1]+", "+ddp);
+		}
+		System.exit(0);
+		*/
+		
+		for( int i = 0; i < 50; i++) {
 			boolean a = Math.random() > 0.5;
 			boolean b = Math.random() > 0.5;
 			boolean c = a ^ b;
 			boolean d = a & b;
-			samples.add(new boolean[]{a,b,c,d});
+			if( i != 0) {
+				samples.add(new boolean[]{a,b,c,d});
+			}
+			if( i == 0) {
+				for( int j = 0; j < 1000; j++) {
+					a = Math.random() > 0.5;
+					b = Math.random() > 0.5;
+					c = a ^ b;
+					d = a & b;
+					samples.add(new boolean[]{a,b,c,d});
+					
+				}
+			}
 			//System.out.println(a+" "+b+" "+c+" "+d+" ");
 			
 			for(int[] ss : sets) {//
 				Integer[] ii = bucket(samples,ss);
 				cat.setNumberOfCategories(buckets.length);
-				double[] dd = getSummaryStatsForEntropyPDF(cat.getEntropyPDF(ii,1024));
-				//double v = Functions.getExpectedEntropy(bucket(samples,ss),1,1)/Math.log(2);
-				System.out.print( dd[0]+", ");
+				//double[] dd = getSummaryStatsForEntropyPDF(cat.getEntropyPDF(ii,num_bins*samples_per_bin, num_bins));
+				//System.out.print( dd[0]+", ");
+				double v = Functions.getExpectedEntropy(bucket(samples,ss),1,1)/Math.log(2);
+				System.out.print( v+", ");
 			}
 			System.out.println();
 		}
@@ -409,6 +456,8 @@ sum(ylnx+y)=0;
 		double total_h_ph = 0;
 		double total_ph = 0;
 		double total_e = 0;
+		
+		//compute normalizing constant
 		for( int i = 0; i < samples.size(); i++) {
 			double[] result = samples.get(i);
 			double h = result[0]/Math.log(2);
@@ -422,6 +471,7 @@ sum(ylnx+y)=0;
 			last_ph = ph;
 			last_h = h;
 		}
+		
 		last_h = 0;
 		last_ph = 0;
 		for( int i = 0; i < samples.size(); i++) {
@@ -440,16 +490,18 @@ sum(ylnx+y)=0;
 				double int_1 = integral(ph0,ph_h,h);//ph_h*(h*h)/2.0 + ph0*h;
 				delta_h_ph = int_1 - int_0; 
 				
-				
-				total_h_ph += delta_h_ph;
+				if( delta_h_ph == delta_h_ph) {
+					total_h_ph += delta_h_ph;
+				}
 				
 				if( ph_h != 0) {
 					double delta_e = integral_e_of_e(ph0,ph_h,h) - integral_e_of_e(ph0,ph_h,last_h);
 					if( delta_e != delta_e) {
-						
+						/*
 						System.out.println("nan: "+ph0+","+ph_h+","+h+","+last_h);
 						System.out.println(" : "+(ph0+ph_h*h));
 						System.out.println(" : "+(ph0+ph_h*last_h));
+						*/
 						
 					} else {
 						total_e -= delta_e;
@@ -461,7 +513,7 @@ sum(ylnx+y)=0;
 			last_h = h;
 		}
 		total_e /= Math.log(2);
-		return new double[]{total_h_ph,0-total_e};
+		return new double[]{total_h_ph,0-total_e,total_ph};
 	}
 	public static double integral(double a, double b, double x) {
 		return x*x*(2.0*b*x+3.0*a)/6.0;
@@ -475,14 +527,40 @@ sum(ylnx+y)=0;
 		}
 		return y*y*(2.0*Math.log(y)-1.0) / (4.0*b);
 	}
-	public Vector<double[]> getEntropyPDF(Integer[] data, int num_samples) {
+	public Vector<double[]> bin(Vector<double[]> samples, int num_bins, int h_col, int p_col, double maxH) {
+		int samples_per_bin = samples.size()/num_bins;
+		Vector<double[]> bins = new Vector<double[]>();
+
+		double lower = 0;
+		for( int i = 0; i < num_bins; i++) {
+			double p = 0;
+			for( int j = 0; j < samples_per_bin; j++) {
+				p += samples.get(i*samples_per_bin+j)[p_col];
+			}
+
+			double upper;
+			if( i + 1 == num_bins ) {
+				upper = maxH;
+			} else {
+				double uleft = samples.get((i+1)*samples_per_bin-1)[h_col];
+				double uright = i + 1 == num_bins ? maxH : samples.get((i+1)*samples_per_bin)[h_col];
+				upper = (uleft+uright)/2.0;
+				
+			}
+			bins.add(new double[]{(lower+upper)/2.0,p});
+			lower = upper;
+		}
+		return bins;
+	}
+	public Vector<double[]> getEntropyPDF(Integer[] data, int num_samples, int num_bins) {
 		Vector<double[]> results = new Vector<double[]>();
 		Vector<Pair<Double,double[]>> samples = new Vector<Pair<Double,double[]>>();
 		
 		//do a bunch of random samples
-		double sum = 0;
 		for( int i = 0; i < num_samples; i++) {
-			double[] thetas = new double[this.thetas.length];
+			/*
+			double sum = 0;
+			double[] thetas = new double[data.length];
 			for(int j = 0; j < thetas.length; j++) {
 				thetas[j] = Math.random();
 				sum += thetas[j];
@@ -496,24 +574,59 @@ sum(ylnx+y)=0;
 			for(int j = 0; j < thetas.length; j++) {
 				thetas[j] *= sum;
 			}
+			*/
 			
 			//calculate entropy and probability
-			double[] dd = getEntropyAndProbabilityAtTheta(thetas,data);
+			double[] dd = getRandomSample(data,false);
 			samples.add(new Pair<Double,double[]>(dd[0],dd));
 		}
 		
 		//now sort by entropy
-		Collections.sort(samples);;
+		Collections.sort(samples);
 		for(int i = 0; i < samples.size(); i++) {
 			results.add(samples.get(i).b);
 		}
-		
-		return results;
-	}
+		double maxH = Math.log((double)data.length);///Math.log(2.0);
 
+		Vector<double[]> dd = bin(results,num_bins,0,1,maxH);
+		//Vector<double[]> samples, int num_bins, int h_col, int p_col) {
+		
+		return dd;
+	}
+	public double[] getRandomSample(Integer[] data, boolean permuted) {
+		double[] thetas = new double[data.length];
+		double sum = 0;
+		for(int j = 0; j < thetas.length; j++) {
+			thetas[j] = 1.0/(Math.random());
+			//thetas[j] = Math.random();//1.0/(Math.random());
+			sum += thetas[j];
+		}
+		
+		//normalize so sum(p)=1
+		if( sum == 0) {
+			sum = 1;
+		}
+		sum = 1/sum;
+		for(int j = 0; j < thetas.length; j++) {
+			thetas[j] *= sum;
+		}
+		
+		//calculate entropy and probability
+		double[] dd = getEntropyAndProbabilityAtTheta(thetas,data,permuted);
+		return dd;
+
+	}
 	public double[] getEntropyAndProbabilityAtTheta(double[] thetas, Integer[] data) {
+		return getEntropyAndProbabilityAtTheta(thetas, data,true); 
+	}
+	public double[] getEntropyAndProbabilityAtTheta(double[] thetas, Integer[] data, boolean permuted) {
 		double h = getEntropyGivenTheta(thetas);
-		double pDO = getProbabilityOfDataGivenThetaPermuted(thetas, data);
+		double pDO = 0;
+		if( permuted) {
+			pDO = getProbabilityOfDataGivenThetaPermuted2(thetas, data);
+		} else {
+			pDO = getProbabilityOfDataGivenTheta(thetas, data);
+		}
 		
 		
 		double[] dHdOs = getDerivsOfEntropyGivenTheta(thetas);
@@ -526,7 +639,7 @@ sum(ylnx+y)=0;
 		//double dHdO = determinant(getJacobianGivenTheta(thetas));
 		double pO = prior.getPriorProbabilityOfTheta(thetas);
 		double ph = pDO*pO / ( prior_is_on_H ? 1 : Math.abs(dHdO));
-		System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
+		//System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
 		/*
 		if( prior_is_on_H)
 			pO = prior.getPriorProbabilityOfTheta(h);
@@ -542,10 +655,16 @@ sum(ylnx+y)=0;
 
 	public double getEntropyGivenTheta(double[] theta) {
 		double p = 0;
+		double sumtheta = 0;
 		for( int i = 0; i < theta.length; i++) {
-			p -= theta[i] == 0 ? 0 : theta[i]*Math.log(theta[i]);
+			sumtheta += theta[i];
+		}
+		for( int i = 0; i < theta.length; i++) {
+			double t = theta[i] / sumtheta;
+			p -= t == 0 ? 0 : t*Math.log(t);
 		}
 		return p;
+
 	}
 	/*
 	 * d(entropy)/d(1-a) = ln(1-a) - [b*ln(b) + c*ln(c)]/a
@@ -624,7 +743,7 @@ sum(ylnx+y)=0;
 	}
 
 	public double[] getDerivsOfEntropyGivenTheta(double[] thetas) {
-		boolean print = true;
+		boolean print = false;
 		double[] derivs = new double[thetas.length];
 		if( print) System.out.print("[");
 		
@@ -709,6 +828,45 @@ sum(ylnx+y)=0;
 		}
 		return p;
 	}
+	
+	public double getProbabilityOfDataGivenThetaPermuted2(double[] theta, Integer[] data) {
+		int bucket_count = theta.length;
+		int[] buckets = new int[bucket_count];
+		for( int i = 0; i < bucket_count; i++) {
+			buckets[i] = i;
+		}
+		//permutations = new int[(int)factorial(bucket_count)][];
+		Double p = new Double(0);
+		permute2(buckets, 0, 0,data,p,theta);
+		
+		/*
+		double p = 0;
+		double[] permuted = new double[theta.length];
+		for( int i = 0; i < permutations.length; i++) {
+			for( int j = 0; j < theta.length; j++) {
+				permuted[j] = theta[permutations[i][j]];
+			}
+			p += getProbabilityOfDataGivenTheta(permuted,data); 
+		}*/
+		return p;
+	}
+	int permute2(int[] num, int i, int start, Integer[] data, Double p, double[] theta) {
+		if (start >= num.length) {
+			double[] result = new double[num.length];
+			for( int j = 0; j < num.length; j++) {
+				result[j] = theta[num[j]];
+			}
+			p += getProbabilityOfDataGivenTheta(result,data); 
+			i++;
+		}
+	 
+		for (int j = start; j <= num.length - 1; j++) {
+			swap(num, start, j);
+			i = permute2(num, i, start + 1,data,p,theta);
+			swap(num, start, j);
+		}
+		return i;
+	}
 
 	void generatePermutations(int bucket_count) {
 		int[] buckets = new int[bucket_count];
@@ -723,7 +881,7 @@ sum(ylnx+y)=0;
 		if (start >= num.length) {
 			result[i] = new int[num.length];
 			for( int j = 0; j < num.length; j++)
-			result[i][j] = num[j];
+				result[i][j] = num[j];
 			i++;
 		}
 	 

@@ -168,20 +168,20 @@ public static double getExpectedEntropyForDelta(double cur_expected_entropy, dou
 }*/
 
 
-public static double getExpectedEntropy(int[] buckets, double exaggerate, double prior) {
+public static double getExpectedEntropy(Integer[] integers, double exaggerate, double prior) {
 	double a = 0;
-	double[] p = new double[buckets.length];
+	double[] p = new double[integers.length];
 	for( int i = 0; i < p.length; i++) {
-		a += (buckets[i]*exaggerate+prior);
+		a += (integers[i]*exaggerate+prior);
 	}
 	double ra = 1.0/a;
 	for( int i = 0; i < p.length; i++) {
-		p[i] = ra*(double)(buckets[i]*exaggerate+prior);
+		p[i] = ra*(double)(integers[i]*exaggerate+prior);
 	}
 	double result = digamma(a+1);
 	
 	for( int i = 0; i < p.length; i++) {
-		result -= p[i]*digamma((buckets[i]*exaggerate+prior)+1);
+		result -= p[i]*digamma((integers[i]*exaggerate+prior)+1);
 	}
 	return result;
 }
@@ -190,7 +190,7 @@ public static double getNaiveExpectedEntropy(double num_buckets, double prior) {
 	return digamma(num_buckets*prior+1) - digamma(prior+1);
 }
 	
-public static double getExpectedEntropyVariance(int[] buckets) {
+public static double getExpectedEntropyVariance(Integer[] buckets) {
 	double a = 0;
 	double[] g = new double[buckets.length];
 	double[] ag = new double[buckets.length];

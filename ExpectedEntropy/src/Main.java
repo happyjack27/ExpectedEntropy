@@ -11,7 +11,7 @@ public class Main {
 		int total = 16;
 		int zeros = 0;
 		boolean prior_is_on_H = true;
-		int num_sample_points = 1024;
+		int num_sample_points = 256;
 		
 		BernoulliDistribution posterior = new BernoulliDistribution();
 		posterior.prior_is_on_H = prior_is_on_H;
@@ -28,6 +28,12 @@ public class Main {
 		//now fill up our array with the results
 		for( int i = 0; i < num_sample_points; i++) {
 			double theta = ((double)i) / (num_sample_points*2);
+			
+			//this produces samples tat are more uniform across entropy
+			double t2 = 1.0/Math.log(1-theta);
+			theta = 1.0/Math.log(theta);
+			theta = theta/(theta+t2);
+			
 			results[i] = posterior.getEntropyAndProbabilityAtTheta(theta, new Integer[]{zeros, ones});
 			sump += results[i][1];
 		}
