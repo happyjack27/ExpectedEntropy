@@ -1,3 +1,4 @@
+package util;
 
 public class Pair<A extends Comparable<A>,B> implements Comparable< Pair<A,B>> {
 	public A a;

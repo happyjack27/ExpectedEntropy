@@ -1,6 +1,6 @@
 package distributions;
 
-import java.util.Vector;
+import java.util.*;
 
 import distributions.interfaces.PosteriorDistribution;
 import distributions.interfaces.PriorDistribution;
@@ -394,6 +394,115 @@ sum(ylnx+y)=0;
 	public void setPriorDistribution(PriorDistribution<double[], double[], Integer> prior) {
 		this.prior = prior;
 		
+	}
+	
+	public static double[] getSummaryStatsForEntropyPDF( Vector<double[]> samples) {
+
+		double last_h = 0;
+		double last_ph = 0;
+		double total_h_ph = 0;
+		double total_ph = 0;
+		double total_e = 0;
+		for( int i = 0; i < samples.size(); i++) {
+			double[] result = samples.get(i);
+			double h = result[0]/Math.log(2);
+			double ph = result[1];
+			double delta_h = h-last_h;
+			double delta_ph = ph-last_ph;
+			double delta_h_ph = 0;
+			double delta_p = 0;
+			delta_p = delta_h*(last_ph+ph)/2.0;
+			total_ph += delta_p;
+			last_ph = ph;
+			last_h = h;
+		}
+		last_h = 0;
+		last_ph = 0;
+		for( int i = 0; i < samples.size(); i++) {
+			double[] result = samples.get(i);
+			double h = result[0]/Math.log(2);
+			double ph = result[1]/total_ph;
+			double delta_h = h-last_h;
+			double delta_ph = ph-last_ph;
+			double delta_h_ph = 0;
+			double delta_p = 0;
+			delta_p = delta_h*(last_ph+ph)/2.0;
+			if( delta_h != 0) {
+				double ph_h = delta_ph/delta_h;
+				double ph0 = last_ph - ph_h*last_h;
+				double int_0 = integral(ph0,ph_h,last_h);// ph_h*(last_h*last_h)/2.0 + ph0*last_h;
+				double int_1 = integral(ph0,ph_h,h);//ph_h*(h*h)/2.0 + ph0*h;
+				delta_h_ph = int_1 - int_0; 
+				
+				
+				total_h_ph += delta_h_ph;
+				
+				if( ph_h != 0) {
+					double delta_e = integral_e_of_e(ph0,ph_h,h) - integral_e_of_e(ph0,ph_h,last_h);
+					if( delta_e != delta_e) {
+						
+						System.out.println("nan: "+ph0+","+ph_h+","+h+","+last_h);
+						System.out.println(" : "+(ph0+ph_h*h));
+						System.out.println(" : "+(ph0+ph_h*last_h));
+						
+					} else {
+						total_e -= delta_e;
+					}
+				}
+	
+			}
+			last_ph = ph;
+			last_h = h;
+		}
+		total_e /= Math.log(2);
+		return new double[]{total_h_ph,0-total_e};
+	}
+	public static double integral(double a, double b, double x) {
+		return x*x*(2.0*b*x+3.0*a)/6.0;
+	}
+	
+	public static double integral_e_of_e(double a, double b, double x) {
+		//integral of (a+bx)log(a+bx)
+		double y = a+b*x;
+		if( y == 0) {
+			y = Double.MIN_VALUE;
+		}
+		return y*y*(2.0*Math.log(y)-1.0) / (4.0*b);
+	}
+	public Vector<double[]> getEntropyPDF(Integer[] data, int num_samples) {
+		Vector<double[]> results = new Vector<double[]>();
+		Vector<Pair<Double,double[]>> samples = new Vector<Pair<Double,double[]>>();
+		
+		//do a bunch of random samples
+		double sum = 0;
+		for( int i = 0; i < num_samples; i++) {
+			double[] thetas = new double[this.thetas.length];
+			for(int j = 0; j < thetas.length; j++) {
+				thetas[j] = Math.random();
+				sum += thetas[j];
+			}
+			
+			//normalize so sum(p)=1
+			if( sum == 0) {
+				sum = 1;
+			}
+			sum = 1/sum;
+			for(int j = 0; j < thetas.length; j++) {
+				thetas[j] *= sum;
+			}
+			
+			//calculate entropy and probability
+			double[] dd = getEntropyAndProbabilityAtTheta(thetas,data);
+			samples.add(new Pair<Double,double[]>(dd[0],dd));
+		}
+		
+		//now sort by entropy
+		Collections.sort(samples);;
+		for(int i = 0; i < samples.size(); i++) {
+			results.add(samples.get(i).b);
+		}
+		
+		return results;
 	}
 
 	public double[] getEntropyAndProbabilityAtTheta(double[] thetas, Integer[] data) {
