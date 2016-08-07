@@ -40,7 +40,7 @@ public abstract class BinaryChromosome extends AbstractListChromosome<Integer> {
      * Constructor.
      * @param representation array of {0,1} values representing the chromosome
      */
-    public BinaryChromosome(Integer[] representation) {
+    public BinaryChromosome(int[] representation) {
         super(representation);
     }
 

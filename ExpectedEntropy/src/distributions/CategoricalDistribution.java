@@ -19,8 +19,8 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 	public static double C_LIMIT = 49;
 	public static double S_LIMIT = 1e-5;
 	
-	public static int[] bucket(Vector<boolean[]> samples, int[] select) {
-		int[] buckets = new int[(int)Math.pow(2, select.length)];
+	public static Integer[] bucket(Vector<boolean[]> samples, int[] select) {
+		Integer[] buckets = new Integer[(int)Math.pow(2, select.length)];
 		for( boolean[] s : samples) {
 			int bucket = 0;
 			for( int i = 0; i < select.length; i++) {
@@ -49,6 +49,9 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		int[] buckets = new int[16];
 		Vector<boolean[]> samples = new Vector<boolean[]>();
 		
+		CategoricalDistribution cat = new CategoricalDistribution();
+		cat.prior_is_on_H = true;
+		
 		for( int i = 0; i < 256; i++) {
 			boolean a = Math.random() > 0.5;
 			boolean b = Math.random() > 0.5;
@@ -57,9 +60,12 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 			samples.add(new boolean[]{a,b,c,d});
 			//System.out.println(a+" "+b+" "+c+" "+d+" ");
 			
-			for(int[] ss : sets) {
-				double v = Functions.getExpectedEntropy(bucket(samples,ss),1,1)/Math.log(2);
-				System.out.print( v+", ");
+			for(int[] ss : sets) {//
+				Integer[] ii = bucket(samples,ss);
+				cat.setNumberOfCategories(buckets.length);
+				double[] dd = getSummaryStatsForEntropyPDF(cat.getEntropyPDF(ii,1024));
+				//double v = Functions.getExpectedEntropy(bucket(samples,ss),1,1)/Math.log(2);
+				System.out.print( dd[0]+", ");
 			}
 			System.out.println();
 		}
