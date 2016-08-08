@@ -38,6 +38,96 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		return buckets;
 	}
 	static int[][] sets = new int[][]{
+		//new int[]{1,2,3,5,6},
+		new int[]{0},
+		new int[]{1},
+		new int[]{2},
+		new int[]{3},
+		new int[]{4},
+		new int[]{5},
+		new int[]{6},
+		new int[]{7},
+		new int[]{8},
+		new int[]{9},
+
+		new int[]{0,1},
+		new int[]{0,2},
+		new int[]{0,3},
+		new int[]{0,4},
+		new int[]{0,5},
+		new int[]{0,6},
+		new int[]{0,7},
+		new int[]{0,8},
+		new int[]{0,9},
+		new int[]{0},
+		
+		new int[]{1,2},
+		new int[]{1,3},
+		new int[]{1,4},
+		new int[]{1,5},
+		new int[]{1,6},
+		new int[]{1,7},
+		new int[]{1,8},
+		new int[]{1,9},
+		new int[]{0},
+		
+
+		new int[]{2,3},
+		new int[]{2,4},
+		new int[]{2,5},
+		new int[]{2,6},
+		new int[]{2,7},
+		new int[]{2,8},
+		new int[]{2,9},
+		new int[]{0},
+
+		new int[]{3,4},
+		new int[]{3,5},
+		new int[]{3,6},
+		new int[]{3,7},
+		new int[]{3,8},
+		new int[]{3,9},
+		new int[]{0},
+
+		new int[]{4,5},
+		new int[]{4,6},
+		new int[]{4,7},
+		new int[]{4,8},
+		new int[]{4,9},
+		new int[]{0},
+
+		new int[]{5,6},
+		new int[]{5,7},
+		new int[]{5,8},
+		new int[]{5,9},
+		new int[]{0},
+
+		new int[]{6,7},
+		new int[]{6,8},
+		new int[]{6,9},
+		new int[]{0},
+		
+		new int[]{7,8},
+		new int[]{7,9},
+		new int[]{0},
+		new int[]{8,9},
+
+		/*
+		new int[]{0,1,2,3,4,5,6,7,8,9},
+		new int[]{1,2,3,4,5,6,7,8,9},
+		new int[]{0,2,3,4,5,6,7,8,9},
+		new int[]{0,1,3,4,5,6,7,8,9},
+		new int[]{0,1,2,4,5,6,7,8,9},
+		new int[]{0,1,2,3,5,6,7,8,9},
+		new int[]{0,1,2,3,4,6,7,8,9},
+		new int[]{0,1,2,3,4,5,7,8,9},
+		new int[]{0,1,2,3,4,5,6,8,9},
+		new int[]{0,1,2,3,4,5,6,7,9},
+		new int[]{0,1,2,3,4,5,6,7,8},
+		*/
+	};
+	/*
+	static int[][] sets = new int[][]{
 		new int[]{0},
 		new int[]{1},
 		new int[]{2},
@@ -51,6 +141,35 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		new int[]{1,3},
 		new int[]{2,3},
 	};
+	*/
+	
+	public static boolean[] getSample() {
+		boolean[] sample = new boolean[]{
+				Math.random() > 0.5,
+				Math.random() > 0.5,
+				Math.random() > 0.5,
+				Math.random() > 0.5,
+				Math.random() > 0.5,
+				Math.random() > 0.5,
+				Math.random() > 0.5,
+				Math.random() > 0.5,
+				Math.random() > 0.5,
+				Math.random() > 0.5,
+		};
+		sample[2] = sample[0] ^ sample[1];
+		sample[3] = sample[0] & sample[1];
+		sample[6] = sample[5];
+		sample[9] = sample[7] | sample[8];
+
+		return sample;
+		/*
+		boolean a = Math.random() > 0.5;
+		boolean b = Math.random() > 0.5;
+		boolean c = a ^ b;
+		boolean d = a & b;
+		return new boolean[]{a,b,c,d};
+		*/
+	}
 	
 	public static void main(String[] args) {
 		int num_bins = 1024;
@@ -60,11 +179,12 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		
 		CategoricalDistribution cat = new CategoricalDistribution();
 		cat.prior_is_on_H = true;
-		
+		/*
 		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,0})/Math.log(2));
 		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0})/Math.log(2));
 		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0,0,0,0})/Math.log(2));
 		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,1,1,0,0,0,0,0,0})/Math.log(2));
+		*/
 		//System.exit(0);
 		
 		//cat.setNumberOfCategories(8);
@@ -86,32 +206,25 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		System.exit(0);
 		*/
 		
-		for( int i = 0; i < 50; i++) {
-			boolean a = Math.random() > 0.5;
-			boolean b = Math.random() > 0.5;
-			boolean c = a ^ b;
-			boolean d = a & b;
+		for( int i = 0; i < 100; i++) {
 			if( i != 0) {
-				samples.add(new boolean[]{a,b,c,d});
+				for( int j = 0; j < 10000; j++) {
+					samples.add(getSample());
+				}
 			}
 			if( i == 0) {
 				for( int j = 0; j < 1000; j++) {
-					a = Math.random() > 0.5;
-					b = Math.random() > 0.5;
-					c = a ^ b;
-					d = a & b;
-					samples.add(new boolean[]{a,b,c,d});
-					
+					//samples.add(getSample());
 				}
 			}
 			//System.out.println(a+" "+b+" "+c+" "+d+" ");
 			
 			for(int[] ss : sets) {//
 				Integer[] ii = bucket(samples,ss);
-				cat.setNumberOfCategories(buckets.length);
+				cat.setNumberOfCategories(ii.length);
 				//double[] dd = getSummaryStatsForEntropyPDF(cat.getEntropyPDF(ii,num_bins*samples_per_bin, num_bins));
 				//System.out.print( dd[0]+", ");
-				double v = Functions.getExpectedEntropy(bucket(samples,ss),1,1)/Math.log(2);
+				double v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
 				System.out.print( v+", ");
 			}
 			System.out.println();
@@ -593,12 +706,11 @@ sum(ylnx+y)=0;
 		
 		return dd;
 	}
-	public double[] getRandomSample(Integer[] data, boolean permuted) {
-		double[] thetas = new double[data.length];
+	public double[] getRandomThetas(int n) {
+		double[] thetas = new double[n];
 		double sum = 0;
 		for(int j = 0; j < thetas.length; j++) {
 			thetas[j] = 1.0/(Math.random());
-			//thetas[j] = Math.random();//1.0/(Math.random());
 			sum += thetas[j];
 		}
 		
@@ -610,11 +722,10 @@ sum(ylnx+y)=0;
 		for(int j = 0; j < thetas.length; j++) {
 			thetas[j] *= sum;
 		}
-		
-		//calculate entropy and probability
-		double[] dd = getEntropyAndProbabilityAtTheta(thetas,data,permuted);
-		return dd;
-
+		return thetas;
+	}
+	public double[] getRandomSample(Integer[] data, boolean permuted) {
+		return getEntropyAndProbabilityAtTheta(getRandomThetas(data.length),data,permuted);
 	}
 	public double[] getEntropyAndProbabilityAtTheta(double[] thetas, Integer[] data) {
 		return getEntropyAndProbabilityAtTheta(thetas, data,true); 
@@ -903,6 +1014,42 @@ sum(ylnx+y)=0;
 			return 1;
 		}
 		return n*factorial(n-1);
+	}
+	
+	public int getRandomBayesian(Integer[] buckets) {
+		return 0;
+	}
+	public int getRandomFrequentist(Integer[] buckets) {
+		return 0;
+	}
+	
+	//also known as marginal likelihood
+	//https://en.wikipedia.org/wiki/Categorical_distribution
+	//“Dirichlet-Multinomial” 
+	//https://people.eecs.berkeley.edu/~stephentu/writeups/dirichlet-conjugate-prior.pdf
+	public double[] getPDFBayesian(Integer[] buckets, int num_samples) {
+		Integer[][] data = new Integer[buckets.length][];
+		for( int i = 0; i < data.length; i++) {
+			data[i] = new Integer[data.length];
+			data[i][i] = 1;
+		}
+		double[] dd = new double[thetas.length];
+		for( int i = 0; i < num_samples; i++) {
+			double[] t = getRandomThetas(thetas.length);
+			for( int j = 0; j < dd.length; j++) {
+				dd[j] += getProbabilityOfThetaGivenData(t,buckets) * getProbabilityOfDataGivenTheta(t,data[j]);
+			}
+		}
+		
+		double sum = 0;
+		for( int j = 0; j < dd.length; j++) {
+			sum += dd[j];
+		}
+		sum = 1.0/sum;
+		for( int j = 0; j < dd.length; j++) {
+			dd[j] *= sum;
+		}
+		return dd;
 	}
 	
 
