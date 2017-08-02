@@ -111,6 +111,24 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		new int[]{7,9},
 		new int[]{0},
 		new int[]{8,9},
+		
+		new int[]{0,1,2,3},
+		new int[]{1,2,3},
+		new int[]{0,2,3},
+		new int[]{0,1,3},
+		new int[]{0,1,2},
+		new int[]{7,8,9},
+
+		//new int[]{},
+		
+		/*
+		sample[2] = sample[0] ^ sample[1];
+		sample[3] = sample[0] & sample[1];
+		//sample[4];
+		sample[6] = sample[5];
+		sample[9] = sample[7] | sample[8];
+		*/
+
 
 		/*
 		new int[]{0,1,2,3,4,5,6,7,8,9},
@@ -126,6 +144,41 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		new int[]{0,1,2,3,4,5,6,7,8},
 		*/
 	};
+	public static Vector<Integer> getRandomFullCover() {
+		Vector<Integer> cover = new Vector<Integer>();
+		while( !doesCover(cover)) {
+			cover.add((int)(Math.random()*(double)sets.length));
+		}
+		optimizeFullCover(cover);
+		return cover;
+	}
+	public static void optimizeFullCover(Vector<Integer> v) {
+		for( int i = 0; i < v.size(); i++) {
+			int r = v.remove(i);
+			if( doesCover(v) ) {
+				i--;
+			} else {
+				v.add(i, r);
+			}
+		}
+	}
+	public static boolean doesCover(Vector<Integer> model) {
+		boolean[] covered = new boolean[10];
+		for( int i = 0; i < covered.length; i++) {
+			covered[i] = false;
+		}
+		for( Integer s : model) {
+			for( int i : sets[s]) {
+				covered[i] = true;
+			}
+		}
+		
+		boolean all_covered = true;
+		for( int i = 0; i < covered.length; i++) {
+			all_covered &= covered[i];
+		}
+		return all_covered;
+	}
 	/*
 	static int[][] sets = new int[][]{
 		new int[]{0},
@@ -156,8 +209,10 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 				Math.random() > 0.5,
 				Math.random() > 0.5,
 		};
+		
 		sample[2] = sample[0] ^ sample[1];
 		sample[3] = sample[0] & sample[1];
+		//sample[4];
 		sample[6] = sample[5];
 		sample[9] = sample[7] | sample[8];
 
@@ -170,8 +225,17 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		return new boolean[]{a,b,c,d};
 		*/
 	}
+	public static double getTotalEntropy(Vector<Integer> cover, double[] entropies) {
+		double tot = 0;
+		for( int i : cover) {
+			tot += entropies[i];
+		}
+		return tot;
+	}
 	
 	public static void main(String[] args) {
+		Vector<Integer> best_cover = getRandomFullCover();
+		
 		int num_bins = 1024;
 		int samples_per_bin = 1024;
 		int[] buckets = new int[16];
@@ -219,14 +283,42 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 			}
 			//System.out.println(a+" "+b+" "+c+" "+d+" ");
 			
-			for(int[] ss : sets) {//
+			double[] entropies = new double[sets.length];
+			for(int j = 0; j < sets.length; j++) {//
+				int[] ss = sets[j];
 				Integer[] ii = bucket(samples,ss);
 				cat.setNumberOfCategories(ii.length);
 				//double[] dd = getSummaryStatsForEntropyPDF(cat.getEntropyPDF(ii,num_bins*samples_per_bin, num_bins));
 				//System.out.print( dd[0]+", ");
 				double v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
-				System.out.print( v+", ");
+				entropies[j] = v;
+				//System.out.print( v+", ");
 			}
+			
+			double best_e = getTotalEntropy(best_cover,entropies);
+			for( int j = 0; j < 10000; j++) {
+				Vector<Integer> test_cover = getRandomFullCover();
+				double test_e = getTotalEntropy(test_cover,entropies);
+				if( test_e < best_e) {
+					best_e = test_e;
+					best_cover = test_cover;
+				}
+			}
+			
+			System.out.print(i+": best cover e: "+best_e+" : ");
+			for( int s : best_cover) {
+				int[] ii = sets[s]; 
+				System.out.print("{");
+				for( int j = 0; j < ii.length; j++) {
+					if( j > 0)
+						System.out.print(",");
+						System.out.print(ii[j]);
+				}
+				System.out.print("} ");
+			}
+
+			
+			
 			System.out.println();
 		}
 		
