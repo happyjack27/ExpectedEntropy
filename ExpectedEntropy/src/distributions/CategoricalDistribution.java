@@ -122,10 +122,15 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		//new int[]{},
 		
 		/*
+		sample[0] = random;
+		sample[1] = random;
 		sample[2] = sample[0] ^ sample[1];
 		sample[3] = sample[0] & sample[1];
-		//sample[4];
+		sample[4] = random;
+		sample[5] = random;
 		sample[6] = sample[5];
+		sample[7] = random;
+		sample[8] = random;
 		sample[9] = sample[7] | sample[8];
 		*/
 
@@ -271,6 +276,8 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		*/
 		
 		for( int i = 0; i < 100; i++) {
+			samples.add(getSample());
+			/*
 			if( i != 0) {
 				for( int j = 0; j < 10000; j++) {
 					samples.add(getSample());
@@ -281,6 +288,7 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 					//samples.add(getSample());
 				}
 			}
+			*/
 			//System.out.println(a+" "+b+" "+c+" "+d+" ");
 			
 			double[] entropies = new double[sets.length];
