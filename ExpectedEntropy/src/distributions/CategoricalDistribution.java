@@ -7,9 +7,20 @@ import distributions.interfaces.PriorDistribution;
 import util.*;
 
 public class CategoricalDistribution implements PosteriorDistribution<double[],double[],Integer> {
+
+	public static int choice = 3;
+	public static double noise = 0.10;
+
 	double[] thetas;
 	public boolean prior_is_on_H = true;
+	public static boolean optimize_cover = true;
+	static Vector<Integer> target_cover = new Vector<Integer>();
+	static int number_of_bits = 10;
+	public static int max_size = 10;
+
 	int[][] permutations;
+	static int[][] sets = null;	
+	static Vector<Vector<Integer>> all_covers = new Vector<Vector<Integer>>();	
 	
 	PriorDistribution<double[],double[],Integer> prior;
 	
@@ -18,6 +29,79 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 	public static double DIGAMMA_MINNEGX = -1250;
 	public static double C_LIMIT = 49;
 	public static double S_LIMIT = 1e-5;
+	
+	public static Vector<Pair<Double,Vector<Integer>>> covers = new Vector<Pair<Double,Vector<Integer>>>();
+	
+	public static void addAllCovers() {
+		addAllCovers(new Vector<Integer>(), 0, 1); //skip the empty set
+	}
+	public static void addAllCovers(Vector<Integer> current, int covered, int next_set) {
+		int full_cover = (0x01 << number_of_bits)-1;
+		for( int set = next_set; set < sets.length; set++) {
+			int[] ii = sets[set];
+			int set_cover = 0;
+			for( int i : ii) {
+				set_cover |= 0x01 << i;
+			}
+			if( (set_cover & covered) != 0) {
+				continue;
+			}
+			current.add(set);
+			int new_cover = set_cover | covered;
+			if( new_cover == full_cover) {
+				Vector<Integer> full = (Vector<Integer>)current.clone();
+				Collections.sort(full);;
+				all_covers.add(full);
+			} else {
+				addAllCovers(current,new_cover,set+1);
+			}
+			current.remove(current.size()-1);
+		}
+	}
+	
+	public static Vector<Integer> scoreAndStuff( double[] entropies) {
+		double best_e = 999999999999999999999999999.9;
+		Vector<Integer> best_cover = new Vector<Integer>();
+		for( Vector<Integer> cover : all_covers) {
+			double e = getTotalEntropy(cover,entropies);
+			if( e < best_e) {
+				best_e = e;
+				best_cover = cover;
+			}
+		}
+		return best_cover;
+		/*
+		
+		
+		int population = 10000;
+		
+		//punish empty set
+		entropies[0] = 1000;
+		for( int n = 0; n < 5; n++) {
+			while( covers.size() < population) {
+				covers.add(new Pair<Double,Vector<Integer>>(0.0,getRandomFullCover()));
+			}
+			for( int i = 0; i < population; i++) {
+				Vector<Integer> cover = (Vector<Integer>) covers.get(i).b.clone();
+				cover.remove((int)(Math.random()*(double)cover.size()));
+				while( !doesCover(cover)) {
+					cover.add((int)(Math.random()*(double)sets.length));
+				}
+				if( optimize_cover) {
+					optimizeFullCover(cover);
+				}
+				covers.add(new Pair<Double,Vector<Integer>>(0.0,cover));
+			}
+			for( Pair<Double,Vector<Integer>> c : covers) {
+				c.a = getTotalEntropy(c.b,entropies);
+			}
+			Collections.sort(covers);
+			while( covers.size() > population) {
+				covers.remove(population);
+			}
+		}
+		*/
+	}
 	
 	public static Integer[] bucket(Vector<boolean[]> samples, int[] select) {
 		if( select.length == 0) {
@@ -37,118 +121,77 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		}
 		return buckets;
 	}
-	static int[][] sets = new int[][]{
-		//new int[]{1,2,3,5,6},
-		new int[]{0},
-		new int[]{1},
-		new int[]{2},
-		new int[]{3},
-		new int[]{4},
-		new int[]{5},
-		new int[]{6},
-		new int[]{7},
-		new int[]{8},
-		new int[]{9},
-
-		new int[]{0,1},
-		new int[]{0,2},
-		new int[]{0,3},
-		new int[]{0,4},
-		new int[]{0,5},
-		new int[]{0,6},
-		new int[]{0,7},
-		new int[]{0,8},
-		new int[]{0,9},
-		new int[]{0},
+	public static Vector<int[]> allSubSets(int n, int max_size) {
+		Vector<int[]> sets = new Vector<int[]>();
+		int combos = 0x01 << n;
 		
-		new int[]{1,2},
-		new int[]{1,3},
-		new int[]{1,4},
-		new int[]{1,5},
-		new int[]{1,6},
-		new int[]{1,7},
-		new int[]{1,8},
-		new int[]{1,9},
-		new int[]{0},
-		
-
-		new int[]{2,3},
-		new int[]{2,4},
-		new int[]{2,5},
-		new int[]{2,6},
-		new int[]{2,7},
-		new int[]{2,8},
-		new int[]{2,9},
-		new int[]{0},
-
-		new int[]{3,4},
-		new int[]{3,5},
-		new int[]{3,6},
-		new int[]{3,7},
-		new int[]{3,8},
-		new int[]{3,9},
-		new int[]{0},
-
-		new int[]{4,5},
-		new int[]{4,6},
-		new int[]{4,7},
-		new int[]{4,8},
-		new int[]{4,9},
-		new int[]{0},
-
-		new int[]{5,6},
-		new int[]{5,7},
-		new int[]{5,8},
-		new int[]{5,9},
-		new int[]{0},
-
-		new int[]{6,7},
-		new int[]{6,8},
-		new int[]{6,9},
-		new int[]{0},
-		
-		new int[]{7,8},
-		new int[]{7,9},
-		new int[]{0},
-		new int[]{8,9},
-		
-		new int[]{0,1,2,3},
-		new int[]{1,2,3},
-		new int[]{0,2,3},
-		new int[]{0,1,3},
-		new int[]{0,1,2},
-		new int[]{7,8,9},
-
-		//new int[]{},
-		
-		/*
-		sample[0] = random;
-		sample[1] = random;
-		sample[2] = sample[0] ^ sample[1];
-		sample[3] = sample[0] & sample[1];
-		sample[4] = random;
-		sample[5] = random;
-		sample[6] = sample[5];
-		sample[7] = random;
-		sample[8] = random;
-		sample[9] = sample[7] | sample[8];
-		*/
-
-
-		/*
-		new int[]{0,1,2,3,4,5,6,7,8,9},
-		new int[]{1,2,3,4,5,6,7,8,9},
-		new int[]{0,2,3,4,5,6,7,8,9},
-		new int[]{0,1,3,4,5,6,7,8,9},
-		new int[]{0,1,2,4,5,6,7,8,9},
-		new int[]{0,1,2,3,5,6,7,8,9},
-		new int[]{0,1,2,3,4,6,7,8,9},
-		new int[]{0,1,2,3,4,5,7,8,9},
-		new int[]{0,1,2,3,4,5,6,8,9},
-		new int[]{0,1,2,3,4,5,6,7,9},
-		new int[]{0,1,2,3,4,5,6,7,8},
-		*/
+		for( int i = 0; i < combos; i++) {
+			if( Integer.bitCount(i) > max_size) {
+				continue;
+			}
+			int[] a = new int[Integer.bitCount(i)];
+			int index = 0;
+			for( int j = 0; j < n; j++) {
+				if( (i & (0x01 << j)) > 0) {
+					a[index++] = j;
+					//System.out.print(j+" ");
+				}
+			}
+			//System.out.println();
+			sets.add(a);
+		}
+		return sets;
 	};
+	public static int getDistance(Vector<Integer> cover, Vector<Integer> target_cover) {
+		int d = 0;
+		
+		for(int s : cover) {
+			int[] ii = sets[s];
+			for( int i : ii) {
+				int[] jj = sets[findSetWithMember(i,target_cover)];
+				d += countMismatch(ii,jj,number_of_bits);
+			}
+			
+		}
+		
+		return d;
+	}
+	public static int findSetWithMember(int m, Vector<Integer> cover) {
+		for(int s : cover) {
+			int[] ii = sets[s];
+			for( int i : ii) {
+				if( i == m) {
+					return s;
+				}
+			}
+			
+		}
+		return 0;
+	}
+	public static int countMismatch(int[] ii, int[] jj, int n) {
+		int mm = 0;
+		for( int i = 0; i < n; i++) {
+			boolean ii_contains = false;
+			for( int j = 0; j < ii.length; j++) {
+				if( ii[j] == i) {
+					ii_contains = true;
+					break;
+				}
+			}
+			boolean jj_contains = false;
+			for( int j = 0; j < jj.length; j++) {
+				if( jj[j] == i) {
+					jj_contains = true;
+					break;
+				}
+			}
+			if( ii_contains ^ jj_contains) {
+				mm++;
+			}
+		}
+		return mm;
+	}
+	
 	public static Vector<Integer> getRandomFullCover() {
 		Vector<Integer> cover = new Vector<Integer>();
 		while( !doesCover(cover)) {
@@ -158,6 +201,11 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		return cover;
 	}
 	public static void optimizeFullCover(Vector<Integer> v) {
+		//randomize first
+		for( int i = 0; i < v.size(); i++) {
+			int r = v.remove((int)(Math.random()*(double)v.size()));
+			v.add(r);
+		}
 		for( int i = 0; i < v.size(); i++) {
 			int r = v.remove(i);
 			if( doesCover(v) ) {
@@ -166,9 +214,11 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 				v.add(i, r);
 			}
 		}
+		//now sort
+		Collections.sort(v);
 	}
 	public static boolean doesCover(Vector<Integer> model) {
-		boolean[] covered = new boolean[10];
+		boolean[] covered = new boolean[number_of_bits];
 		for( int i = 0; i < covered.length; i++) {
 			covered[i] = false;
 		}
@@ -201,6 +251,7 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 	};
 	*/
 	
+	
 	public static boolean[] getSample() {
 		boolean[] sample = new boolean[]{
 				Math.random() > 0.5,
@@ -215,11 +266,80 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 				Math.random() > 0.5,
 		};
 		
-		sample[2] = sample[0] ^ sample[1];
-		sample[3] = sample[0] & sample[1];
-		//sample[4];
-		sample[6] = sample[5];
-		sample[9] = sample[7] | sample[8];
+		switch(choice) {
+		case 0:
+			sample[1] = sample[0];
+			sample[3] = sample[2];
+			sample[5] = sample[4];
+			sample[7] = sample[6];
+			sample[9] = sample[8];
+			target_cover.add(3);
+			target_cover.add(12);
+			target_cover.add(48);
+			target_cover.add(192);
+			target_cover.add(768);
+			break;
+		case 1:
+			sample[2] = sample[0] ^ sample[1];
+			sample[5] = sample[4] & sample[3];
+			sample[8] = sample[6] | sample[7];
+			target_cover.add(7);
+			target_cover.add(56);
+			target_cover.add(448);
+			target_cover.add(512);
+			break;
+		case 2:
+			//sample[0];
+			sample[2] = sample[1];
+			sample[5] = sample[4] & sample[3];
+			sample[8] = sample[6] ^ sample[7];
+			sample[9] = sample[0];
+			target_cover.add(6);
+			target_cover.add(56);
+			target_cover.add(448);
+			target_cover.add(513);
+			//sample[9];
+			break;
+		case 3:
+			//half adder, full adder
+			sample[3] = sample[1] ^ sample[2];
+			sample[4] = sample[1] & sample[2];
+
+			sample[8] = sample[5] ^ sample[6] ^ sample[7];
+			sample[9] = (sample[5] & sample[6]) | (sample[6] & sample[7]) | (sample[7] & sample[5]);
+			target_cover.add(1);
+			target_cover.add(30);
+			target_cover.add(992);
+			break;
+		case 4:
+			//something random
+			sample[2] = sample[0] ^ sample[1];
+			sample[3] = sample[0] & sample[1];
+			sample[6] = sample[5];
+			sample[9] = sample[7] | sample[8];
+			break;
+		case 8:
+			//random
+			break;
+		case 9:
+			//all 0s
+			for(int i = 0; i < number_of_bits; i++) {
+				sample[i] = false;
+			}
+			break;
+		case 10:
+			//all joined
+			for(int i = 0; i < number_of_bits; i++) {
+				sample[i] = sample[0];
+			}
+			break;
+		}
+		for( int i = 0; i < sample.length; i++) {
+			if( Math.random() < noise) {
+				sample[i] = Math.random() > 0.5;
+			}
+		}
+		
 
 		return sample;
 		/*
@@ -239,15 +359,25 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 	}
 	
 	public static void main(String[] args) {
+		Vector<int[]> vsets = allSubSets(number_of_bits,max_size);
+		sets = new int[vsets.size()][];
+		for(int i = 0; i < sets.length; i++) {
+			sets[i] = vsets.get(i);
+		}
+		addAllCovers();
+		System.out.println("found "+all_covers.size()+" unique covers");
+		
+		
+		//System.exit(0);
 		Vector<Integer> best_cover = getRandomFullCover();
 		
-		int num_bins = 1024;
-		int samples_per_bin = 1024;
+		int num_bins = 10240;
+		int samples_per_bin = 10240;
 		int[] buckets = new int[16];
 		Vector<boolean[]> samples = new Vector<boolean[]>();
 		
 		CategoricalDistribution cat = new CategoricalDistribution();
-		cat.prior_is_on_H = true;
+		//cat.prior_is_on_H = true;
 		/*
 		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,0})/Math.log(2));
 		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0})/Math.log(2));
@@ -275,7 +405,7 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		System.exit(0);
 		*/
 		
-		for( int i = 0; i < 100; i++) {
+		for( int i = 0; i < 500; i++) {
 			samples.add(getSample());
 			/*
 			if( i != 0) {
@@ -303,8 +433,13 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 				//System.out.print( v+", ");
 			}
 			
+			best_cover = scoreAndStuff(entropies);
 			double best_e = getTotalEntropy(best_cover,entropies);
-			for( int j = 0; j < 10000; j++) {
+			//double best_e = covers.get(0).a;
+			//best_cover = covers.get(0).b;
+					/*
+			getTotalEntropy(best_cover,entropies);
+			for( int j = 0; j < 1000000; j++) {
 				Vector<Integer> test_cover = getRandomFullCover();
 				double test_e = getTotalEntropy(test_cover,entropies);
 				if( test_e < best_e) {
@@ -312,11 +447,15 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 					best_cover = test_cover;
 				}
 			}
+			*/
+			
+
 			
 			System.out.print(i+": best cover e: "+best_e+" : ");
 			for( int s : best_cover) {
 				int[] ii = sets[s]; 
-				System.out.print("{");
+				System.out.print(s+":{");
+				//System.out.print("{");
 				for( int j = 0; j < ii.length; j++) {
 					if( j > 0)
 						System.out.print(",");
@@ -324,11 +463,17 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 				}
 				System.out.print("} ");
 			}
+			
 
-			
-			
+			int num = isCorrect(best_cover);
+			System.out.print(": "+num);
 			System.out.println();
+
+			if( num == 0) {
+				System.exit(0);
+			}
 		}
+		
 		
 		/*
 		System.out.println("{0,0}: "+Functions.getExpectedEntropy(new int[]{0,0},1,1)/Math.log(2));
@@ -351,6 +496,18 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		*/
 		
 	}
+	public static int isCorrect(Vector<Integer> cover) {
+		return getDistance(cover,target_cover);
+		/*
+		int c = 0;
+		c += cover.contains(378) ? 1 : 0;
+		c += cover.contains(16) ? 1 : 0;
+		c += cover.contains(15) ? 1 : 0;
+		c += cover.contains(83) ? 1 : 0;
+		return c;
+		*/
+	}
+	
 	/*
 	
 		BEST PAPERS EVER!!!
