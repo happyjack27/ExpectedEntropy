@@ -7,12 +7,19 @@ import distributions.interfaces.PriorDistribution;
 import util.*;
 
 public class CategoricalDistribution implements PosteriorDistribution<double[],double[],Integer> {
+	static int max_n = 100;
+	static int num_runs = 100;
 
-	public static int choice = 3;
-	public static double noise = 0.10;
+	public boolean prior_is_on_H = false;
+	public static int[] choices = new int[]{0,1,3,0,1,3};
+	public static double[] noises = new double[]{0.0,0.0,0.0,0.1,0.1,0.1};
+	
+	
+	public static int cur_choice = 0;
+	public static int choice = 0;
+	public static double noise = 0.0;
 
 	double[] thetas;
-	public boolean prior_is_on_H = true;
 	public static boolean optimize_cover = true;
 	static Vector<Integer> target_cover = new Vector<Integer>();
 	static int number_of_bits = 10;
@@ -24,6 +31,12 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 	
 	PriorDistribution<double[],double[],Integer> prior;
 	
+	static Vector<double[]> runs = new Vector<double[]>(); 
+	static double[] results = new double[max_n];
+	static double[] run_avg = new double[max_n];
+	static double[][] run_avgs = new double[choices.length][max_n];
+	
+	
 	public static double GAMMA = 0.577215664901532860606512090082;
 	public static double GAMMA_MINX = 1.e-12;
 	public static double DIGAMMA_MINNEGX = -1250;
@@ -31,6 +44,68 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 	public static double S_LIMIT = 1e-5;
 	
 	public static Vector<Pair<Double,Vector<Integer>>> covers = new Vector<Pair<Double,Vector<Integer>>>();
+	
+	public static void main( String[] args) {
+		for( cur_choice = 0; cur_choice < choices.length; cur_choice++) {
+			choice = choices[cur_choice];
+			noise = noises[cur_choice];
+			
+			Vector<int[]> vsets = allSubSets(number_of_bits,max_size);
+			sets = new int[vsets.size()][];
+			for(int i = 0; i < sets.length; i++) {
+				sets[i] = vsets.get(i);
+			}
+			addAllCovers();
+			System.out.println("found "+all_covers.size()+" unique covers");
+			
+			
+			//cat.prior_is_on_H = true;
+			/*
+			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,0})/Math.log(2));
+			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0})/Math.log(2));
+			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0,0,0,0})/Math.log(2));
+			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,1,1,0,0,0,0,0,0})/Math.log(2));
+			*/
+			//System.exit(0);
+			
+			//cat.setNumberOfCategories(8);
+			/*
+			int mult = 0;
+			int o = 0;
+			Integer[] ii2 = new Integer[]{o,o,mult,mult
+					,o,o,o,o
+					//,o,o,o,o,o,o,o,o
+					};
+			cat.setNumberOfCategories(ii2.length);
+			Vector<double[]> vdd = cat.getEntropyPDF(ii2,num_bins*samples_per_bin, num_bins);
+			double ddp = 0;
+			for( int i = 0; i < vdd.size(); i++) {
+				double[] dd = vdd.get(i);
+				ddp += dd[1];
+				System.out.println(""+dd[0]/Math.log(2)+", "+dd[1]+", "+ddp);
+			}
+			System.exit(0);
+			*/
+				
+			for( int i = 0; i < num_runs; i++) {
+				doRun();
+				runs.add(results);
+				results = new double[max_n];
+			}
+			double m = 1.0/(double)num_runs;
+			for( int i = 0; i < max_n; i++) {
+				run_avg[i]*=m;
+				System.out.println(run_avg[i]);
+			}
+			run_avgs[cur_choice] =run_avg;
+		}
+		for( int i = 0; i < max_n; i++) {
+			for( int j = 0; j < run_avgs.length; j++) {
+				System.out.print(run_avgs[j][i]+", ");
+			}
+			System.out.println();
+		}
+	}
 	
 	public static void addAllCovers() {
 		addAllCovers(new Vector<Integer>(), 0, 1); //skip the empty set
@@ -289,7 +364,7 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 			target_cover.add(512);
 			break;
 		case 2:
-			//sample[0];
+			//sample[0]; //mixed
 			sample[2] = sample[1];
 			sample[5] = sample[4] & sample[3];
 			sample[8] = sample[6] ^ sample[7];
@@ -358,104 +433,40 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 		return tot;
 	}
 	
-	public static void main(String[] args) {
-		Vector<int[]> vsets = allSubSets(number_of_bits,max_size);
-		sets = new int[vsets.size()][];
-		for(int i = 0; i < sets.length; i++) {
-			sets[i] = vsets.get(i);
-		}
-		addAllCovers();
-		System.out.println("found "+all_covers.size()+" unique covers");
-		
-		
+
+	public static void doRun() {
 		//System.exit(0);
 		Vector<Integer> best_cover = getRandomFullCover();
+		CategoricalDistribution cat = new CategoricalDistribution();
 		
 		int num_bins = 10240;
 		int samples_per_bin = 10240;
 		int[] buckets = new int[16];
 		Vector<boolean[]> samples = new Vector<boolean[]>();
 		
-		CategoricalDistribution cat = new CategoricalDistribution();
-		//cat.prior_is_on_H = true;
-		/*
-		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,0})/Math.log(2));
-		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0})/Math.log(2));
-		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0,0,0,0})/Math.log(2));
-		System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,1,1,0,0,0,0,0,0})/Math.log(2));
-		*/
-		//System.exit(0);
-		
-		//cat.setNumberOfCategories(8);
-		/*
-		int mult = 0;
-		int o = 0;
-		Integer[] ii2 = new Integer[]{o,o,mult,mult
-				,o,o,o,o
-				//,o,o,o,o,o,o,o,o
-				};
-		cat.setNumberOfCategories(ii2.length);
-		Vector<double[]> vdd = cat.getEntropyPDF(ii2,num_bins*samples_per_bin, num_bins);
-		double ddp = 0;
-		for( int i = 0; i < vdd.size(); i++) {
-			double[] dd = vdd.get(i);
-			ddp += dd[1];
-			System.out.println(""+dd[0]/Math.log(2)+", "+dd[1]+", "+ddp);
-		}
-		System.exit(0);
-		*/
-		
-		for( int i = 0; i < 500; i++) {
+		for( int i = 0; i < max_n; i++) {
 			samples.add(getSample());
-			/*
-			if( i != 0) {
-				for( int j = 0; j < 10000; j++) {
-					samples.add(getSample());
-				}
-			}
-			if( i == 0) {
-				for( int j = 0; j < 1000; j++) {
-					//samples.add(getSample());
-				}
-			}
-			*/
-			//System.out.println(a+" "+b+" "+c+" "+d+" ");
 			
 			double[] entropies = new double[sets.length];
 			for(int j = 0; j < sets.length; j++) {//
 				int[] ss = sets[j];
 				Integer[] ii = bucket(samples,ss);
 				cat.setNumberOfCategories(ii.length);
-				//double[] dd = getSummaryStatsForEntropyPDF(cat.getEntropyPDF(ii,num_bins*samples_per_bin, num_bins));
-				//System.out.print( dd[0]+", ");
 				double v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
 				entropies[j] = v;
-				//System.out.print( v+", ");
 			}
 			
 			best_cover = scoreAndStuff(entropies);
 			double best_e = getTotalEntropy(best_cover,entropies);
-			//double best_e = covers.get(0).a;
-			//best_cover = covers.get(0).b;
-					/*
-			getTotalEntropy(best_cover,entropies);
-			for( int j = 0; j < 1000000; j++) {
-				Vector<Integer> test_cover = getRandomFullCover();
-				double test_e = getTotalEntropy(test_cover,entropies);
-				if( test_e < best_e) {
-					best_e = test_e;
-					best_cover = test_cover;
-				}
-			}
-			*/
+
 			
 
 			
 			System.out.print(i+": best cover e: "+best_e+" : ");
 			for( int s : best_cover) {
 				int[] ii = sets[s]; 
-				System.out.print(s+":{");
-				//System.out.print("{");
+				//System.out.print(s+":{");
+				System.out.print("{");
 				for( int j = 0; j < ii.length; j++) {
 					if( j > 0)
 						System.out.print(",");
@@ -468,9 +479,11 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 			int num = isCorrect(best_cover);
 			System.out.print(": "+num);
 			System.out.println();
+			results[i] = num;
+			run_avg[i] += num;
 
 			if( num == 0) {
-				System.exit(0);
+				//System.exit(0);
 			}
 		}
 		
