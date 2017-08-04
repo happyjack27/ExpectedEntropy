@@ -337,6 +337,10 @@ sum(ylnx+y)=0;
 	}
 	
 	public double[] getSummaryStats(Integer[] data, int num_samples) {
+		if( data.length == 0) {
+			return new double[]{0};
+		}
+
 		setNumberOfCategories(data.length);
 		Vector<double[]> results = new Vector<double[]>();
 		Vector<Pair<Double,double[]>> samples = new Vector<Pair<Double,double[]>>();
@@ -348,6 +352,10 @@ sum(ylnx+y)=0;
 			double[] dd = getRandomSample(data,false);
 			samples.add(new Pair<Double,double[]>(dd[0],dd));
 		}
+		double[] dd0 = getEntropyAndProbabilityAtTheta(getMinEntropyThetas(data.length),data,false);
+		double[] dd1 = getEntropyAndProbabilityAtTheta(getMaxEntropyThetas(data.length),data,false);
+		samples.add(new Pair<Double,double[]>(dd0[0],dd0));
+		samples.add(new Pair<Double,double[]>(dd1[0],dd1));
 		//getEntropyAndProbabilityAtTheta(getMinEntropyThetas(),data,false);
 		//doulbe[] min = 
 		Collections.sort(samples);
@@ -355,8 +363,53 @@ sum(ylnx+y)=0;
 		for(int i = 0; i < samples.size(); i++) {
 			results.add(samples.get(i).b);
 		}
+		double maxH = Math.log((double)data.length);///Math.log(2.0);
 		
-		return getSummaryStatsForEntropyPDF( results);
+		//0 is entropy 1 is probablily
+		//return new double[]{h,ph,pDO,dHdO,pO};
+		
+		//integrate
+		double sumP = 0;
+		double sumHP = 0;
+		double last_h = results.get(0)[0];
+		double last_p = results.get(0)[1];
+		/*
+		if( last_h!= last_h) {
+			System.out.println("bad last_h");
+		}
+		if( last_p!= last_p) {
+			System.out.println("bad last_p");
+		}
+		*/
+		//System.out.println("results: "+results.size());
+		for( int i = 1; i < results.size(); i++) {
+			double h = results.get(i)[0];
+			double p = results.get(i)[1];
+			/*
+			if( h != h) {
+				System.out.println("bad h "+i+" "+p);
+			}
+			if( p != p) {
+				System.out.println("bad p "+i+" "+h);
+			}
+			*/
+			double dH = h-last_h;
+			double avgH = (h+last_h)/2.0;
+			double avgP = (p+last_p)/2.0;
+			sumHP += avgH*dH*avgP;
+			sumP += dH*avgP;
+			last_h = h;
+			last_p = p;
+		}
+		//System.out.println("sump: "+sumHP);
+		//System.out.println("sumhp: "+sumP);
+		return new double[]{(sumHP/sumP)/Math.log(2.0)};
+		//return new double[]{(sumHP/sumP)};
+
+		//Vector<double[]> dd = bin(results,num_bins,0,1,maxH);
+
+		
+		//return getSummaryStatsForEntropyPDF( results);
 	}
 	
 	public static double[] getSummaryStatsForEntropyPDF( Vector<double[]> samples) {
@@ -797,23 +850,23 @@ sum(ylnx+y)=0;
 		return n*factorial(n-1);
 	}
 	
-	public double[] getMaxEntropyThetas() {
-		if( thetas.length == 0) {
+	public static double[] getMaxEntropyThetas(int n) {
+		if( n == 0) {
 			return new double[]{};
 		}
-		double p = 1.0/(thetas.length);
-		double[] dd = new double[thetas.length];
+		double p = 1.0/(double)n;
+		double[] dd = new double[n];
 		for( int i = 0; i < dd.length; i++) {
 			dd[i] = p;
 		}
 		return dd;
 	}
-	public double[] getMinEntropyThetas() {
-		if( thetas.length == 0) {
+	public static double[] getMinEntropyThetas(int n) {
+		if( n == 0) {
 			return new double[]{};
 		}
 		//double p = 1.0/(thetas.length);
-		double[] dd = new double[thetas.length];
+		double[] dd = new double[n];
 		for( int i = 0; i < dd.length; i++) {
 			dd[i] = 0;
 		}

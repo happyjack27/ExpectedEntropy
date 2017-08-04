@@ -7,37 +7,11 @@ import util.*;
 // http://www.sortie-nd.org/lme/Statistical%20Papers/Burnham_and_Anderson_2004_Multimodel_Inference.pdf
 
 public class _RunTests {
-	static int max_n = 100;
-	static int num_runs = 25;
+	static int max_n = 50;
+	static int num_runs = 100;//25;
 	static boolean divide_log_likelihood_by_n = false;
 	static int MONTE_CARLO_RESOLUTION = 1024;
-
-	public boolean prior_is_on_H = false;
-	public static int[] choices = new int[]{
-			0,0
-			//0,1,3,0,1,3,
-			//0,1,3,0,1,3,
-			//0,1,3,0,1,3,
-	};
-	public static double[] noises = new double[]{
-			0.0,0.1,
-			0.0,0.0,0.0,
-			//0.0,0.0,0.0,
-			//0.0,0.0,0.0,
-			0.1,0.1,0.1,
-			//0.1,0.1,0.1,
-			//0.1,0.1,0.1,
-			
-	};
-	public static int[] metrics = new int[]{
-			5,5,5,
-			0,0,0,
-			//2,2,2,
-			//4,4,4,
-			0,0,0,
-			//2,2,2,
-			//4,4,4,
-	};
+	
 	static final int METRIC_BEES = 0;
 	static final int METRIC_BEES_PRIOR_NOT_H = 1;
 	static final int METRIC_AIC = 2;
@@ -49,6 +23,35 @@ public class _RunTests {
 	static double C = 10;
 	
 	static int METRIC = 0;
+
+
+	public boolean prior_is_on_H = false;
+	public static int[] choices = new int[]{
+			0,0,1,1,
+			//0,1,3,0,1,3,
+			//0,1,3,0,1,3,
+			//0,1,3,0,1,3,
+	};
+	public static double[] noises = new double[]{
+			0.0,0.0,0.1,0.1,
+			0.0,0.0,0.0,
+			//0.0,0.0,0.0,
+			//0.0,0.0,0.0,
+			0.1,0.1,0.1,
+			//0.1,0.1,0.1,
+			//0.1,0.1,0.1,
+			
+	};
+	public static int[] metrics = new int[]{
+			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			5,5,5,
+			0,0,0,
+			//2,2,2,
+			//4,4,4,
+			0,0,0,
+			//2,2,2,
+			//4,4,4,
+	};
 	
 	public static void setTargetCover() {
 		target_cover = new Vector<Integer>();
@@ -612,7 +615,10 @@ public class _RunTests {
 				
 				switch(METRIC) {
 				case METRIC_BEES:
+					//CategoricalDistribution cat = new CategoricalDistribution();
+					cat.prior_is_on_H = true;
 					v = cat.getSummaryStats(ii,MONTE_CARLO_RESOLUTION)[0];
+					//System.out.print(""+ii.length+": "+v);
 					//System.out.print(".");
 					//v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
 					break;

@@ -25,7 +25,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		int resolution = 1024;
+		int resolution = 102400;
 		
 		CategoricalDistribution cat = new CategoricalDistribution();
 		cat.prior_is_on_H = true;
@@ -33,17 +33,21 @@ public class Main {
 		
 		//		return new double[]{total_h_ph,0-total_e,total_ph};
 
-		/*
+		
 		double[] dd0;
-		for( int i = 0; i < 10; i++) {
-			dd0 = cat.getSummaryStats(new Integer[]{i,0,i,0}, resolution);
+		double[] dd1;
+		for( int i = 0; i < 100; i++) {
+			dd0 = cat.getSummaryStats(new Integer[]{i,i,0,0}, resolution);
+			dd1 = cat.getSummaryStats(new Integer[]{i,i}, resolution);
+			dd1[0] *= 2;
 			for( int j = 0; j < dd0.length; j++) {
-				System.out.print(dd0[j]+", ");
+				System.out.print(dd0[j]+", "+dd1[j]+", "+(dd0[j]-dd1[j]));
 			}
 			System.out.println();
 		}
-		*/
 		
+		/*
+		resolution = 1024;
 		cat.setNumberOfCategories(4);
 		int m = 2;
 		Vector<double[]> pdf = cat.getEntropyPDF(new Integer[]{m,m,0,0}, resolution*resolution, resolution);
@@ -59,6 +63,7 @@ public class Main {
 			}
 			System.out.println();
 		}
+		*/
 		
 		//System.out.println("ms: "+(m1-m0));
 		System.exit(0);
