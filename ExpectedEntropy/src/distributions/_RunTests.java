@@ -30,6 +30,7 @@ public class _RunTests {
 			
 	};
 	public static int[] metrics = new int[]{
+			5,5,5,
 			0,0,0,
 			//2,2,2,
 			//4,4,4,
@@ -42,6 +43,10 @@ public class _RunTests {
 	static final int METRIC_AIC = 2;
 	static final int METRIC_AICc = 3;
 	static final int METRIC_BIC = 4;
+	static final int METRIC_BEES_LNMULT = 5;
+	static final int METRIC_BEES_I_MULT = 6;
+	static final int METRIC_BEES_C_MULT = 7;
+	static double C = 10;
 	
 	static int METRIC = 0;
 	
@@ -608,6 +613,32 @@ public class _RunTests {
 				switch(METRIC) {
 				case METRIC_BEES:
 					v = cat.getSummaryStats(ii,MONTE_CARLO_RESOLUTION)[0];
+					//System.out.print(".");
+					//v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
+					break;
+				case METRIC_BEES_C_MULT:
+					Integer[] ii1 = new Integer[ii.length];
+					double mult1 = C;
+					for( int k = 0; k < ii.length; k++) {
+						ii1[k] = (int)(mult1*(double)ii[k]);
+					}
+					v = cat.getSummaryStats(ii1,MONTE_CARLO_RESOLUTION)[0];
+					break;
+				case METRIC_BEES_I_MULT:
+					Integer[] ii2 = new Integer[ii.length];
+					double mult = ii.length;
+					for( int k = 0; k < ii.length; k++) {
+						ii2[k] = (int)(mult*(double)ii[k]);
+					}
+					v = cat.getSummaryStats(ii2,MONTE_CARLO_RESOLUTION)[0];
+					break;
+				case METRIC_BEES_LNMULT:
+					Integer[] ii3 = new Integer[ii.length];
+					double mult3 = Math.log((double)ii.length)/Math.log(2.0);
+					for( int k = 0; k < ii.length; k++) {
+						ii3[k] = (int)(mult3*(double)ii[k]);
+					}
+					v = cat.getSummaryStats(ii3,MONTE_CARLO_RESOLUTION)[0];
 					//System.out.print(".");
 					//v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
 					break;

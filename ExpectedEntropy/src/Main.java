@@ -45,12 +45,15 @@ public class Main {
 		*/
 		
 		cat.setNumberOfCategories(4);
-		Vector<double[]> pdf = cat.getEntropyPDF(new Integer[]{100,100,0,0}, resolution*resolution, resolution);
+		int m = 2;
+		Vector<double[]> pdf = cat.getEntropyPDF(new Integer[]{m,m,0,0}, resolution*resolution, resolution);
+		Vector<double[]> pdf2 = cat.getEntropyPDF(new Integer[]{m,m}, resolution*resolution, resolution);
 		long m1 = new Date().getTime();
 		
 		for( int i = 0; i < pdf.size(); i++) {
 			double[] dd = pdf.get(i);
-			System.out.print((dd[0]/Math.log(2))+", "+dd[1]);
+			double[] dd2 = pdf2.get(i);
+			System.out.print((dd[0]/Math.log(2))+", "+dd[1] +", "+ (2.0*dd2[0]/Math.log(2))+", "+dd2[1]);
 			for( int j = 0; j < dd.length; j++) {
 				//System.out.print(dd[j]+", ");
 			}
