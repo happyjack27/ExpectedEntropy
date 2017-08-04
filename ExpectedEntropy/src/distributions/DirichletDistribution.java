@@ -9,6 +9,13 @@ public class DirichletDistribution implements PriorDistribution<double[],double[
 	double normalizing_constant = 1;
 
 	public double getPriorProbabilityOfTheta(double[] theta) {
+		if( a.length != theta.length) {
+			a = new double[theta.length];
+			for( int i = 0; i < a.length; i++) {
+				a[i] = 1;
+			}
+			
+		}
 		double m = 1;
 		for( int i = 0; i < theta.length; i++) {
 			m *= Math.pow(theta[i],a[i]-1);

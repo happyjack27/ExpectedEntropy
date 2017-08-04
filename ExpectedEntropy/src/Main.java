@@ -1,7 +1,9 @@
+import java.util.Date;
 import java.util.Vector;
 
 import distributions.*;
 import distributions.interfaces.PosteriorDistribution;
+import util.Functions;
 
 public class Main {
 	public static int verbosity = 0;
@@ -23,13 +25,61 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
+		int resolution = 1024;
+		
+		CategoricalDistribution cat = new CategoricalDistribution();
+		cat.prior_is_on_H = true;
+		long m0 = new Date().getTime();
+		
+		//		return new double[]{total_h_ph,0-total_e,total_ph};
+
+		/*
+		double[] dd0;
+		for( int i = 0; i < 10; i++) {
+			dd0 = cat.getSummaryStats(new Integer[]{i,0,i,0}, resolution);
+			for( int j = 0; j < dd0.length; j++) {
+				System.out.print(dd0[j]+", ");
+			}
+			System.out.println();
+		}
+		*/
+		
+		cat.setNumberOfCategories(4);
+		Vector<double[]> pdf = cat.getEntropyPDF(new Integer[]{100,100,0,0}, resolution*resolution, resolution);
+		long m1 = new Date().getTime();
+		
+		for( int i = 0; i < pdf.size(); i++) {
+			double[] dd = pdf.get(i);
+			System.out.print((dd[0]/Math.log(2))+", "+dd[1]);
+			for( int j = 0; j < dd.length; j++) {
+				//System.out.print(dd[j]+", ");
+			}
+			System.out.println();
+		}
+		
+		//System.out.println("ms: "+(m1-m0));
+		System.exit(0);
+		
+		/*
+		double d;
+		d = Functions.getExpectedEntropy(new Integer[]{0,0}, 1, 1)/Math.log(2.0);
+		System.out.println("d: "+d);
+		d = Functions.getExpectedEntropy(new Integer[]{1,0}, 1, 1)/Math.log(2.0);
+		System.out.println("d: "+d);
+		d = Functions.getExpectedEntropy(new Integer[]{1,1}, 1, 1)/Math.log(2.0);
+		System.out.println("d: "+d);
+		d = Functions.getExpectedEntropy(new Integer[]{10,1}, 1, 1)/Math.log(2.0);
+		System.out.println("d: "+d);
+		d = Functions.getExpectedEntropy(new Integer[]{100,1}, 1, 1)/Math.log(2.0);
+		System.out.println("d: "+d);
+		System.exit(0);
+		*/
 		
 		//there is the input - the results of the sample trials, and the bayesian prior. 
-		int n = 160;
+		int n = 0;
 		double p = 0;
 		
 		boolean prior_is_on_H = true;
-		int resolution = 256;
 		
 		BernoulliDistribution posterior = new BernoulliDistribution();
 		posterior.prior_is_on_H = prior_is_on_H;
@@ -37,7 +87,8 @@ public class Main {
 		
 		int total = n;
 		int zeros = (int)(p*(double)n);
-		showEntropyDensityForBernoulli(zeros,total-zeros, posterior,resolution);
+		double[] dd = showEntropyDensityForBernoulli(zeros,total-zeros, posterior,resolution);
+		System.out.println("e: "+dd[0]+" h:"+dd[1]);
 	}
 		
 	public static double[] showEntropyDensityForBernoulli( int zeros, int ones, BernoulliDistribution posterior, int num_sample_points ) {

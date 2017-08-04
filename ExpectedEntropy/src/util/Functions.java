@@ -168,6 +168,7 @@ public static double getExpectedEntropyForDelta(double cur_expected_entropy, dou
 }*/
 
 
+//this uses a prior on p, rather than entropy!  i.e. entropy(1,1)=0.72... instead of 0.5
 public static double getExpectedEntropy(Integer[] integers, double exaggerate, double prior) {
 	double a = 0;
 	double[] p = new double[integers.length];

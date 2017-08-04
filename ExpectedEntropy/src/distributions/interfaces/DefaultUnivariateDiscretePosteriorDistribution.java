@@ -29,7 +29,7 @@ public abstract class DefaultUnivariateDiscretePosteriorDistribution<TTheta> imp
 			double dHdO = getDerivOfEntropyGivenTheta(thetas);
 			double pO = prior.getPriorProbabilityOfTheta(thetas);
 			double ph = pDO*pO / ( prior_is_on_H ? 1 : Math.abs(dHdO));
-			System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
+			//System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
 			/*
 			if( prior_is_on_H)
 				pO = prior.getPriorProbabilityOfTheta(h);
