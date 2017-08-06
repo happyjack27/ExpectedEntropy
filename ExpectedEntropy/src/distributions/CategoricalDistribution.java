@@ -17,6 +17,8 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 	int[][] permutations;
 	
 	PriorDistribution<double[],double[],Integer> prior;
+
+	public static int add_to_all_cats;
 	
 	public static double GAMMA = 0.577215664901532860606512090082;
 	public static double GAMMA_MINX = 1.e-12;
@@ -335,25 +337,167 @@ sum(ylnx+y)=0;
 		this.prior = prior;
 		
 	}
+	public Integer[] jointToMarginData(Integer[] data,int[][] marginal_categories) {
+		Integer[] ii = new Integer[marginal_categories.length];
+		for( int i = 0; i < ii.length; i++) {
+			ii[i] = 0;
+			for( int k : marginal_categories[i]) {
+				ii[i] += data[k];
+			}
+		}
+		return ii;
+	}
+	public double[] jointToMarginTheta(double[] data,int[][] marginal_categories) {
+		double[] ii = new double[marginal_categories.length];
+		for( int i = 0; i < ii.length; i++) {
+			ii[i] = 0;
+			for( int k : marginal_categories[i]) {
+				ii[i] += data[k];
+			}
+		}
+		return ii;
+	}
 	
+	//if you want the conditional entropy of X given Y, the marginal categories should be the categories for Y.
+	public double getConditionalEntropy(Integer[] data,int[][] marginal_categories, int num_samples) {
+		Integer[] margin_data = jointToMarginData(data,marginal_categories);
+		if( data.length == 0) {
+			return 0;
+		}
+		
+		//NEED TO GO THROUGH THIS
+		setNumberOfCategories(data.length);
+
+		Vector<double[]> results = new Vector<double[]>();
+		Vector<Pair<Double,double[]>> samples = new Vector<Pair<Double,double[]>>();
+		
+		//do a bunch of random samples
+		for( int i = 0; i < num_samples; i++) {		
+			//calculate entropy and probability
+			double[] thetas = getRandomThetas(data.length);
+			double[] margin_thetas = jointToMarginTheta(thetas,marginal_categories);
+			
+			double[] dd = getEntropyAndLogProbabilityAtTheta(thetas,data,false);
+			double[] dd_margin = getEntropyAndLogProbabilityAtTheta(margin_thetas,margin_data,false);
+			dd[0] -= dd_margin[0];
+			
+			samples.add(new Pair<Double,double[]>(dd[0],dd));
+		}
+		double[] thetas = getMLEThetas(data);
+		double[] thetas2 = getMLEThetas(margin_data);
+		double[] dd2 = getEntropyAndLogProbabilityAtTheta(thetas,data,false);
+		double[] dd2_m = getEntropyAndLogProbabilityAtTheta(thetas2,margin_data,false);
+		double[] dd0 = getEntropyAndLogProbabilityAtTheta(getMinEntropyThetas(data.length),data,false);
+		double[] dd0_m = getEntropyAndLogProbabilityAtTheta(getMinEntropyThetas(margin_data.length),margin_data,false);
+		double[] dd1 = getEntropyAndLogProbabilityAtTheta(getMaxEntropyThetas(data.length),data,false);
+		double[] dd1_m = getEntropyAndLogProbabilityAtTheta(getMaxEntropyThetas(margin_data.length),margin_data,false);
+		dd0[0] -= dd0_m[0];
+		dd1[0] -= dd1_m[0];
+		dd2[0] -= dd2_m[0];
+		samples.add(new Pair<Double,double[]>(dd0[0],dd0));
+		samples.add(new Pair<Double,double[]>(dd1[0],dd1));
+		samples.add(new Pair<Double,double[]>(dd2[0],dd2));
+		//getEntropyAndProbabilityAtTheta(getMinEntropyThetas(),data,false);
+		//doulbe[] min = 
+		Collections.sort(samples);
+		//results.add
+		
+		//adjust log p arithmetically to max of 64, then take the exponent;
+		double max_log_p = samples.get(0).b[1];
+		for(int i = 0; i < samples.size(); i++) {
+			if( samples.get(i).b[1] > max_log_p) {
+				max_log_p = samples.get(i).b[1];
+			}
+		}
+		for(int i = 0; i < samples.size(); i++) {
+			samples.get(i).b[1] = Math.exp(samples.get(i).b[1] + 64.0 - max_log_p);
+		}
+		
+		//now add all samples to results.
+		for(int i = 0; i < samples.size(); i++) {
+			results.add(samples.get(i).b);
+		}
+		double maxH = Math.log((double)data.length);///Math.log(2.0);
+		
+		//integrate
+		double sumP = 0;
+		double sumHP = 0;
+		double last_h = results.get(0)[0];
+		double last_p = results.get(0)[1];
+
+		for( int i = 1; i < results.size(); i++) {
+			double h = results.get(i)[0];
+			double p = results.get(i)[1];
+			double dH = h-last_h;
+			double avgH = (h+last_h)/2.0;
+			double avgP = (p+last_p)/2.0;
+			double dHP = avgH*dH*avgP;
+			double dP = dH*avgP;
+			if( dP == 0) {
+				//System.out.println("dP is 0 "+dH+" "+avgP);
+			}
+			if( dP == dP && dHP == dHP) {
+				sumHP += dHP;
+				sumP += dP;
+			} else {
+				//System.out.println("NAN! :"+dP+" "+dHP+" | "+avgH+" "+dH+" "+avgP);
+			}
+			last_h = h;
+			last_p = p;
+		}
+		//System.out.println("sums "+sumHP+" "+sumP);
+
+		return (sumHP/sumP)/Math.log(2.0);
+	}
+	private double[] getMLEThetas(Integer[] data) {
+		double[] thetas = new double[data.length];
+		double tot = 0;
+		for( int i = 0; i < data.length; i++) {
+			tot += data[i];
+		}
+		if( tot == 0) {
+			double p = 1.0/(double)data.length;
+			for( int i = 0; i < data.length; i++) {
+				thetas[i] = p;
+			}
+		} else {
+			double p = 1.0/tot;
+			for( int i = 0; i < data.length; i++) {
+				thetas[i] = p * (double) data[i];
+			}
+		}
+		// TODO Auto-generated method stub
+		return thetas;
+	}
+
 	public double[] getSummaryStats(Integer[] data, int num_samples) {
 		if( data.length == 0) {
 			return new double[]{0};
 		}
 
 		setNumberOfCategories(data.length);
+		Integer[] data2;
+		if( add_to_all_cats == 0) {
+			data2 = data;
+		} else {
+			data2 = new Integer[data.length];
+			for( int i = 0; i < data.length; i++) {
+				data2[i] = data[i] + add_to_all_cats;
+			}
+			
+		}
+		
 		Vector<double[]> results = new Vector<double[]>();
 		Vector<Pair<Double,double[]>> samples = new Vector<Pair<Double,double[]>>();
 		
 		//do a bunch of random samples
-		for( int i = 0; i < num_samples; i++) {
-			
+		for( int i = 0; i < num_samples; i++) {		
 			//calculate entropy and probability
-			double[] dd = getRandomSample(data,false);
+			double[] dd = getEntropyAndProbabilityAtTheta(getRandomThetas(data2.length),data2,false);
 			samples.add(new Pair<Double,double[]>(dd[0],dd));
 		}
-		double[] dd0 = getEntropyAndProbabilityAtTheta(getMinEntropyThetas(data.length),data,false);
-		double[] dd1 = getEntropyAndProbabilityAtTheta(getMaxEntropyThetas(data.length),data,false);
+		double[] dd0 = getEntropyAndProbabilityAtTheta(getMinEntropyThetas(data2.length),data2,false);
+		double[] dd1 = getEntropyAndProbabilityAtTheta(getMaxEntropyThetas(data2.length),data2,false);
 		samples.add(new Pair<Double,double[]>(dd0[0],dd0));
 		samples.add(new Pair<Double,double[]>(dd1[0],dd1));
 		//getEntropyAndProbabilityAtTheta(getMinEntropyThetas(),data,false);
@@ -365,34 +509,15 @@ sum(ylnx+y)=0;
 		}
 		double maxH = Math.log((double)data.length);///Math.log(2.0);
 		
-		//0 is entropy 1 is probablily
-		//return new double[]{h,ph,pDO,dHdO,pO};
-		
 		//integrate
 		double sumP = 0;
 		double sumHP = 0;
 		double last_h = results.get(0)[0];
 		double last_p = results.get(0)[1];
-		/*
-		if( last_h!= last_h) {
-			System.out.println("bad last_h");
-		}
-		if( last_p!= last_p) {
-			System.out.println("bad last_p");
-		}
-		*/
-		//System.out.println("results: "+results.size());
+
 		for( int i = 1; i < results.size(); i++) {
 			double h = results.get(i)[0];
 			double p = results.get(i)[1];
-			/*
-			if( h != h) {
-				System.out.println("bad h "+i+" "+p);
-			}
-			if( p != p) {
-				System.out.println("bad p "+i+" "+h);
-			}
-			*/
 			double dH = h-last_h;
 			double avgH = (h+last_h)/2.0;
 			double avgP = (p+last_p)/2.0;
@@ -401,15 +526,7 @@ sum(ylnx+y)=0;
 			last_h = h;
 			last_p = p;
 		}
-		//System.out.println("sump: "+sumHP);
-		//System.out.println("sumhp: "+sumP);
 		return new double[]{(sumHP/sumP)/Math.log(2.0)};
-		//return new double[]{(sumHP/sumP)};
-
-		//Vector<double[]> dd = bin(results,num_bins,0,1,maxH);
-
-		
-		//return getSummaryStatsForEntropyPDF( results);
 	}
 	
 	public static double[] getSummaryStatsForEntropyPDF( Vector<double[]> samples) {
@@ -565,13 +682,20 @@ sum(ylnx+y)=0;
 		return getEntropyAndProbabilityAtTheta(thetas, data,true); 
 	}
 	public double[] getEntropyAndProbabilityAtTheta(double[] thetas, Integer[] data, boolean permuted) {
-		double h = getEntropyGivenTheta(thetas);
-		double pDO = 0;
-		if( permuted) {
-			pDO = getProbabilityOfDataGivenThetaPermuted2(thetas, data);
-		} else {
-			pDO = getProbabilityOfDataGivenTheta(thetas, data);
+		double sum_data = 0;
+		for( int i = 0; i < data.length; i++) {
+			sum_data += data[i];
 		}
+		
+		
+		double h = getEntropyGivenTheta(thetas);
+		double lpDO = 0;
+		if( permuted) {
+			lpDO = Math.log(getProbabilityOfDataGivenThetaPermuted2(thetas, data));
+		} else {
+			lpDO = getLogProbabilityOfDataGivenTheta(thetas, data);
+		}
+		double pDO = Math.exp(lpDO);
 		
 		
 		double[] dHdOs = getDerivsOfEntropyGivenTheta(thetas);
@@ -582,15 +706,72 @@ sum(ylnx+y)=0;
 		
 		
 		//double dHdO = determinant(getJacobianGivenTheta(thetas));
-		double pO = prior.getPriorProbabilityOfTheta(thetas);
-		double ph = pDO*pO / ( prior_is_on_H ? 1 : Math.abs(dHdO));
+		double lpO = Math.log(prior.getPriorProbabilityOfTheta(thetas));
+		double lph = lpDO+lpO - ( prior_is_on_H ? 0 : Math.log(Math.abs(dHdO)));
+		
+		//double l_add = sum_data;//data.length == 0 ? 0 : Math.log(data.length)*sum_data;
+		double l_add = data.length == 0 ? 0 : Math.log(data.length)*sum_data;
+		//double l_add = data.length == 0 ? 0 : data.length*sum_data;
+		//l_add -= 1000;
+		//lph += l_add;
+		
+		double pO = Math.exp(lpO);
+		double ph = Math.exp(lph);
 		//System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
 		/*
 		if( prior_is_on_H)
 			pO = prior.getPriorProbabilityOfTheta(h);
 			*/
-		
+		if( ph == 0) {
+			//System.out.println("ph is zero 25! "+pDO+" "+pO+" "+dHdO+" "+lpO+" "+lph+" "+l_add+" "+(lph+l_add));
+		}
 		return new double[]{h,ph,pDO,dHdO,pO};
+	}
+	public double[] getEntropyAndLogProbabilityAtTheta(double[] thetas, Integer[] data, boolean permuted) {
+		double sum_data = 0;
+		for( int i = 0; i < data.length; i++) {
+			sum_data += data[i];
+		}
+		
+		
+		double h = getEntropyGivenTheta(thetas);
+		double lpDO = 0;
+		if( permuted) {
+			lpDO = Math.log(getProbabilityOfDataGivenThetaPermuted2(thetas, data));
+		} else {
+			lpDO = getLogProbabilityOfDataGivenTheta(thetas, data);
+		}
+		double pDO = Math.exp(lpDO);
+		
+		
+		double[] dHdOs = getDerivsOfEntropyGivenTheta(thetas);
+		double dHdO = 1;//getDerivOfEntropyGivenTheta(thetas);
+		for( int i = 0; i < dHdOs.length-1; i++) {
+			dHdO *= dHdOs[i];
+		}
+		
+		
+		//double dHdO = determinant(getJacobianGivenTheta(thetas));
+		double lpO = Math.log(prior.getPriorProbabilityOfTheta(thetas));
+		double lph = lpDO+lpO - ( prior_is_on_H ? 0 : Math.log(Math.abs(dHdO)));
+		
+		//double l_add = sum_data;//data.length == 0 ? 0 : Math.log(data.length)*sum_data;
+		double l_add = data.length == 0 ? 0 : Math.log(data.length)*sum_data;
+		//double l_add = data.length == 0 ? 0 : data.length*sum_data;
+		//l_add -= 1000;
+		//lph += l_add;
+		
+		double pO = Math.exp(lpO);
+		double ph = Math.exp(lph);
+		//System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
+		/*
+		if( prior_is_on_H)
+			pO = prior.getPriorProbabilityOfTheta(h);
+			*/
+		if( ph == 0) {
+			//System.out.println("ph is zero 25! "+pDO+" "+pO+" "+dHdO+" "+lpO+" "+lph+" "+l_add+" "+(lph+l_add));
+		}
+		return new double[]{h,lph,lpDO,dHdO,lpO};
 	}
 
 	public double getDerivOfEntropyGivenTheta(double[] thetas) {
@@ -736,19 +917,27 @@ sum(ylnx+y)=0;
 	}
 	*/
 
-	public double getProbabilityOfDataGivenTheta(double[] thetas, Integer[] data) {
-		double mult = 1;
+	public double getLogProbabilityOfDataGivenTheta(double[] thetas, Integer[] data) {
+		/*
+		double mult = 1;//00000000000000000000000000000000000.0;
 		for(int i = 0; i < thetas.length; i++) {
 			mult *= Math.pow(thetas[i],(double)data[i]);
 		}
 		return mult;
-		/*
+		*/
+		
+		
 		double sum = 0;
+		double tot = 0;
 		for(int i = 0; i < thetas.length; i++) {
 			sum += Math.log(thetas[i])*(double)data[i];
+			tot += data[i];
 		}
-		return Math.exp(sum);
-		*/
+		//sum /= tot;
+		return sum;
+		//return Math.exp(sum);
+		
+		
 	}
 
 	public double getProbabilityOfThetaGivenData(double[] theta, Integer[] data) {
@@ -883,7 +1072,7 @@ sum(ylnx+y)=0;
 	
 	//also known as marginal likelihood
 	//https://en.wikipedia.org/wiki/Categorical_distribution
-	//“Dirichlet-Multinomial” 
+	//ï¿½Dirichlet-Multinomialï¿½ 
 	//https://people.eecs.berkeley.edu/~stephentu/writeups/dirichlet-conjugate-prior.pdf
 	public double[] getPDFBayesian(Integer[] buckets, int num_samples) {
 		Integer[][] data = new Integer[buckets.length][];
@@ -908,6 +1097,12 @@ sum(ylnx+y)=0;
 			dd[j] *= sum;
 		}
 		return dd;
+	}
+
+	@Override
+	public double getProbabilityOfDataGivenTheta(double[] thetas, Integer[] data) {
+		// TODO Auto-generated method stub
+		return Math.exp(getLogProbabilityOfDataGivenTheta(thetas,data));
 	}
 	
 

@@ -27,15 +27,62 @@ public class Main {
 	public static void main(String[] args) {
 		int resolution = 102400;
 		
+		
 		CategoricalDistribution cat = new CategoricalDistribution();
 		cat.prior_is_on_H = true;
+		cat.add_to_all_cats = 0;
 		long m0 = new Date().getTime();
 		
 		//		return new double[]{total_h_ph,0-total_e,total_ph};
 
 		
+		
 		double[] dd0;
 		double[] dd1;
+		double[] dd2;
+		
+		// new Integer{162, 8, 103, 5, 14, 32, 77, 231, 11, 154, 122, 4, 63, 7, 11, 53, 65, 352, 12, 4}
+		// new int[][]{new int[]{0,1,2,3,4,5,6,7,8,9}, new int[]{10,11,12,13,14,15,16,17,18,19}}
+		// 
+		
+		dd0 = cat.getSummaryStats(new Integer[]{797,693}, resolution);
+		System.out.println(dd0[0]);
+		//797 693
+		double ce3 = cat.getConditionalEntropy(
+				new Integer[]{162, 8, 103, 5, 14, 32, 77, 231, 11, 154, 122, 4, 63, 7, 11, 53, 65, 352, 12, 4},
+				new int[][]{new int[]{0,1,2,3,4,5,6,7,8,9}, new int[]{10,11,12,13,14,15,16,17,18,19}},
+				/*
+				new int[][]{
+					new int[]{0,10},
+					new int[]{1,11},
+					new int[]{2,12},
+					new int[]{3,13},
+					new int[]{4,14},
+					new int[]{5,15},
+					new int[]{6,16},
+					new int[]{7,17},
+					new int[]{8,18},
+					new int[]{9,19},
+					},
+					*/
+				resolution);
+		System.out.println(ce3);
+		
+		System.exit(0);
+		
+		for( int i = 0; i < 20; i++) {
+			dd0 = cat.getSummaryStats(new Integer[]{i*3,i,i*2,i*2,i,i*3}, resolution); //joint counts
+			dd1 = cat.getSummaryStats(new Integer[]{i*4,i*4,i*4}, resolution); //counts of answers on question x
+			dd2 = cat.getSummaryStats(new Integer[]{i*6,i*6}, resolution); //counts on dem or rep
+			double ce2 = cat.getConditionalEntropy(new Integer[]{i*3,i,i*2,i*2,i,i*3}, 
+					new int[][]{new int[]{0,1},new int[]{2,3},new int[]{4,5}}
+					, resolution);
+			double mi = dd1[0]+dd2[0]-dd0[0];
+			double ce = dd0[0]-dd1[0];
+			System.out.println(i+" : "+dd0[0]+", "+dd1[0]+","+dd2[0]+" | "+ce+", "+ce2);
+		}
+		System.exit(0);
+		
 		for( int i = 0; i < 100; i++) {
 			dd0 = cat.getSummaryStats(new Integer[]{i,i,0,0}, resolution);
 			dd1 = cat.getSummaryStats(new Integer[]{i,i}, resolution);
