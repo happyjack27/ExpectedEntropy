@@ -455,6 +455,40 @@ sum(ylnx+y)=0;
 
 		return (sumHP/sumP)/Math.log(2.0);
 	}
+	
+	public double integrateSortedEntropyCurve(Vector<double[]> results) {
+		//integrate
+		double sumP = 0;
+		double sumHP = 0;
+		double last_h = results.get(0)[0];
+		double last_p = results.get(0)[1];
+
+		for( int i = 1; i < results.size(); i++) {
+			double h = results.get(i)[0];
+			double p = results.get(i)[1];
+			double dH = h-last_h;
+			double avgH = (h+last_h)/2.0;
+			double avgP = (p+last_p)/2.0;
+			double dHP = avgH*dH*avgP;
+			double dP = dH*avgP;
+			if( dP == 0) {
+				//System.out.println("dP is 0 "+dH+" "+avgP);
+			}
+			if( dP == dP && dHP == dHP) {
+				sumHP += dHP;
+				sumP += dP;
+			} else {
+				//System.out.println("NAN! :"+dP+" "+dHP+" | "+avgH+" "+dH+" "+avgP);
+			}
+			last_h = h;
+			last_p = p;
+		}
+		//System.out.println("sums "+sumHP+" "+sumP);
+
+		return (sumHP/sumP)/Math.log(2.0);
+	}		
+	}
+	
 	private double[] getMLEThetas(Integer[] data) {
 		double[] thetas = new double[data.length];
 		double tot = 0;

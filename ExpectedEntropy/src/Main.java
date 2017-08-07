@@ -1,6 +1,8 @@
 import java.util.Date;
 import java.util.Vector;
 
+import javax.swing.JOptionPane;
+
 import distributions.*;
 import distributions.interfaces.PosteriorDistribution;
 import util.Functions;
@@ -49,8 +51,10 @@ public class Main {
 		System.out.println(dd0[0]);
 		//797 693
 		double ce3 = cat.getConditionalEntropy(
-				new Integer[]{162, 8, 103, 5, 14, 32, 77, 231, 11, 154, 122, 4, 63, 7, 11, 53, 65, 352, 12, 4},
-				new int[][]{new int[]{0,1,2,3,4,5,6,7,8,9}, new int[]{10,11,12,13,14,15,16,17,18,19}},
+				new Integer[]{80,176,175,105,139,94,156,129,112,86,116},
+				new int[][]{new int[]{0,1,2,3,4,5}, new int[]{6,7,8,9,10,11}},
+				//new Integer[]{162, 8, 103, 5, 14, 32, 77, 231, 11, 154, 122, 4, 63, 7, 11, 53, 65, 352, 12, 4},
+				//new int[][]{new int[]{0,1,2,3,4,5,6,7,8,9}, new int[]{10,11,12,13,14,15,16,17,18,19}},
 				/*
 				new int[][]{
 					new int[]{0,10},
@@ -66,6 +70,7 @@ public class Main {
 					},
 					*/
 				resolution);
+		JOptionPane.showMessageDialog(null, ""+ce3);
 		System.out.println(ce3);
 		
 		System.exit(0);
