@@ -405,11 +405,17 @@ sum(ylnx+y)=0;
 		//adjust log p arithmetically to max of 64, then take the exponent;
 		double max_log_p = samples.get(0).b[1];
 		for(int i = 0; i < samples.size(); i++) {
-			if( samples.get(i).b[1] > max_log_p) {
+			if( samples.get(i).b[1] != samples.get(i).b[1]) {
+				continue;
+			}
+			if( samples.get(i).b[1] > max_log_p || max_log_p != max_log_p) {
 				max_log_p = samples.get(i).b[1];
 			}
 		}
 		for(int i = 0; i < samples.size(); i++) {
+			if( samples.get(i).b[1] != samples.get(i).b[1]) {
+				samples.get(i).b[1] = 0;
+			}
 			samples.get(i).b[1] = Math.exp(samples.get(i).b[1] + 64.0 - max_log_p);
 		}
 		
@@ -494,12 +500,17 @@ sum(ylnx+y)=0;
 		for( int i = 0; i < num_samples; i++) {		
 			//calculate entropy and probability
 			double[] dd = getEntropyAndProbabilityAtTheta(getRandomThetas(data2.length),data2,false);
+			if( i == 0) {
+				dd = getEntropyAndProbabilityAtTheta(getMinEntropyThetas(data2.length),data2,false);
+			}
+			if( i == 1) {
+				dd = getEntropyAndProbabilityAtTheta(getMaxEntropyThetas(data2.length),data2,false);
+			}
+			if( i == 2) {
+				dd = getEntropyAndProbabilityAtTheta(getMLEThetas(data2),data2,false);
+			}
 			samples.add(new Pair<Double,double[]>(dd[0],dd));
 		}
-		double[] dd0 = getEntropyAndProbabilityAtTheta(getMinEntropyThetas(data2.length),data2,false);
-		double[] dd1 = getEntropyAndProbabilityAtTheta(getMaxEntropyThetas(data2.length),data2,false);
-		samples.add(new Pair<Double,double[]>(dd0[0],dd0));
-		samples.add(new Pair<Double,double[]>(dd1[0],dd1));
 		//getEntropyAndProbabilityAtTheta(getMinEntropyThetas(),data,false);
 		//doulbe[] min = 
 		Collections.sort(samples);
@@ -682,20 +693,15 @@ sum(ylnx+y)=0;
 		return getEntropyAndProbabilityAtTheta(thetas, data,true); 
 	}
 	public double[] getEntropyAndProbabilityAtTheta(double[] thetas, Integer[] data, boolean permuted) {
-		double sum_data = 0;
-		for( int i = 0; i < data.length; i++) {
-			sum_data += data[i];
-		}
-		
 		
 		double h = getEntropyGivenTheta(thetas);
-		double lpDO = 0;
+		double pDO = 0;
 		if( permuted) {
-			lpDO = Math.log(getProbabilityOfDataGivenThetaPermuted2(thetas, data));
+			pDO = getProbabilityOfDataGivenThetaPermuted2(thetas, data);
 		} else {
-			lpDO = getLogProbabilityOfDataGivenTheta(thetas, data);
+			pDO = getProbabilityOfDataGivenTheta(thetas, data);
 		}
-		double pDO = Math.exp(lpDO);
+		//double pDO = Math.exp(lpDO);
 		
 		
 		double[] dHdOs = getDerivsOfEntropyGivenTheta(thetas);
@@ -706,17 +712,19 @@ sum(ylnx+y)=0;
 		
 		
 		//double dHdO = determinant(getJacobianGivenTheta(thetas));
-		double lpO = Math.log(prior.getPriorProbabilityOfTheta(thetas));
-		double lph = lpDO+lpO - ( prior_is_on_H ? 0 : Math.log(Math.abs(dHdO)));
+		//double lpO = Math.log(prior.getPriorProbabilityOfTheta(thetas));
+		//double lph = lpDO+lpO - ( prior_is_on_H ? 0 : Math.log(Math.abs(dHdO)));
 		
 		//double l_add = sum_data;//data.length == 0 ? 0 : Math.log(data.length)*sum_data;
-		double l_add = data.length == 0 ? 0 : Math.log(data.length)*sum_data;
+		//double l_add = data.length == 0 ? 0 : Math.log(data.length)*sum_data;
 		//double l_add = data.length == 0 ? 0 : data.length*sum_data;
 		//l_add -= 1000;
 		//lph += l_add;
 		
-		double pO = Math.exp(lpO);
-		double ph = Math.exp(lph);
+		//double pO = Math.exp(lpO);
+		//double ph = Math.exp(lph);
+		double pO = Math.log(prior.getPriorProbabilityOfTheta(thetas));
+		double ph = pDO*pO / ( prior_is_on_H ? 1 : Math.abs(dHdO));
 		//System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
 		/*
 		if( prior_is_on_H)
@@ -728,11 +736,7 @@ sum(ylnx+y)=0;
 		return new double[]{h,ph,pDO,dHdO,pO};
 	}
 	public double[] getEntropyAndLogProbabilityAtTheta(double[] thetas, Integer[] data, boolean permuted) {
-		double sum_data = 0;
-		for( int i = 0; i < data.length; i++) {
-			sum_data += data[i];
-		}
-		
+
 		
 		double h = getEntropyGivenTheta(thetas);
 		double lpDO = 0;
@@ -741,7 +745,7 @@ sum(ylnx+y)=0;
 		} else {
 			lpDO = getLogProbabilityOfDataGivenTheta(thetas, data);
 		}
-		double pDO = Math.exp(lpDO);
+		//double pDO = Math.exp(lpDO);
 		
 		
 		double[] dHdOs = getDerivsOfEntropyGivenTheta(thetas);
@@ -756,21 +760,21 @@ sum(ylnx+y)=0;
 		double lph = lpDO+lpO - ( prior_is_on_H ? 0 : Math.log(Math.abs(dHdO)));
 		
 		//double l_add = sum_data;//data.length == 0 ? 0 : Math.log(data.length)*sum_data;
-		double l_add = data.length == 0 ? 0 : Math.log(data.length)*sum_data;
+		//double l_add = data.length == 0 ? 0 : Math.log(data.length)*sum_data;
 		//double l_add = data.length == 0 ? 0 : data.length*sum_data;
 		//l_add -= 1000;
 		//lph += l_add;
 		
-		double pO = Math.exp(lpO);
-		double ph = Math.exp(lph);
+		//double pO = Math.exp(lpO);
+		//double ph = Math.exp(lph);
 		//System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
 		/*
 		if( prior_is_on_H)
 			pO = prior.getPriorProbabilityOfTheta(h);
 			*/
-		if( ph == 0) {
+		//if( ph == 0) {
 			//System.out.println("ph is zero 25! "+pDO+" "+pO+" "+dHdO+" "+lpO+" "+lph+" "+l_add+" "+(lph+l_add));
-		}
+		//}
 		return new double[]{h,lph,lpDO,dHdO,lpO};
 	}
 
@@ -917,9 +921,24 @@ sum(ylnx+y)=0;
 	}
 	*/
 
+	@Override
+	public double getProbabilityOfDataGivenTheta(double[] thetas, Integer[] data) {
+		double mult = 1;
+		for(int i = 0; i < thetas.length; i++) {
+			mult *= Math.pow(thetas[i],(double)data[i]);
+		}
+		return mult;
+		// TODO Auto-generated method stub
+		//return Math.exp(getLogProbabilityOfDataGivenTheta(thetas,data));
+	}
+
+	public double getProbabilityOfThetaGivenData(double[] theta, Integer[] data) {
+		return getProbabilityOfDataGivenTheta(theta,data)*prior.getPriorProbabilityOfTheta(theta);
+	}
+		
 	public double getLogProbabilityOfDataGivenTheta(double[] thetas, Integer[] data) {
 		/*
-		double mult = 1;//00000000000000000000000000000000000.0;
+		double mult = 1;
 		for(int i = 0; i < thetas.length; i++) {
 			mult *= Math.pow(thetas[i],(double)data[i]);
 		}
@@ -928,20 +947,16 @@ sum(ylnx+y)=0;
 		
 		
 		double sum = 0;
-		double tot = 0;
+		//double tot = 0;
 		for(int i = 0; i < thetas.length; i++) {
 			sum += Math.log(thetas[i])*(double)data[i];
-			tot += data[i];
+			//tot += data[i];
 		}
 		//sum /= tot;
 		return sum;
 		//return Math.exp(sum);
 		
 		
-	}
-
-	public double getProbabilityOfThetaGivenData(double[] theta, Integer[] data) {
-		return getProbabilityOfDataGivenTheta(theta,data)*prior.getPriorProbabilityOfTheta(theta);
 	}
 
 	public PriorDistribution<double[], double[], Integer> getConjugatePrior() {
@@ -969,11 +984,11 @@ sum(ylnx+y)=0;
 		for( int i = 0; i < bucket_count; i++) {
 			buckets[i] = i;
 		}
-		//permutations = new int[(int)factorial(bucket_count)][];
-		Double p = new Double(0);
-		permute2(buckets, 0, 0,data,p,theta);
+		permutations = new int[(int)factorial(bucket_count)][];
+		//Double p = new Double(0);
+		permute2(buckets, 0, 0,data, new Double(0),theta);
 		
-		/*
+		
 		double p = 0;
 		double[] permuted = new double[theta.length];
 		for( int i = 0; i < permutations.length; i++) {
@@ -981,7 +996,7 @@ sum(ylnx+y)=0;
 				permuted[j] = theta[permutations[i][j]];
 			}
 			p += getProbabilityOfDataGivenTheta(permuted,data); 
-		}*/
+		}
 		return p;
 	}
 	int permute2(int[] num, int i, int start, Integer[] data, Double p, double[] theta) {
@@ -1099,12 +1114,7 @@ sum(ylnx+y)=0;
 		return dd;
 	}
 
-	@Override
-	public double getProbabilityOfDataGivenTheta(double[] thetas, Integer[] data) {
-		// TODO Auto-generated method stub
-		return Math.exp(getLogProbabilityOfDataGivenTheta(thetas,data));
-	}
-	
+
 
 
 }

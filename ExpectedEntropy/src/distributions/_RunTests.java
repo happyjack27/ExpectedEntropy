@@ -8,49 +8,97 @@ import util.*;
 
 public class _RunTests {
 	static int max_n = 50;
-	static int num_runs = 100;//25;
+	static int num_runs = 100;//1000;//25;
 	static boolean divide_log_likelihood_by_n = false;
-	static int MONTE_CARLO_RESOLUTION = 1024;
+	static int MONTE_CARLO_RESOLUTION = 400;
+	
+	
 	
 	static final int METRIC_BEES = 0;
 	static final int METRIC_BEES_PRIOR_NOT_H = 1;
+	static final int METRIC_BEES_START_WITH_1 = 8;
 	static final int METRIC_AIC = 2;
-	static final int METRIC_AICc = 3;
+	static final int METRIC_AIC_NO_PENALTY = 9;
 	static final int METRIC_BIC = 4;
+
+	static final int METRIC_AICc = 3;
 	static final int METRIC_BEES_LNMULT = 5;
 	static final int METRIC_BEES_I_MULT = 6;
 	static final int METRIC_BEES_C_MULT = 7;
-	static double C = 10;
+	static final int METRIC_BEES_PENALIZED = 10;
+	static final int METRIC_BEES_PENALIZED_LOG = 11;
+	static double min_entropy_reduction_per_parameter = 0.1;
+
+	public static int max_size = 3;//10;//3;
 	
+	static double C = 10;
+	 
 	static int METRIC = 0;
 
 
-	public boolean prior_is_on_H = false;
+	public static boolean prior_is_on_H = true; 
 	public static int[] choices = new int[]{
-			0,0,1,1,
+			//3,3,3,3,3,3,3,3,
+			0,0,0,0,0,0,0,0,
+			1,1,1,1,1,1,1,1,
+			//3,3,3,3,3,3,3,3,
+
+			0,0,0,0,0,0,0,0,
+			1,1,1,1,1,1,1,1,
+			//3,3,3,3,3,3,3,3,
+
+			0,0,0,0,0,0,0,0,
+			1,1,1,1,1,1,1,1,
+			//3,3,3,3,3,3,3,3,
+//1,1,
+			/*
+			0,0,0,0,
+			0,0,0,
+			0,0,0,0,
+			0,0,0,
+			*/
+			/*
+			1,1,1,1,
+			1,1,
+			1,1,1,1,
+			1,1,
+			*/
 			//0,1,3,0,1,3,
 			//0,1,3,0,1,3,
 			//0,1,3,0,1,3,
 	};
 	public static double[] noises = new double[]{
-			0.0,0.0,0.1,0.1,
-			0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
+			//0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
+
+			0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,
+			0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,
+			//0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1,
+
+			0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,
+			0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,
+			//0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,
+//0.0,0.0,
 			//0.0,0.0,0.0,
 			//0.0,0.0,0.0,
-			0.1,0.1,0.1,
+			//0.1,0.1,0.1,
 			//0.1,0.1,0.1,
 			//0.1,0.1,0.1,
 			
 	};
 	public static int[] metrics = new int[]{
-			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
-			5,5,5,
-			0,0,0,
-			//2,2,2,
-			//4,4,4,
-			0,0,0,
-			//2,2,2,
-			//4,4,4,
+			//METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED_LOG,
+			METRIC_BEES,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED,METRIC_BEES_START_WITH_1,METRIC_BEES_PRIOR_NOT_H,METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_BIC,
+			METRIC_BEES,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED,METRIC_BEES_START_WITH_1,METRIC_BEES_PRIOR_NOT_H,METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_BIC,
+			METRIC_BEES,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED,METRIC_BEES_START_WITH_1,METRIC_BEES_PRIOR_NOT_H,METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_BIC,
+			METRIC_BEES,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED,METRIC_BEES_START_WITH_1,METRIC_BEES_PRIOR_NOT_H,METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_BIC,
+			METRIC_BEES,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED,METRIC_BEES_START_WITH_1,METRIC_BEES_PRIOR_NOT_H,METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_BIC,
+			METRIC_BEES,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED,METRIC_BEES_START_WITH_1,METRIC_BEES_PRIOR_NOT_H,METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_BIC,
+			//METRIC_BEES,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED,METRIC_BEES_START_WITH_1,METRIC_BEES_PRIOR_NOT_H,METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_BIC,
+			//METRIC_BEES,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED,METRIC_BEES_START_WITH_1,METRIC_BEES_PRIOR_NOT_H,METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_BIC,
+			//METRIC_BEES,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED,METRIC_BEES_START_WITH_1,METRIC_BEES_PRIOR_NOT_H,METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_BIC,
+			
 	};
 	
 	public static void setTargetCover() {
@@ -130,7 +178,6 @@ public class _RunTests {
 	public static boolean optimize_cover = true;
 	static Vector<Integer> target_cover = new Vector<Integer>();
 	static int number_of_bits = 10;
-	public static int max_size = 3;
 
 	static int[][] sets = null;	
 	static Vector<Vector<Integer>> all_covers = new Vector<Vector<Integer>>();	
@@ -237,48 +284,44 @@ public class _RunTests {
 	
 	public static Vector<Integer> scoreAndStuff( double[] entropies) {
 		double best_e = 999999999999999999999999999.9;
+		double best_e_param_count = 1;
 		Vector<Integer> best_cover = new Vector<Integer>();
+		/*
+	static final int METRIC_BEES = 0;
+	static final int METRIC_BEES_PRIOR_NOT_H = 1;
+	static final int METRIC_BEES_START_WITH_1 = 8;
+		 */
 		for( Vector<Integer> cover : all_covers) {
 			double e = getTotalEntropy(cover,entropies);
-			if( e < best_e) {
+			double p = getTotalParams(cover);
+			double max_e = best_e;
+			if( METRIC == METRIC_BEES_PENALIZED) {
+				//if( METRIC == METRIC_BEES || METRIC == METRIC_BEES_PRIOR_NOT_H || METRIC == METRIC_BEES_START_WITH_1) {
+				max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter;
+			}
+			if( METRIC == METRIC_BEES_PENALIZED_LOG) {
+				max_e -= (Math.log(p)-Math.log(best_e_param_count))*min_entropy_reduction_per_parameter;
+				
+			}
+			//min_entropy_reduction_per_parameter
+			if( e < max_e || e == max_e && p < best_e_param_count) {
 				best_e = e;
+				best_e_param_count = p;
 				best_cover = cover;
 			}
 		}
 		return best_cover;
-		/*
-		
-		
-		int population = 10000;
-		
-		//punish empty set
-		entropies[0] = 1000;
-		for( int n = 0; n < 5; n++) {
-			while( covers.size() < population) {
-				covers.add(new Pair<Double,Vector<Integer>>(0.0,getRandomFullCover()));
-			}
-			for( int i = 0; i < population; i++) {
-				Vector<Integer> cover = (Vector<Integer>) covers.get(i).b.clone();
-				cover.remove((int)(Math.random()*(double)cover.size()));
-				while( !doesCover(cover)) {
-					cover.add((int)(Math.random()*(double)sets.length));
-				}
-				if( optimize_cover) {
-					optimizeFullCover(cover);
-				}
-				covers.add(new Pair<Double,Vector<Integer>>(0.0,cover));
-			}
-			for( Pair<Double,Vector<Integer>> c : covers) {
-				c.a = getTotalEntropy(c.b,entropies);
-			}
-			Collections.sort(covers);
-			while( covers.size() > population) {
-				covers.remove(population);
-			}
-		}
-		*/
+
 	}
 	
+	private static double getTotalParams(Vector<Integer> cover) {
+		double tot = 0;
+		for( int i : cover) {
+			tot += 0x01 << sets[i].length;
+		}
+		return tot;
+	}
+
 	public static Integer[] bucket(Vector<boolean[]> samples, int[] select) {
 		if( select.length == 0) {
 			return new Integer[0];
@@ -518,6 +561,30 @@ public class _RunTests {
 		return tot;
 	}
 	
+	public static double getAICNoPenalty(Integer[] buckets) {
+		double k = buckets.length;
+		
+		double total_log_probability = 0;
+		
+		double n = 0;
+		for(int i = 0; i < buckets.length; i++) {
+			n += buckets[i];
+		}
+		
+		for(int i = 0; i < buckets.length; i++) {
+			double p = ((double)buckets[i]) / n;
+			if( p == 0) {
+				continue;
+			}
+			total_log_probability += Math.log(p)*(double)buckets[i];
+		}
+		if( divide_log_likelihood_by_n) {
+			total_log_probability /= n;
+		}
+		
+		return  - total_log_probability;
+	}
+	
 	public static double getAIC(Integer[] buckets) {
 		double k = buckets.length;
 		
@@ -612,11 +679,13 @@ public class _RunTests {
 				Integer[] ii = bucket(samples,ss);
 				cat.setNumberOfCategories(ii.length);
 				double v = 0;
+				cat.prior_is_on_H = prior_is_on_H;
 				
 				switch(METRIC) {
 				case METRIC_BEES:
+				case METRIC_BEES_PENALIZED:
+				case METRIC_BEES_PENALIZED_LOG:
 					//CategoricalDistribution cat = new CategoricalDistribution();
-					cat.prior_is_on_H = true;
 					v = cat.getSummaryStats(ii,MONTE_CARLO_RESOLUTION)[0];
 					//System.out.print(""+ii.length+": "+v);
 					//System.out.print(".");
@@ -648,6 +717,16 @@ public class _RunTests {
 					//System.out.print(".");
 					//v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
 					break;
+				case METRIC_BEES_START_WITH_1:
+					Integer[] ii4 = new Integer[ii.length];
+					//double mult3 = Math.log((double)ii.length)/Math.log(2.0);
+					for( int k = 0; k < ii.length; k++) {
+						ii4[k] = ii[k]+1;
+					}
+					v = cat.getSummaryStats(ii4,MONTE_CARLO_RESOLUTION)[0];
+					//System.out.print(".");
+					//v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
+					break;
 				case METRIC_BEES_PRIOR_NOT_H:
 					v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
 					break;
@@ -659,6 +738,9 @@ public class _RunTests {
 					break;
 				case METRIC_BIC:
 					v = getBIC(ii);
+					break;
+				case METRIC_AIC_NO_PENALTY:
+					v = getAICNoPenalty(ii);
 					break;
 				}
 				
