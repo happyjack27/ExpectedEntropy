@@ -44,11 +44,9 @@ public class ProcessArgs {
 		CategoricalDistribution cat = new CategoricalDistribution();
 		cat.prior_is_on_H = true;
 		
-		Vector<double[]>[] entropyCurves = null;
-		double[] summaries = new double[entropyCurves.length];
-		for( int i = 0; i < entropyCurves.length; i++) {
-			summaries[i] = cat.integrateSortedEntropyCurve(entropyCurves[i]);
-		}
+		Vector<double[]>[] entropyCurves = cat.getAllEntropiesVectors(
+				counts, margin1, margin2, resolution
+				); 
 		
 		String[] names = new String[]{
 				"H(X;Y)",
@@ -60,18 +58,17 @@ public class ProcessArgs {
 				
 		};
 		
-		//Vector<double[]> vs = new Vector<double[]>();
-		
 		//now cat out the file.
 		try {
 			File f = new File(args[OUTPUT_FILE]);
 			FileOutputStream fis = new FileOutputStream(f);
 			
 			StringBuffer sb = new StringBuffer();
-			sb.append("\"EXPECTATIONS\", ");
-			appendLine(sb,summaries);
 			for( int i = 0; i < entropyCurves.length; i++) {
 				Vector<double[]> vs = entropyCurves[i]; 
+				double expectation = cat.integrateSortedEntropyCurve(vs);
+				sb.append("\"E("+names[i]+")\", ");
+				appendLine(sb,new double[]{1,expectation});
 				for( int j = 0; j < vs.size(); j++) {
 					sb.append("\""+names[i]+"\", ");
 					appendLine(sb,vs.get(i));

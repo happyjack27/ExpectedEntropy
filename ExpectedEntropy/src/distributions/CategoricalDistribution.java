@@ -490,9 +490,10 @@ sum(ylnx+y)=0;
 	
 	//if you want the conditional entropy of X given Y, the marginal categories should be the categories for Y.
 	//H(X,Y),H(X),H(Y),H(X|Y),H(Y|X),MI(X,Y)
-	public double[] getAllEntropies(Integer[] data, int[][] marginal_categories1, int[][] marginal_categories2, int num_samples) {
+	public Vector<double[]>[] getAllEntropiesVectors(Integer[] data, int[][] marginal_categories1, int[][] marginal_categories2, int num_samples) {
+		Vector<double[]>[]  rets = new Vector[6];
 		if( data.length == 0) {
-			return new double[]{0,0,0,0,0,0};
+			return rets;
 		}
 		Integer[] margin_data1 = jointToMarginData(data,marginal_categories1);
 		Integer[] margin_data2 = jointToMarginData(data,marginal_categories2);
@@ -552,7 +553,7 @@ sum(ylnx+y)=0;
 			vmi.add(new Pair<Double,double[]>(mi[0],mi));
 		}
 	
-		double[] rets = new double[vs.size()];
+		//double[] rets = new double[vs.size()];
 		for( int vi = 0; vi < rets.length; vi++) {
 			Vector<Pair<Double,double[]>> vp = vs.get(vi);
 			Collections.sort(vp);
@@ -603,7 +604,7 @@ sum(ylnx+y)=0;
 				last_p = p;
 			}
 		
-			rets[vi] = (sumHP/sumP)/Math.log(2.0);
+			rets[vi] = results;//(sumHP/sumP)/Math.log(2.0);
 		}
 	
 		return rets;
