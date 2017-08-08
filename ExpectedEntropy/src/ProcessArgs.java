@@ -16,8 +16,8 @@ public class ProcessArgs {
 		//args = "out.csv 1000 5,3,2,5,12,3 2".split(" ");
 		if( args == null || args.length < 4) {
 			System.out.println("Usage: ");
-			System.out.println("  java -jar bees.jar output_file resolution counts marginal_categories [show expectations (true/false)] [show curves (true/false)] ");
-			System.out.println("  example: java -jar bees.jar out.csv 1000 51,3,20,5,12,3 2");
+			System.out.println("  java -jar catsnbees.jar output_file resolution counts marginal_categories [show expectations (true/false)] [show curves (true/false)] ");
+			System.out.println("  example: java -jar catsnbees.jar out.csv 1000 51,3,20,5,12,3 2");
 			System.out.println("  will use a marginal distribution of {5+3+2,  5+12+3}");
 			System.out.println("       and a marginal distribution of {5+5, 3+12, 2+3}");
 			return;
