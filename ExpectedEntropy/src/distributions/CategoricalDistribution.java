@@ -500,7 +500,6 @@ sum(ylnx+y)=0;
 	
 		setNumberOfCategories(data.length);
 	
-		Vector<double[]> results = new Vector<double[]>();
 		Vector<Pair<Double,double[]>> vhxy = new Vector<Pair<Double,double[]>>();
 		Vector<Pair<Double,double[]>> vhx = new Vector<Pair<Double,double[]>>();
 		Vector<Pair<Double,double[]>> vhy = new Vector<Pair<Double,double[]>>();
@@ -555,6 +554,7 @@ sum(ylnx+y)=0;
 	
 		//double[] rets = new double[vs.size()];
 		for( int vi = 0; vi < rets.length; vi++) {
+			Vector<double[]> results = new Vector<double[]>();
 			Vector<Pair<Double,double[]>> vp = vs.get(vi);
 			Collections.sort(vp);
 			//adjust log p arithmetically to max of 0, then take the exponent;
@@ -570,12 +570,12 @@ sum(ylnx+y)=0;
 			}
 		
 			//now add all samples to results.
-			results = new Vector<double[]>();
 			for(int i = 0; i < vp.size(); i++) {
-				results.add(vp.get(i).b);
+				results.add(new double[]{vp.get(i).b[0],vp.get(i).b[1]});
 			}
 			//double maxH = Math.log((double)data.length);///Math.log(2.0);
 			//integrate
+			/*
 			double sumP = 0;
 			double sumHP = 0;
 			double last_h = results.get(0)[0];
@@ -603,6 +603,7 @@ sum(ylnx+y)=0;
 				last_h = h;
 				last_p = p;
 			}
+			*/
 		
 			rets[vi] = results;//(sumHP/sumP)/Math.log(2.0);
 		}
