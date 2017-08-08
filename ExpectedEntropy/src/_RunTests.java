@@ -13,6 +13,10 @@ public class _RunTests {
 	static boolean divide_log_likelihood_by_n = false;
 	static int MONTE_CARLO_RESOLUTION = 200;
 	
+	//entropy at percentile
+	//percentile at entropy
+	//expected entropy
+	
 	
 	
 	static final int METRIC_BEES = 0;
@@ -30,6 +34,7 @@ public class _RunTests {
 	static final int METRIC_BEES_PENALIZED_LOG = 11;
 	static final int METRIC_BEES_PENALIZED_K_N = 12;
 	static double min_entropy_reduction_per_parameter = 0.1;
+	static double min_entropy_reduction_per_parameter_for_k_n = 1.0;
 
 	public static int max_size = 3;//10;//3;
 	
@@ -40,6 +45,8 @@ public class _RunTests {
 
 	public static boolean prior_is_on_H = true; 
 	public static int[] choices = new int[]{
+			0,1,0,1,0,1,0,1,
+			/*
 			0,0,0,0,//0,0,0,0,
 			1,1,1,1,//1,1,1,1,
 
@@ -51,8 +58,11 @@ public class _RunTests {
 
 			0,0,0,0,//0,0,0,0,
 			1,1,1,1,//1,1,1,1,
+			*/
 	};
 	public static double[] noises = new double[]{
+			0.0,0.0,0.05,0.05,0.1,0.1,0.2,0.2,
+			
 			0.0,0.0,0.0,0.0,//0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,//0.0,0.0,0.0,0.0,
 			
@@ -66,8 +76,11 @@ public class _RunTests {
 			0.2,0.2,0.2,0.2,//0.2,0.2,0.2,0.2,
 	};
 	public static int[] metrics = new int[]{
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
 			//METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED_LOG,
 			//METRIC_BEES_START_WITH_1,METRIC_BEES_PENALIZED_LOG,
+			/*
 			METRIC_BEES,METRIC_BEES_PENALIZED,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PRIOR_NOT_H,
 			METRIC_BEES,METRIC_BEES_PENALIZED,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PRIOR_NOT_H,
 			METRIC_BEES,METRIC_BEES_PENALIZED,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PRIOR_NOT_H,
@@ -76,6 +89,7 @@ public class _RunTests {
 			METRIC_BEES,METRIC_BEES_PENALIZED,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PRIOR_NOT_H,
 			METRIC_BEES,METRIC_BEES_PENALIZED,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PRIOR_NOT_H,
 			METRIC_BEES,METRIC_BEES_PENALIZED,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PRIOR_NOT_H,
+			*/
 			/*
 			METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_AICc,METRIC_BIC,
 			METRIC_AIC_NO_PENALTY,METRIC_AIC,METRIC_AICc,METRIC_BIC,
@@ -285,16 +299,17 @@ public class _RunTests {
 			double p = getTotalParams(cover);
 			double max_e = best_e;
 			if( METRIC == METRIC_BEES_PENALIZED) {
+				e += min_entropy_reduction_per_parameter*p;
 				//if( METRIC == METRIC_BEES || METRIC == METRIC_BEES_PRIOR_NOT_H || METRIC == METRIC_BEES_START_WITH_1) {
-				max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter;
+				//max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter;
+			}
+			if( METRIC == METRIC_BEES_PENALIZED_LOG) {
+				e += Math.log(p)*min_entropy_reduction_per_parameter;
 			}
 			if( METRIC == METRIC_BEES_PENALIZED_K_N) {
 				//if( METRIC == METRIC_BEES || METRIC == METRIC_BEES_PRIOR_NOT_H || METRIC == METRIC_BEES_START_WITH_1) {
-				max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter / N;
-			}
-			if( METRIC == METRIC_BEES_PENALIZED_LOG) {
-				max_e -= (Math.log(p)-Math.log(best_e_param_count))*min_entropy_reduction_per_parameter;
-				
+				//max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter_for_k_n / N;
+				e += min_entropy_reduction_per_parameter_for_k_n*p / N;
 			}
 			//min_entropy_reduction_per_parameter
 			if( e < max_e || e == max_e && p < best_e_param_count) {

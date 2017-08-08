@@ -458,6 +458,66 @@ sum(ylnx+y)=0;
 
 		return (sumHP/sumP)/Math.log(2.0);
 	}
+	public double getAtPercentile(Vector<double[]> results, double percentile) {
+		return getAtSortedPercentiles(results, new double[]{percentile})[0];
+	}
+	public double[] getAtSortedPercentiles(Vector<double[]> results, double[] percentiles) {
+		double[] ret = new double[percentiles.length];
+		//integrate
+		double sumP = 0;
+		double last_h = results.get(0)[0];
+		double last_p = results.get(0)[1];
+		for( int i = 1; i < results.size(); i++) {
+			double h = results.get(i)[0];
+			double p = results.get(i)[1];
+			double dH = h-last_h;
+			double avgP = (p+last_p)/2.0;
+			double dP = dH*avgP;
+			if( dP == dP) {
+				sumP += dP;
+			} else {
+				//System.out.println("NAN! :"+dP+" "+dHP+" | "+avgH+" "+dH+" "+avgP);
+			}
+			last_h = h;
+			last_p = p;
+		}
+		double totP = sumP;
+		double targetP = percentiles[0] * totP;
+
+		int n = 0;
+		sumP = 0;
+		last_h = results.get(0)[0];
+		last_p = results.get(0)[1];
+		for( int i = 1; i < results.size(); i++) {
+			double h = results.get(i)[0];
+			double p = results.get(i)[1];
+			double dH = h-last_h;
+			double avgP = (p+last_p)/2.0;
+			double dP = dH*avgP;
+			if( dP == dP) {
+				sumP += dP;
+			} else {
+				//System.out.println("NAN! :"+dP+" "+dHP+" | "+avgH+" "+dH+" "+avgP);
+			}
+			while( sumP > targetP) {
+				double prevP = sumP - dP;
+				ret[n] = (last_h + dH*(targetP - prevP)/dP)/Math.log(2);
+				n++;
+				if( n >= percentiles.length) {
+					break;
+				}
+				targetP = percentiles[n] * totP;
+				//return (h+last_h)/2.0;
+			}
+			if( n >= percentiles.length) {
+				break;
+			}
+			last_h = h;
+			last_p = p;
+		}
+		
+		return ret;
+	}
 	
 	public double integrateSortedEntropyCurve(Vector<double[]> results) {
 		//integrate

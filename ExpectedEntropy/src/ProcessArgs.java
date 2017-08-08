@@ -10,15 +10,17 @@ public class ProcessArgs {
 	static int MARGINAL_CATS = 3;
 	
 	public static void main(String[] args) {
-		args = "out.csv 10000 162,8,103,5,14,32,77,231,11,154,122,4,63,7,11,53,65,352,12,4 2".split(" ");
+		args = "out.csv 100000 162,8,103,5,14,32,77,231,11,154,122,4,63,7,11,53,65,352,12,4 2 true false 0.01,0.1,0.25,0.5,0.75,0.9,0.99".split(" ");
 		boolean show_expectations = true;
 		boolean show_curves = true;
 		boolean use_prior_for_sampling = false;
+		double[] percentiles = null;
+		//getAtPercentile
 		//args = "out.csv 1000 5,3,2,5,12,3 2".split(" ");
 		//args = "1000 162,8,103,5,14,32,77,231,11,154,122,4,63, 7, 11, 53, 65, 352, 12, 4},		
 		if( args == null || args.length < 4) {
 			System.out.println("Usage: ");
-			System.out.println("  java -jar catsnbees.jar output_file resolution counts marginal_categories [show expectations (true/false)] [show curves (true/false)] ");
+			System.out.println("  java -jar catsnbees.jar output_file resolution counts marginal_categories [show expectations (true/false)] [show curves (true/false)] [percentiles]");
 			System.out.println("  example: java -jar catsnbees.jar out.csv 1000 51,3,20,5,12,3 2");
 			System.out.println("  will use a marginal distribution of {5+3+2,  5+12+3}");
 			System.out.println("       and a marginal distribution of {5+5, 3+12, 2+3}");
@@ -29,6 +31,13 @@ public class ProcessArgs {
 		}
 		if( args.length > 5) {
 			show_curves = args[5].toLowerCase().equals("true");
+		}
+		if( args.length > 6) {
+			String[] cs = args[6].split(",");
+			percentiles = new double[cs.length];
+			for( int i = 0; i < percentiles.length; i++) {
+				percentiles[i] = Double.parseDouble(cs[i]);
+			}
 		}
 		int resolution = Integer.parseInt(args[RESOLUTION]);
 		int cats = Integer.parseInt(args[MARGINAL_CATS]);
@@ -85,6 +94,12 @@ public class ProcessArgs {
 					double expectation = cat.integrateSortedEntropyCurve(vs);
 					sb.append("\"E("+names[i]+")\", ");
 					appendLine(sb,new double[]{1,expectation});
+				}
+				if( percentiles != null) {
+					double[] ps = cat.getAtSortedPercentiles(vs, percentiles);
+					for( int j = 0; j < percentiles.length; j++) {
+						sb.append("\"icdf("+names[i]+",p)\", "+percentiles[j]+", "+ps[j]+"\n");
+					}
 				}
 				if( show_curves) {
 					for( int j = 0; j < vs.size(); j++) {
