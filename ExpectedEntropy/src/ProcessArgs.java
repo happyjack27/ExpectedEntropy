@@ -10,7 +10,9 @@ public class ProcessArgs {
 	static int MARGINAL_CATS = 3;
 	
 	public static void main(String[] args) {
-		args = "out.csv 100000 162,8,103,5,14,32,77,231,11,154,122,4,63,7,11,53,65,352,12,4 2 true false 0.01,0.1,0.25,0.5,0.75,0.9,0.99".split(" ");
+		//args = "out.csv 100000 162,8,103,5,14,32,77,231,11,154,122,4,63,7,11,53,65,352,12,4 2 true false 0.01,0.1,0.25,0.5,0.75,0.9,0.99".split(" ");
+		//args = "out.csv 100000 1,1 2 true false".split(" "); //sb 0.389...
+
 		boolean show_expectations = true;
 		boolean show_curves = true;
 		boolean use_prior_for_sampling = false;
@@ -92,8 +94,9 @@ public class ProcessArgs {
 				Vector<double[]> vs = entropyCurves[i];
 				if( show_expectations) {
 					double expectation = cat.integrateSortedEntropyCurve(vs);
+					double e_of_e1 = cat.getEntropyOfSortedEntropyCurve(vs);
 					sb.append("\"E("+names[i]+")\", ");
-					appendLine(sb,new double[]{1,expectation});
+					appendLine(sb,new double[]{1,expectation,e_of_e1});
 				}
 				if( percentiles != null) {
 					double[] ps = cat.getAtSortedPercentiles(vs, percentiles);
@@ -111,6 +114,7 @@ public class ProcessArgs {
 			fis.write(sb.toString().getBytes());
 			fis.flush();
 			fis.close();
+			//System.out.println(sb.toString());
 			System.out.println("Done.");
 			System.exit(0);
 		} catch (Exception e) {

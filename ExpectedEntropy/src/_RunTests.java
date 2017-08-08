@@ -9,9 +9,9 @@ import util.*;
 
 public class _RunTests {
 	static int max_n = 50;
-	static int num_runs = 50;//1000;//25;
+	static int num_runs = 200;//1000;//25;
 	static boolean divide_log_likelihood_by_n = false;
-	static int MONTE_CARLO_RESOLUTION = 200;
+	static int MONTE_CARLO_RESOLUTION = 400;
 	
 	//entropy at percentile
 	//percentile at entropy
@@ -23,20 +23,22 @@ public class _RunTests {
 	static final int METRIC_BEES_PRIOR_NOT_H = 1;
 	static final int METRIC_BEES_START_WITH_1 = 8;
 	static final int METRIC_AIC = 2;
-	static final int METRIC_AIC_NO_PENALTY = 9;
+	static final int METRIC_LOG_LIKELIHOOD = 9;
 	static final int METRIC_BIC = 4;
 
 	static final int METRIC_AICc = 3;
 	static final int METRIC_BEES_LNMULT = 5;
 	static final int METRIC_BEES_I_MULT = 6;
 	static final int METRIC_BEES_C_MULT = 7;
-	static final int METRIC_BEES_PENALIZED = 10;
 	static final int METRIC_BEES_PENALIZED_LOG = 11;
 	static final int METRIC_BEES_PENALIZED_K_N = 12;
-	static double min_entropy_reduction_per_parameter = 0.1;
+	static final int METRIC_BEES_PENALIZED_K_N_NEG = 13;
+	//static double min_entropy_reduction_per_parameter = 0.1;
 	static double min_entropy_reduction_per_parameter_for_k_n = 1.0;
+	
+	static boolean use_neg_entropy = false;
 
-	public static int max_size = 3;//10;//3;
+	public static int max_size = 3;
 	
 	static double C = 10;
 	 
@@ -45,7 +47,9 @@ public class _RunTests {
 
 	public static boolean prior_is_on_H = true; 
 	public static int[] choices = new int[]{
-			0,1,0,1,0,1,0,1,
+			//3,3,3,3,3,
+			0,1,0,1,
+			0,1,0,1,
 			/*
 			0,0,0,0,//0,0,0,0,
 			1,1,1,1,//1,1,1,1,
@@ -61,13 +65,17 @@ public class _RunTests {
 			*/
 	};
 	public static double[] noises = new double[]{
-			0.0,0.0,0.05,0.05,0.1,0.1,0.2,0.2,
+			/*
+			0.0,0.0,
+			0.0,0.0,0.0,
+			0.05,0.05,0.1,0.1,0.2,0.2,
+			*/
 			
 			0.0,0.0,0.0,0.0,//0.0,0.0,0.0,0.0,
-			0.0,0.0,0.0,0.0,//0.0,0.0,0.0,0.0,
+			0.1,0.1,0.1,0.1,//0.0,0.0,0.0,0.0,
 			
-			0.05,0.05,0.05,0.05,//0.0,0.0,0.0,0.0,
-			0.05,0.05,0.05,0.05,//0.0,0.0,0.0,0.0,
+			//0.05,0.05,0.05,0.05,//0.0,0.0,0.0,0.0,
+			//0.05,0.05,0.05,0.05,//0.0,0.0,0.0,0.0,
 
 			0.1,0.1,0.1,0.1,//0.1,0.1,0.1,0.1,
 			0.1,0.1,0.1,0.1,//0.1,0.1,0.1,0.1,
@@ -76,8 +84,10 @@ public class _RunTests {
 			0.2,0.2,0.2,0.2,//0.2,0.2,0.2,0.2,
 	};
 	public static int[] metrics = new int[]{
-			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
-			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+			METRIC_LOG_LIKELIHOOD,METRIC_AIC,METRIC_BEES,METRIC_BEES_PENALIZED_K_N,
+
+			//METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+			//METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
 			//METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED_LOG,
 			//METRIC_BEES_START_WITH_1,METRIC_BEES_PENALIZED_LOG,
 			/*
@@ -298,18 +308,18 @@ public class _RunTests {
 			double e = getTotalEntropy(cover,entropies);
 			double p = getTotalParams(cover);
 			double max_e = best_e;
-			if( METRIC == METRIC_BEES_PENALIZED) {
-				e += min_entropy_reduction_per_parameter*p;
-				//if( METRIC == METRIC_BEES || METRIC == METRIC_BEES_PRIOR_NOT_H || METRIC == METRIC_BEES_START_WITH_1) {
-				//max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter;
+			if( use_neg_entropy || METRIC == METRIC_BEES_PENALIZED_K_N_NEG) {
+				e -= number_of_bits;
 			}
+			e *= N;
 			if( METRIC == METRIC_BEES_PENALIZED_LOG) {
-				e += Math.log(p)*min_entropy_reduction_per_parameter;
+				e += Math.log(p)*min_entropy_reduction_per_parameter_for_k_n;
 			}
 			if( METRIC == METRIC_BEES_PENALIZED_K_N) {
 				//if( METRIC == METRIC_BEES || METRIC == METRIC_BEES_PRIOR_NOT_H || METRIC == METRIC_BEES_START_WITH_1) {
 				//max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter_for_k_n / N;
-				e += min_entropy_reduction_per_parameter_for_k_n*p / N;
+				e += p*min_entropy_reduction_per_parameter_for_k_n;
+				//e += min_entropy_reduction_per_parameter_for_k_n*p / N;
 			}
 			//min_entropy_reduction_per_parameter
 			if( e < max_e || e == max_e && p < best_e_param_count) {
@@ -691,9 +701,9 @@ public class _RunTests {
 				
 				switch(METRIC) {
 				case METRIC_BEES:
-				case METRIC_BEES_PENALIZED:
 				case METRIC_BEES_PENALIZED_K_N:
 				case METRIC_BEES_PENALIZED_LOG:
+				case METRIC_BEES_PENALIZED_K_N_NEG:
 					//CategoricalDistribution cat = new CategoricalDistribution();
 					v = cat.getSummaryStats(ii,MONTE_CARLO_RESOLUTION)[0];
 					//System.out.print(""+ii.length+": "+v);
@@ -748,7 +758,7 @@ public class _RunTests {
 				case METRIC_BIC:
 					v = getBIC(ii);
 					break;
-				case METRIC_AIC_NO_PENALTY:
+				case METRIC_LOG_LIKELIHOOD:
 					v = getAICNoPenalty(ii);
 					break;
 				}

@@ -550,6 +550,31 @@ sum(ylnx+y)=0;
 
 		return (sumHP/sumP)/Math.log(2.0);
 	}	
+	public double getEntropyOfSortedEntropyCurve(Vector<double[]> results) {
+		double res = 10.0/(double)results.size();//Math.exp(-Math.log((double)results.size())*0.5);
+		double maxH = results.get(results.size()-1)[0]/Math.log(2); 
+		//System.out.println("maxH: "+maxH);
+		
+		double[] percentiles = new double[(int)Math.ceil((double)1.0 / res)];
+		for( int i = 0; i < percentiles.length; i++) {
+			percentiles[i] = res*(double)i;
+			if( percentiles[i] > 1) {
+				percentiles[i] = 1;
+			}
+		}
+		double[] hs = this.getAtSortedPercentiles(results, percentiles);
+		
+		double e = 0;
+		double max_e = 0;
+		for( int i = 1; i < hs.length; i++) {
+			max_e -= res * Math.log(res);
+		}
+		for( int i = 1; i < hs.length; i++) {
+			double dH = (hs[i] - hs[i-1])/maxH;
+			e -= res * Math.log(dH);
+		}
+		return (e-max_e)/Math.log(2.0);
+	}	
 	
 	//if you want the conditional entropy of X given Y, the marginal categories should be the categories for Y.
 	//H(X,Y),H(X),H(Y),H(X|Y),H(Y|X),MI(X,Y)
