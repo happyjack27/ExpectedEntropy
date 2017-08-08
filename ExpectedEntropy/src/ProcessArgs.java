@@ -10,10 +10,12 @@ public class ProcessArgs {
 	static int MARGINAL_CATS = 3;
 	
 	public static void main(String[] args) {
-		//args = "out.csv 10000 162,8,103,5,14,32,77,231,11,154,122,4,63,7,11,53,65,352,12,4 2".split(" ");
+		args = "out.csv 10000 162,8,103,5,14,32,77,231,11,154,122,4,63,7,11,53,65,352,12,4 2".split(" ");
 		boolean show_expectations = true;
 		boolean show_curves = true;
+		boolean use_prior_for_sampling = false;
 		//args = "out.csv 1000 5,3,2,5,12,3 2".split(" ");
+		//args = "1000 162,8,103,5,14,32,77,231,11,154,122,4,63, 7, 11, 53, 65, 352, 12, 4},		
 		if( args == null || args.length < 4) {
 			System.out.println("Usage: ");
 			System.out.println("  java -jar catsnbees.jar output_file resolution counts marginal_categories [show expectations (true/false)] [show curves (true/false)] ");
@@ -56,10 +58,11 @@ public class ProcessArgs {
 		
 		CategoricalDistribution cat = new CategoricalDistribution();
 		cat.prior_is_on_H = true;
+		cat.use_prior_for_sampling = use_prior_for_sampling;
 		
 		Vector<double[]>[] entropyCurves = cat.getAllEntropiesVectors(
 				counts, margin1, margin2, resolution
-				); 
+		); 
 		
 		String[] names = new String[]{
 				"H(X;Y)",
@@ -68,7 +71,6 @@ public class ProcessArgs {
 				"H(X|Y)",
 				"H(Y|X)",
 				"I(X;Y)",
-				
 		};
 		
 		//now cat out the file.

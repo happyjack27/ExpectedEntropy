@@ -1,6 +1,6 @@
 package util;
 
-import org.apache.commons.math.special.*;
+import org.apache.commons.math3.special.*;
 
 public class Functions {
 	

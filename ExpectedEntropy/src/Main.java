@@ -50,11 +50,12 @@ public class Main {
 		dd0 = cat.getSummaryStats(new Integer[]{797,693}, resolution);
 		System.out.println(dd0[0]);
 		//797 693
+		cat.use_prior_for_sampling = false;
 		double ce3 = cat.getConditionalEntropy(
-				new Integer[]{80,176,175,105,139,94,156,129,112,86,116},
-				new int[][]{new int[]{0,1,2,3,4,5}, new int[]{6,7,8,9,10,11}},
-				//new Integer[]{162, 8, 103, 5, 14, 32, 77, 231, 11, 154, 122, 4, 63, 7, 11, 53, 65, 352, 12, 4},
-				//new int[][]{new int[]{0,1,2,3,4,5,6,7,8,9}, new int[]{10,11,12,13,14,15,16,17,18,19}},
+				//new Integer[]{80,176,175,105,139,94,156,129,112,86,116},
+				//new int[][]{new int[]{0,1,2,3,4,5}, new int[]{6,7,8,9,10,11}},
+				new Integer[]{162, 8, 103, 5, 14, 32, 77, 231, 11, 154, 122, 4, 63, 7, 11, 53, 65, 352, 12, 4},
+				new int[][]{new int[]{0,1,2,3,4,5,6,7,8,9}, new int[]{10,11,12,13,14,15,16,17,18,19}},
 				/*
 				new int[][]{
 					new int[]{0,10},
