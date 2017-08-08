@@ -486,7 +486,127 @@ sum(ylnx+y)=0;
 		//System.out.println("sums "+sumHP+" "+sumP);
 
 		return (sumHP/sumP)/Math.log(2.0);
-	}		
+	}	
+	
+	//if you want the conditional entropy of X given Y, the marginal categories should be the categories for Y.
+	//H(X,Y),H(X),H(Y),H(X|Y),H(Y|X),MI(X,Y)
+	public double[] getAllEntropies(Integer[] data, int[][] marginal_categories1, int[][] marginal_categories2, int num_samples) {
+		if( data.length == 0) {
+			return new double[]{0,0,0,0,0,0};
+		}
+		Integer[] margin_data1 = jointToMarginData(data,marginal_categories1);
+		Integer[] margin_data2 = jointToMarginData(data,marginal_categories2);
+	
+		setNumberOfCategories(data.length);
+	
+		Vector<double[]> results = new Vector<double[]>();
+		Vector<Pair<Double,double[]>> vhxy = new Vector<Pair<Double,double[]>>();
+		Vector<Pair<Double,double[]>> vhx = new Vector<Pair<Double,double[]>>();
+		Vector<Pair<Double,double[]>> vhy = new Vector<Pair<Double,double[]>>();
+		Vector<Pair<Double,double[]>> vhxgy = new Vector<Pair<Double,double[]>>();
+		Vector<Pair<Double,double[]>> vhygx = new Vector<Pair<Double,double[]>>();
+		Vector<Pair<Double,double[]>> vmi = new Vector<Pair<Double,double[]>>();
+	
+		Vector<Vector<Pair<Double,double[]>>> vs = new Vector<Vector<Pair<Double,double[]>>>();
+		vs.add(vhxy);
+		vs.add(vhx);
+		vs.add(vhy);
+		vs.add(vhxgy);
+		vs.add(vhygx);
+		vs.add(vmi);
+	
+		//do a bunch of random samples
+		for( int i = 0; i < num_samples; i++) {
+		//calculate entropy and probability
+			double[] thetas = getRandomThetas(data.length);
+			switch(i) {
+				case 0:
+				thetas = getMinEntropyThetas(data.length);
+			break;
+				case 1:
+				thetas = getMaxEntropyThetas(data.length);
+			break;
+				case 2:
+				thetas = getMLEThetas(data);
+			break;
+			}
+			double[] margin_thetas1 = jointToMarginTheta(thetas,marginal_categories1);
+			double[] margin_thetas2 = jointToMarginTheta(thetas,marginal_categories2);
+		
+			double[] hxy = getEntropyAndLogProbabilityAtTheta(thetas,data,false);
+			double[] hx = getEntropyAndLogProbabilityAtTheta(margin_thetas1,margin_data1,false);
+			double[] hy = getEntropyAndLogProbabilityAtTheta(margin_thetas2,margin_data2,false);
+			double[] hxgy = hxy.clone();
+			double[] hygx = hxy.clone();
+			double[] mi = hxy.clone();
+		
+			hxgy[0] -= hy[0];
+			hygx[0] -= hx[0];
+			mi[0] = hx[0]+hy[0]-hxy[0];
+		
+			vhxy.add(new Pair<Double,double[]>(hxy[0],hxy));
+			vhx.add(new Pair<Double,double[]>(hx[0],hx));
+			vhy.add(new Pair<Double,double[]>(hy[0],hy));
+			vhxgy.add(new Pair<Double,double[]>(hxgy[0],hxgy));
+			vhygx.add(new Pair<Double,double[]>(hygx[0],hygx));
+			vmi.add(new Pair<Double,double[]>(mi[0],mi));
+		}
+	
+		double[] rets = new double[vs.size()];
+		for( int vi = 0; vi < rets.length; vi++) {
+			Vector<Pair<Double,double[]>> vp = vs.get(vi);
+			Collections.sort(vp);
+			//adjust log p arithmetically to max of 0, then take the exponent;
+			double max_log_p = vp.get(0).b[1];
+			for(int i = 0; i < vp.size(); i++) {
+				if( vp.get(i).b[1] > max_log_p) {
+					max_log_p = vp.get(i).b[1];
+				}
+			}
+		
+			for(int i = 0; i < vp.size(); i++) {
+				vp.get(i).b[1] = Math.exp(vp.get(i).b[1] + 0.0 - max_log_p);
+			}
+		
+			//now add all samples to results.
+			results = new Vector<double[]>();
+			for(int i = 0; i < vp.size(); i++) {
+				results.add(vp.get(i).b);
+			}
+			//double maxH = Math.log((double)data.length);///Math.log(2.0);
+			//integrate
+			double sumP = 0;
+			double sumHP = 0;
+			double last_h = results.get(0)[0];
+			double last_p = results.get(0)[1];
+		
+			for( int i = 1; i < results.size(); i++) {
+				double h = results.get(i)[0];
+				double p = results.get(i)[1];
+				double dH = h-last_h;
+				double avgH = (h+last_h)/2.0;
+				double avgP = (p+last_p)/2.0;
+				double dHP = avgH*dH*avgP;
+				double dP = dH*avgP;
+				if( dP == 0) {
+					//System.out.println("dP is 0 "+dH+" "+avgP);
+				}
+			
+				if( dP == dP && dHP == dHP) {
+					sumHP += dHP;
+					sumP += dP;
+				} else {
+					//System.out.println("NAN! :"+dP+" "+dHP+" | "+avgH+" "+dH+" "+avgP);
+				}
+			
+				last_h = h;
+				last_p = p;
+			}
+		
+			rets[vi] = (sumHP/sumP)/Math.log(2.0);
+		}
+	
+		return rets;
 	}
 	
 	private double[] getMLEThetas(Integer[] data) {
