@@ -8,10 +8,17 @@ import util.*;
 // http://www.sortie-nd.org/lme/Statistical%20Papers/Burnham_and_Anderson_2004_Multimodel_Inference.pdf
 
 public class _RunTests {
-	static int max_n = 50;
-	static int num_runs = 200;//1000;//25;
+	static int max_n = 25;
+	static int num_runs = 50;//1000;//25;
 	static boolean divide_log_likelihood_by_n = false;
-	static int MONTE_CARLO_RESOLUTION = 400;
+	static int MONTE_CARLO_RESOLUTION = 200;
+	
+	static int number_of_bits = 10;
+	public static int max_size = 10;
+
+	static double at_percentile = 0;
+	static boolean show_detail = false;
+	
 	
 	//entropy at percentile
 	//percentile at entropy
@@ -33,23 +40,46 @@ public class _RunTests {
 	static final int METRIC_BEES_PENALIZED_LOG = 11;
 	static final int METRIC_BEES_PENALIZED_K_N = 12;
 	static final int METRIC_BEES_PENALIZED_K_N_NEG = 13;
+	static final int METRIC_BEES_PENALIZED_MULT = 14;
+	static final int METRIC_BEES_CONSTRAINED = 15;
 	//static double min_entropy_reduction_per_parameter = 0.1;
 	static double min_entropy_reduction_per_parameter_for_k_n = 1.0;
+	//static double min_e_per_p = 0.1;
+	static double constrained_min_total_e_saved_per_p = 1;
 	
-	static boolean use_neg_entropy = false;
+	static boolean use_neg_entropy = true;
 
-	public static int max_size = 3;
 	
 	static double C = 10;
 	 
 	static int METRIC = 0;
 
 
-	public static boolean prior_is_on_H = true; 
+	public static boolean prior_is_on_H = true;
+	//0 - wire
+	//1 - and/or/xor
+	//2 - half add
+	//8 - full add
 	public static int[] choices = new int[]{
+			0,1,2,8,
+			0,1,2,8,
+			0,1,2,8,
+			//0,1,2,8,
+			//8,8,8,
+			//8,8,8,
+			//2,2,
+			//2,2,2,
+			//2,2,2,2,
+			//0,1,0,1,
 			//3,3,3,3,3,
-			0,1,0,1,
-			0,1,0,1,
+			/*
+			0,0,0,0,0,
+			1,1,1,1,1,
+			0,0,0,0,0,
+			1,1,1,1,1,
+			*/
+			//0,0,0,0,
+			//1,1,1,1,
 			/*
 			0,0,0,0,//0,0,0,0,
 			1,1,1,1,//1,1,1,1,
@@ -58,21 +88,30 @@ public class _RunTests {
 			1,1,1,1,//1,1,1,1,
 
 			0,0,0,0,//0,0,0,0,
-			1,1,1,1,//1,1,1,1,
+			1,1,1,1,//1,1,1,1,  
 
 			0,0,0,0,//0,0,0,0,
 			1,1,1,1,//1,1,1,1,
 			*/
 	};
 	public static double[] noises = new double[]{
+			0.0,0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,
+			0.1,0.1,0.1,0.1,
+			//0.0,0.0,0.1,0.1,
 			/*
-			0.0,0.0,
 			0.0,0.0,0.0,
 			0.05,0.05,0.1,0.1,0.2,0.2,
 			*/
+			//0.1,0.1,
 			
-			0.0,0.0,0.0,0.0,//0.0,0.0,0.0,0.0,
-			0.1,0.1,0.1,0.1,//0.0,0.0,0.0,0.0,
+			
+			//0.0,0.0,0.0, 0.0,0.0,0.0,
+			0.1,0.1,0.1, 0.1,0.1,0.1,
+			0.0,0.0,0.0,0.0,0.0,0.0,
+			//0.1,0.1,0.1,0.1,0.1,0.1,
+			
 			
 			//0.05,0.05,0.05,0.05,//0.0,0.0,0.0,0.0,
 			//0.05,0.05,0.05,0.05,//0.0,0.0,0.0,0.0,
@@ -84,7 +123,33 @@ public class _RunTests {
 			0.2,0.2,0.2,0.2,//0.2,0.2,0.2,0.2,
 	};
 	public static int[] metrics = new int[]{
+			//METRIC_AIC,
+			//METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			//METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			//METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,
+			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+			METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PENALIZED_MULT,
+			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
+			//METRIC_BEES,
+			//METRIC_LOG_LIKELIHOOD,
+			//METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,
+			//METRIC_LOG_LIKELIHOOD,METRIC_AIC,
+			//METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			METRIC_LOG_LIKELIHOOD,METRIC_AIC,METRIC_BEES,
+			METRIC_LOG_LIKELIHOOD,METRIC_AIC,METRIC_BEES,
+			METRIC_BEES,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PRIOR_NOT_H,
+			//METRIC_LOG_LIKELIHOOD,METRIC_AIC,METRIC_BEES, METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PRIOR_NOT_H,
+
+			//METRIC_LOG_LIKELIHOOD,METRIC_AIC, 
+			METRIC_BEES,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PRIOR_NOT_H,
+			//METRIC_LOG_LIKELIHOOD,METRIC_AIC,METRIC_BEES, METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PRIOR_NOT_H,
+
+			/*
+			METRIC_BEES_PENALIZED_MULT,METRIC_BEES_CONSTRAINED,
 			METRIC_LOG_LIKELIHOOD,METRIC_AIC,METRIC_BEES,METRIC_BEES_PENALIZED_K_N,
+			METRIC_LOG_LIKELIHOOD,METRIC_AIC,METRIC_BEES,METRIC_BEES_PENALIZED_K_N,
+			*/
 
 			//METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
 			//METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
@@ -150,6 +215,40 @@ public class _RunTests {
 				break;
 			}		
 		}
+		if( max_size == 4) {
+			switch(choice) {
+			case 0:
+				break;
+			case 1:
+				break;
+			case 2:
+				target_cover.add(30);
+				target_cover.add(385);
+				target_cover.add(1);
+				target_cover.add(31);
+				//sample[9];
+				break;
+			case 3:
+				break;
+			}		
+		}
+		if( max_size == 5) {
+			switch(choice) {
+			case 0:
+				break;
+			case 1:
+				break;
+			case 2:
+				//sample[9];
+				break;
+			case 3:
+				break;
+			case 8:
+				target_cover.add(31);
+				target_cover.add(637);
+				break;
+			}		
+		}
 		if( max_size < 10) {
 			return;
 		}
@@ -168,16 +267,26 @@ public class _RunTests {
 			target_cover.add(512);
 			break;
 		case 2:
-			target_cover.add(6);
-			target_cover.add(56);
-			target_cover.add(448);
-			target_cover.add(513);
+			
+			target_cover.add(30);
+			target_cover.add(960);
+			target_cover.add(1);
+			target_cover.add(32);
 			//sample[9];
 			break;
+			/*
 		case 3:
 			target_cover.add(1);
 			target_cover.add(30);
 			target_cover.add(992);
+			break;
+			*/
+		case 8:
+			target_cover.add(31);
+			target_cover.add(992);
+			//target_cover.add(1);
+			//target_cover.add(30);
+			//target_cover.add(992);
 			break;
 		}		
 	}
@@ -190,7 +299,6 @@ public class _RunTests {
 
 	public static boolean optimize_cover = true;
 	static Vector<Integer> target_cover = new Vector<Integer>();
-	static int number_of_bits = 10;
 
 	static int[][] sets = null;	
 	static Vector<Vector<Integer>> all_covers = new Vector<Vector<Integer>>();	
@@ -204,6 +312,15 @@ public class _RunTests {
 	
 	public static void main( String[] args) {
 		for( cur_choice = 0; cur_choice < choices.length; cur_choice++) {
+			/*
+			at_percentile = 
+					cur_choice == 0 ? 0.25 :
+					cur_choice == 1 ? 0.50 :
+					cur_choice == 2 ? 0.75 :
+					0
+			;
+			*/
+			
 			choice = choices[cur_choice];
 			noise = noises[cur_choice];
 			METRIC = metrics[cur_choice];
@@ -308,10 +425,20 @@ public class _RunTests {
 			double e = getTotalEntropy(cover,entropies);
 			double p = getTotalParams(cover);
 			double max_e = best_e;
-			if( use_neg_entropy || METRIC == METRIC_BEES_PENALIZED_K_N_NEG) {
+			//if( use_neg_entropy || METRIC == METRIC_BEES_PENALIZED_K_N_NEG) {
 				e -= number_of_bits;
-			}
+			//}
 			e *= N;
+			
+			
+			if( METRIC == METRIC_BEES_CONSTRAINED) {
+				if( -e / p < constrained_min_total_e_saved_per_p) {
+					e /= p;
+				}
+			}
+			if( METRIC == METRIC_BEES_PENALIZED_MULT) {
+				e /= p;//Math.log(p)*min_entropy_reduction_per_parameter_for_k_n;
+			}
 			if( METRIC == METRIC_BEES_PENALIZED_LOG) {
 				e += Math.log(p)*min_entropy_reduction_per_parameter_for_k_n;
 			}
@@ -490,18 +617,10 @@ public class _RunTests {
 	
 
 	public static boolean[] getSample() {
-		boolean[] sample = new boolean[]{
-				Math.random() > 0.5,
-				Math.random() > 0.5,
-				Math.random() > 0.5,
-				Math.random() > 0.5,
-				Math.random() > 0.5,
-				Math.random() > 0.5,
-				Math.random() > 0.5,
-				Math.random() > 0.5,
-				Math.random() > 0.5,
-				Math.random() > 0.5,
-		};
+		boolean[] sample = new boolean[number_of_bits];
+		for( int i = 0; i < sample.length; i++) {
+			sample[i] = Math.random() > 0.5;
+		}
 		
 		switch(choice) {
 		case 0:
@@ -517,11 +636,12 @@ public class _RunTests {
 			sample[8] = sample[6] | sample[7];
 			break;
 		case 2:
-			//sample[0]; //mixed
-			sample[2] = sample[1];
-			sample[5] = sample[4] & sample[3];
+			//sample[0]; //mixed //2 half adders
+			sample[3] = sample[1] ^ sample[2];
+			sample[4] = sample[1] & sample[2];
+
 			sample[8] = sample[6] ^ sample[7];
-			sample[9] = sample[0];
+			sample[9] = sample[6] & sample[7];
 			//sample[9];
 			break;
 		case 3:
@@ -540,6 +660,11 @@ public class _RunTests {
 			sample[9] = sample[7] | sample[8];
 			break;
 		case 8:
+			sample[3] = sample[0] ^ sample[1] ^ sample[2];
+			sample[4] = (sample[0] & sample[1]) | (sample[1] & sample[2]) | (sample[2] & sample[0]);
+			
+			sample[8] = sample[5] ^ sample[6] ^ sample[7];
+			sample[9] = (sample[5] & sample[6]) | (sample[6] & sample[7]) | (sample[7] & sample[5]);
 			//random
 			break;
 		case 9:
@@ -703,9 +828,19 @@ public class _RunTests {
 				case METRIC_BEES:
 				case METRIC_BEES_PENALIZED_K_N:
 				case METRIC_BEES_PENALIZED_LOG:
+				case METRIC_BEES_PENALIZED_MULT:
+				case METRIC_BEES_CONSTRAINED:
 				case METRIC_BEES_PENALIZED_K_N_NEG:
+					Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii,MONTE_CARLO_RESOLUTION);
+					if( at_percentile > 0) {
+						v = cat.getAtPercentile(curve, at_percentile);
+					} else {
+						v = cat.integrateSortedEntropyCurve(curve);
+					}
+
+					
 					//CategoricalDistribution cat = new CategoricalDistribution();
-					v = cat.getSummaryStats(ii,MONTE_CARLO_RESOLUTION)[0];
+					//v = cat.getSummaryStats(ii,MONTE_CARLO_RESOLUTION)[0];
 					//System.out.print(""+ii.length+": "+v);
 					//System.out.print(".");
 					//v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
@@ -773,7 +908,7 @@ public class _RunTests {
 
 			
 			int num = getDistance(best_cover,target_cover);
-			if( false) {
+			if( show_detail) {
 				System.out.print(i+": best cover e: "+best_e+" : ");
 				for( int s : best_cover) {
 					int[] ii = sets[s]; 
@@ -785,9 +920,9 @@ public class _RunTests {
 							System.out.print(ii[j]);
 					}
 					System.out.print("} ");
-					System.out.print(": "+num);
-					System.out.println();
 				}
+				System.out.print(": "+num);
+				System.out.println();
 			}
 			
 			

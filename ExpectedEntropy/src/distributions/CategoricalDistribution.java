@@ -21,7 +21,7 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 	
 	PriorDistribution<double[],double[],Integer> prior;
 
-	public static int add_to_all_cats;
+	public static int add_to_all_cats = 0;
 	
 	public static double GAMMA = 0.577215664901532860606512090082;
 	public static double GAMMA_MINX = 1.e-12;
@@ -459,6 +459,9 @@ sum(ylnx+y)=0;
 		return (sumHP/sumP)/Math.log(2.0);
 	}
 	public double getAtPercentile(Vector<double[]> results, double percentile) {
+		if( results.size() == 0) {
+			return 0;
+		}
 		return getAtSortedPercentiles(results, new double[]{percentile})[0];
 	}
 	public double[] getAtSortedPercentiles(Vector<double[]> results, double[] percentiles) {
@@ -520,6 +523,10 @@ sum(ylnx+y)=0;
 	}
 	
 	public double integrateSortedEntropyCurve(Vector<double[]> results) {
+		if( results.size() == 0) {
+			return 0;
+		}
+		
 		//integrate
 		double sumP = 0;
 		double sumHP = 0;
@@ -687,6 +694,104 @@ sum(ylnx+y)=0;
 		}
 		// TODO Auto-generated method stub
 		return thetas;
+	}
+	public Vector<double[]> getEntropyCurveLogarithmic(Integer[] data, int num_samples) {
+		if( data.length == 0) {
+			return new Vector<double[]>();
+		}
+		setNumberOfCategories(data.length);
+	
+		Vector<Pair<Double,double[]>> vhxy = new Vector<Pair<Double,double[]>>();
+	
+		//do a bunch of random samples
+		for( int i = 0; i < num_samples; i++) {
+		//calculate entropy and probability
+			double[] thetas = getRandomThetas(data);
+			switch(i) {
+				case 0:
+				thetas = getMinEntropyThetas(data.length);
+			break;
+				case 1:
+				thetas = getMaxEntropyThetas(data.length);
+			break;
+				case 2:
+				thetas = getMLEThetas(data);
+			break;
+			}
+			double[] hxy = getEntropyAndLogProbabilityAtTheta(thetas,data,false);
+		
+		
+			vhxy.add(new Pair<Double,double[]>(hxy[0],hxy));
+		}
+	
+		Vector<double[]> results = new Vector<double[]>();
+		Vector<Pair<Double,double[]>> vp = vhxy;
+		Collections.sort(vp);
+		//adjust log p arithmetically to max of 0, then take the exponent;
+		double max_log_p = vp.get(0).b[1];
+		for(int i = 0; i < vp.size(); i++) {
+			if( vp.get(i).b[1] > max_log_p) {
+				max_log_p = vp.get(i).b[1];
+			}
+		}
+	
+		for(int i = 0; i < vp.size(); i++) {
+			vp.get(i).b[1] = Math.exp(vp.get(i).b[1] + 0.0 - max_log_p);
+		}
+	
+		//now add all samples to results.
+		for(int i = 0; i < vp.size(); i++) {
+			results.add(new double[]{vp.get(i).b[0],vp.get(i).b[1]});
+		}
+		
+		return results;
+	}
+	
+	
+	
+	public Vector<double[]> getEntropyCurveMultiplicative(Integer[] data, int num_samples) {
+		if( data.length == 0) {
+			return new Vector<double[]>();
+		}
+
+		setNumberOfCategories(data.length);
+		Integer[] data2;
+		if( add_to_all_cats == 0) {
+			data2 = data;
+		} else {
+			data2 = new Integer[data.length];
+			for( int i = 0; i < data.length; i++) {
+				data2[i] = data[i] + add_to_all_cats;
+			}
+			
+		}
+		
+		Vector<double[]> results = new Vector<double[]>();
+		Vector<Pair<Double,double[]>> samples = new Vector<Pair<Double,double[]>>();
+		
+		//do a bunch of random samples
+		for( int i = 0; i < num_samples; i++) {		
+			//calculate entropy and probability
+			double[] dd = getEntropyAndProbabilityAtTheta(getRandomThetas(data2),data2,false);
+			if( i == 0) {
+				dd = getEntropyAndProbabilityAtTheta(getMinEntropyThetas(data2.length),data2,false);
+			}
+			if( i == 1) {
+				dd = getEntropyAndProbabilityAtTheta(getMaxEntropyThetas(data2.length),data2,false);
+			}
+			if( i == 2) {
+				dd = getEntropyAndProbabilityAtTheta(getMLEThetas(data2),data2,false);
+			}
+			samples.add(new Pair<Double,double[]>(dd[0],dd));
+		}
+		//getEntropyAndProbabilityAtTheta(getMinEntropyThetas(),data,false);
+		//doulbe[] min = 
+		Collections.sort(samples);
+		//results.add
+		for(int i = 0; i < samples.size(); i++) {
+			results.add(samples.get(i).b);
+		}
+		return results;
 	}
 
 	public double[] getSummaryStats(Integer[] data, int num_samples) {
