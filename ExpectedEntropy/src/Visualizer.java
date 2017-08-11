@@ -28,7 +28,8 @@ public class Visualizer {
 	 */
 	
 	int num_vars = 4;
-	int num_dots = 100*100;
+	int dot_width = 64;
+	int num_dots = dot_width*dot_width;
 	int last_dot = 0;
 	double totalH = 4;
 	double dots_per_H = 0;
@@ -38,9 +39,11 @@ public class Visualizer {
 	int[] dot_connections = new int[num_dots];
 	int[][] dot_coords = new int[num_dots][2];
 	
-	public void init() {
+	public void init(int num, double totalEntropy, double[] Is) {
+		num_vars = num;
+		totalH = totalEntropy;
 		size = 0x01 << num_vars;
-		I = new double[size];
+		I = Is;
 		D = new double[size];
 		dots_per_H = (double)num_dots/totalH;
 		
@@ -73,19 +76,47 @@ public class Visualizer {
 				cur_remainder--;
 			}
 		}
+		
+		//now randomize array
+		for( int d = 0; d < dot_connections.length; d++) {
+			int d2 = (int)(Math.random()*(double)dot_connections.length);
+			int t = dot_connections[d];
+			dot_connections[d] = dot_connections[d2];
+			dot_connections[d2] = t;
+		}
+		
 	}
-	public double scoreMap(int[][] dot_coords) {
+	
+	public void perturb(int[][] dot_grid, double rate) {
+		int N = (int)rate; //better to poisson estimate this.
+		for( int i = 0; i < N; i++) {
+			int x = (int)(Math.random()*(double)dot_grid.length);
+			int y = (int)(Math.random()*(double)dot_grid.length);
+			int dx = (int)(Math.random()*3.0-1.0); 
+			int dy = (int)(Math.random()*3.0-1.0); 
+			int x2 = (x+dx) < 0 ? x : (x+dx) >= dot_grid.length ? x : (x+dx);
+			int y2 = (y+dy) < 0 ? y : (y+dy) >= dot_grid.length ? y : (y+dy);
+			int t = dot_grid[x][y];
+			dot_grid[x][y] = dot_grid[x2][y2];
+			dot_grid[x2][y2] = t;
+		}
+	}
+	
+	public double scoreGrid(int[][] dot_grid) {
 		double[] counts = new double[num_vars];
 		double[][] centers = new double[num_vars][2];
 		double[] squared_distances = new double[num_vars];
 		
 		//compute centers
-		for( int d = 0; d < dot_connections.length; d++) {
-			for( int i = 0; i < num_vars; i++) {
-				if( ((0x01 << i) & dot_connections[d]) != 0 ) {
-					counts[i]++;
-					centers[i][0] += dot_coords[i][0];
-					centers[i][1] += dot_coords[i][1];
+		for( int x = 0; x < dot_grid.length; x++) {
+			for( int y = 0; y < dot_grid.length; y++) {
+				int dot = dot_grid[x][y];
+				for( int i = 0; i < num_vars; i++) {
+					if( ((0x01 << i) & dot) != 0 ) {
+						counts[i]++;
+						centers[i][0] += x;//dot_coords[i][0];
+						centers[i][1] += y;//dot_coords[i][1];
+					}
 				}
 			}
 		}
@@ -97,12 +128,15 @@ public class Visualizer {
 		
 		//compute sum squared distance
 		double ssd = 0;
-		for( int d = 0; d < dot_connections.length; d++) {
-			for( int i = 0; i < num_vars; i++) {
-				if( ((0x01 << i) & dot_connections[d]) != 0 ) {
-					double dx = dot_coords[i][0] - centers[i][0];
-					double dy = dot_coords[i][1] - centers[i][1];
-					ssd += dx*dx + dy*dy;
+		for( int x = 0; x < dot_grid.length; x++) {
+			for( int y = 0; y < dot_grid.length; y++) {
+				int dot = dot_grid[x][y];
+				for( int i = 0; i < num_vars; i++) {
+					if( ((0x01 << i) & dot) != 0 ) {
+						double dx = x - centers[i][0];
+						double dy = y - centers[i][1];
+						ssd += dx*dx + dy*dy;
+					}
 				}
 			}
 		}
