@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.*;
 
 import util.Pair;
@@ -42,13 +43,43 @@ public class Visualizer {
 	int last_dot = 0;
 	int[] dot_connections = new int[num_dots];
 	int[][] dot_coords = new int[num_dots][2];
-	Vector<Pair<Double,int[][]>> all_grids = new Vector<Pair<Double,int[][]>>();
+	static Vector<Pair<Double,int[][]>> all_grids = new Vector<Pair<Double,int[][]>>();
 	int num_grids = 100;
 	
 	double init_rate = dot_width;
 	double anneal_mult = 0.99;
 	
-	public static void main(String[] ss) {
+	public static final int OUTPUT_FILE = 0;
+	public static final int INPUT_FILE = 1;
+	public static final int VARS = 2;
+	public static final int GRIDSIZE = 3;
+	public static final int ITERATIONS = 4;
+	
+	public static void main(String[] args) {
+		if( args.length > 4) {
+			try {
+				int gridSize = Integer.parseInt(args[GRIDSIZE]);
+				int iterations = Integer.parseInt(args[ITERATIONS]);
+				int numVars = Integer.parseInt(args[VARS]);
+				File f = new File(args[INPUT_FILE]);
+				FileInputStream fis = new FileInputStream(f);
+				BufferedReader buf = new BufferedReader(new InputStreamReader(fis));
+				double[] Is = new double[0x01 << numVars];
+				for( int i = 0; i < Is.length; i++) {
+					Is[i] = Double.parseDouble(buf.readLine());
+				}
+				Visualizer v = new Visualizer();
+				v.init(numVars,gridSize,iterations,Is);
+				
+				int[][] grid = v.all_grids.get(0).b;
+				v.toCsv(grid, args[OUTPUT_FILE]);
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.exit(0);
+		}
 		/*
 		 * double[] Is = new double[]{
 				1.5,
@@ -337,6 +368,40 @@ public class Visualizer {
 			}
 		}
 		return tot;
+	}
+	public void toCsv(int[][] grid, String fn) {
+		try {
+			File f = new File(fn);
+			FileOutputStream fis = new FileOutputStream(f);
+			
+			StringBuffer sb = new StringBuffer();
+			for( int i = 0; i < grid.length; i++) {
+				appendLine(sb,grid[i]);
+			}
+			fis.write(sb.toString().getBytes());
+			fis.flush();
+			fis.close();
+			//System.out.println(sb.toString());
+			System.out.println("Done.");
+			System.exit(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+	public void appendLine(StringBuffer sb, int[] dd) {
+		for( int j = 0; j < dd.length; j++) {
+			int dot = dd[j];
+			if( j > 0) {
+				sb.append(", ");
+			}
+			String s = "";
+			for( int i = 0; i < num_vars; i++) {
+				s = (((0x01 << i) & dot) != 0 ? "1" : "0") + s;
+			}
+			sb.append(""+s);
+		}
+		sb.append("\n");
 	}
 
 }
