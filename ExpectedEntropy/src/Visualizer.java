@@ -44,12 +44,23 @@ public class Visualizer {
 	Vector<Pair<Double,int[][]>> all_grids = new Vector<Pair<Double,int[][]>>();
 	int num_grids = 100;
 	
-	double init_rate = 4;
-	double anneal_mult = 0.9;
+	double init_rate = 100;
+	double anneal_mult = 0.95;
 	
-	public void init(int num, double totalEntropy, double[] Is) {
+	public static void main(String[] ss) {
+		double[] Is = new double[]{
+				1.5,
+				1,
+				1,
+				0.5
+		};
+		Visualizer v = new Visualizer();
+		v.init(2,Is);
+	}
+	
+	public void init(int num, double[] Is) {
 		num_vars = num;
-		totalH = totalEntropy;
+		totalH = Is[0];
 		size = 0x01 << num_vars;
 		I = Is;
 		D = new double[size];
@@ -78,6 +89,9 @@ public class Visualizer {
 					d--;
 				}
 				i2++;
+				if( i2 >= D.length) {
+					break;
+				}
 				cur_remainder = D[i2]*dots_per_H;
 			} else {
 				dot_connections[d] = i2;
@@ -112,9 +126,7 @@ public class Visualizer {
 				int dot = dot_grid[x][y];
 				String s = "";
 				for( int i = 0; i < num_vars; i++) {
-					if( ((0x01 << i) & dot) != 0 ) {
-						s = (((0x01 << i) & dot) != 0 ? "1" : "0") + s;
-					}
+					s = (((0x01 << i) & dot) != 0 ? "1" : "0") + s;
 				}
 				System.out.print(s+",");
 			}
