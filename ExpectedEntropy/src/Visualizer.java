@@ -30,24 +30,33 @@ public class Visualizer {
 	 * 
 	 */
 	
-	int num_vars = 4;
-	int dot_width = 64;
-	int num_dots = dot_width*dot_width;
-	int last_dot = 0;
 	double totalH = 4;
 	double dots_per_H = 0;
 	double[] I;
 	double[] D;
 	int size = 0;
+
+	int num_vars = 4;
+	int dot_width = 64;
+	int num_dots = dot_width*dot_width;
+	int last_dot = 0;
 	int[] dot_connections = new int[num_dots];
 	int[][] dot_coords = new int[num_dots][2];
 	Vector<Pair<Double,int[][]>> all_grids = new Vector<Pair<Double,int[][]>>();
 	int num_grids = 100;
 	
-	double init_rate = 100;
-	double anneal_mult = 0.95;
+	double init_rate = dot_width;
+	double anneal_mult = 0.99;
 	
 	public static void main(String[] ss) {
+		/*
+		 * double[] Is = new double[]{
+				1.5,
+				1,
+				1,
+				0.5
+		};
+		*/
 		double[] Is = new double[]{
 				1.5,
 				1,
@@ -55,16 +64,23 @@ public class Visualizer {
 				0.5
 		};
 		Visualizer v = new Visualizer();
-		v.init(2,Is);
+		v.init(2,4,1000,Is);
 	}
 	
-	public void init(int num, double[] Is) {
+	public void init(int num, int gridSize, int iterations, double[] Is) {
+		dot_width = gridSize;
+		num_dots = dot_width*dot_width;
 		num_vars = num;
 		totalH = Is[0];
 		size = 0x01 << num_vars;
 		I = Is;
 		D = new double[size];
 		dots_per_H = (double)num_dots/totalH;
+		
+
+		int[] dot_connections = new int[num_dots];
+		int[][] dot_coords = new int[num_dots][2];
+
 		
 		//calculate dot_density
 		for( int bit_count = num_vars; bit_count > 0; bit_count--) {
@@ -76,7 +92,7 @@ public class Visualizer {
 		}
 
 		//now attach dots
-		int i2 = 0;
+		int i2 = 1;
 		double dot_remainder = 0;
 		double cur_remainder = D[i2]*dots_per_H;
 		for( int d = 0; d < num_dots; d++) {
@@ -104,10 +120,20 @@ public class Visualizer {
 			int[][] grid = randomGrid(dot_connections);
 			all_grids.add(new Pair<Double,int[][]>(scoreGrid(grid),grid));
 		}
+		Collections.sort(all_grids);
+		for( int i = 0; i < iterations; i++) {
+			int[][] grid = all_grids.get(0).b;
+			perturbScored(grid,(double)dot_connections.length);
+			double score = scoreGrid(grid);
+			all_grids.get(0).a = score;
+			//System.out.println(score);
+		}
+		/*
 		while( init_rate*(double)dot_connections.length > 1.0) {
 			for( int g = 0; g < num_grids*3; g++) {
 				int c = (int)(Math.random()*(double)num_grids);
 				int[][] grid = cloneGrid(all_grids.get(c).b);
+				perturbScored(grid,init_rate*(double)dot_connections.length);
 				all_grids.add(new Pair<Double,int[][]>(scoreGrid(grid),grid));
 			}
 			Collections.sort(all_grids);
@@ -115,11 +141,12 @@ public class Visualizer {
 				all_grids.remove(num_grids);
 			}
 			init_rate *= anneal_mult;
-			System.out.println(init_rate*(double)dot_connections.length);
+			System.out.println(init_rate*(double)dot_connections.length+" "+all_grids.get(0).a);
 		}
+		*/
 		
 		//now print out best grid
-		System.out.println("start grid:");
+		//System.out.println("start grid:");
 		int[][] dot_grid = all_grids.get(0).b;
 		for( int x = 0; x < dot_grid.length; x++) {
 			for( int y = 0; y < dot_grid.length; y++) {
@@ -161,6 +188,90 @@ public class Visualizer {
 			}
 		}
 		return dot_grid;
+	}
+	
+	public void perturbScored( int[][] dot_grid, double rate) {
+		double[] counts = new double[num_vars];
+		double[][] centers = new double[num_vars][2];
+		
+		//compute centers
+		for( int x = 0; x < dot_grid.length; x++) {
+			for( int y = 0; y < dot_grid.length; y++) {
+				int dot = dot_grid[x][y];
+				for( int i = 0; i < num_vars; i++) {
+					if( ((0x01 << i) & dot) != 0 ) {
+						counts[i]++;
+						centers[i][0] += x;//dot_coords[i][0];
+						centers[i][1] += y;//dot_coords[i][1];
+					}
+				}
+			}
+		}
+		for( int i = 0; i < num_vars; i++) {
+			counts[i] = 1.0 / counts[i];
+			centers[i][0] *= counts[i];
+			centers[i][1] *= counts[i];
+		}
+		
+		//compute sum squared distance
+		double ssd = 0;
+		for( int x = 0; x < dot_grid.length; x++) {
+			for( int y = 0; y < dot_grid.length; y++) {
+				int dot = dot_grid[x][y];
+				for( int i = 0; i < num_vars; i++) {
+					if( ((0x01 << i) & dot) != 0 ) {
+						double dx = x - centers[i][0];
+						double dy = y - centers[i][1];
+						ssd += dx*dx + dy*dy;
+					}
+				}
+			}
+		}
+
+		int N = (int)rate; //better to poisson estimate this.
+		for( int n = 0; n < N; n++) {
+			int x1 = (int)(Math.random()*(double)dot_grid.length);
+			int y1 = (int)(Math.random()*(double)dot_grid.length);
+			int idx = (int)(Math.random()*3.0-1.0); 
+			int idy = (int)(Math.random()*3.0-1.0); 
+			int x2 = (int)(Math.random()*(double)dot_grid.length);
+			int y2 = (int)(Math.random()*(double)dot_grid.length);
+			//int x2 = (x1+idx) < 0 ? x1 : (x1+idx) >= dot_grid.length ? x1 : (x1+idx);
+			//int y2 = (y1+idy) < 0 ? y1 : (y1+idy) >= dot_grid.length ? y1 : (y1+idy);
+			int t = dot_grid[x1][y1];
+			int t2 = dot_grid[x2][y2];
+			
+			int dot1 = dot_grid[x1][y1];
+			int dot2 = dot_grid[x2][y2];
+			double ssd0 = 0;
+			for( int i = 0; i < num_vars; i++) {
+				if( ((0x01 << i) & dot1) != 0 ) {
+					double dx = x1 - centers[i][0];
+					double dy = y1 - centers[i][1];
+					ssd0 -= dx*dx + dy*dy;
+				}
+				if( ((0x01 << i) & dot2) != 0 ) {
+					double dx = x2 - centers[i][0];
+					double dy = y2 - centers[i][1];
+					ssd0 -= dx*dx + dy*dy;
+				}
+				
+				if( ((0x01 << i) & dot1) != 0 ) {
+					double dx = x2 - centers[i][0];
+					double dy = y2 - centers[i][1];
+					ssd0 += dx*dx + dy*dy;
+				}
+				if( ((0x01 << i) & dot2) != 0 ) {
+					double dx = x1 - centers[i][0];
+					double dy = y1 - centers[i][1];
+					ssd0 += dx*dx + dy*dy;
+				}
+			}
+			if( ssd0 < 0) {
+				dot_grid[x1][y1] = dot2;
+				dot_grid[x2][y2] = dot1;
+			}
+		}
 	}
 	
 	public void perturb(int[][] dot_grid, double rate) {
