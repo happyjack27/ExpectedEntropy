@@ -1,3 +1,6 @@
+import java.util.*;
+
+import util.Pair;
 
 public class Visualizer {
 	/*
@@ -38,6 +41,11 @@ public class Visualizer {
 	int size = 0;
 	int[] dot_connections = new int[num_dots];
 	int[][] dot_coords = new int[num_dots][2];
+	Vector<Pair<Double,int[][]>> all_grids = new Vector<Pair<Double,int[][]>>();
+	int num_grids = 100;
+	
+	double init_rate = 4;
+	double anneal_mult = 0.9;
 	
 	public void init(int num, double totalEntropy, double[] Is) {
 		num_vars = num;
@@ -57,27 +65,65 @@ public class Visualizer {
 		}
 
 		//now attach dots
-		int i = 0;
+		int i2 = 0;
 		double dot_remainder = 0;
-		double cur_remainder = D[i]*dots_per_H;
+		double cur_remainder = D[i2]*dots_per_H;
 		for( int d = 0; d < num_dots; d++) {
 			if( cur_remainder < 1) {
 				dot_remainder += cur_remainder;
 				if( dot_remainder >= 1) {
-					dot_connections[d] = i;
+					dot_connections[d] = i2;
 					dot_remainder--;
 				} else {
 					d--;
 				}
-				i++;
-				cur_remainder = D[i]*dots_per_H;
+				i2++;
+				cur_remainder = D[i2]*dots_per_H;
 			} else {
-				dot_connections[d] = i;
+				dot_connections[d] = i2;
 				cur_remainder--;
 			}
 		}
 		
-		//now randomize array
+		//now create random grids
+		for( int g = 0; g < num_grids; g++) {
+			int[][] grid = randomGrid(dot_connections);
+			all_grids.add(new Pair<Double,int[][]>(scoreGrid(grid),grid));
+		}
+		while( init_rate*(double)dot_connections.length > 1.0) {
+			for( int g = 0; g < num_grids*3; g++) {
+				int c = (int)(Math.random()*(double)num_grids);
+				int[][] grid = cloneGrid(all_grids.get(c).b);
+				all_grids.add(new Pair<Double,int[][]>(scoreGrid(grid),grid));
+			}
+			Collections.sort(all_grids);
+			while( all_grids.size() > num_grids) {
+				all_grids.remove(num_grids);
+			}
+			init_rate *= anneal_mult;
+			System.out.println(init_rate*(double)dot_connections.length);
+		}
+		
+		//now print out best grid
+		System.out.println("start grid:");
+		int[][] dot_grid = all_grids.get(0).b;
+		for( int x = 0; x < dot_grid.length; x++) {
+			for( int y = 0; y < dot_grid.length; y++) {
+				int dot = dot_grid[x][y];
+				String s = "";
+				for( int i = 0; i < num_vars; i++) {
+					if( ((0x01 << i) & dot) != 0 ) {
+						s = (((0x01 << i) & dot) != 0 ? "1" : "0") + s;
+					}
+				}
+				System.out.print(s+",");
+			}
+			System.out.println();
+		}
+	}
+	
+	public int[][] randomGrid(int[] dot_connections) {
+		//randomize array
 		for( int d = 0; d < dot_connections.length; d++) {
 			int d2 = (int)(Math.random()*(double)dot_connections.length);
 			int t = dot_connections[d];
@@ -85,6 +131,24 @@ public class Visualizer {
 			dot_connections[d2] = t;
 		}
 		
+		//write to grid
+		int[][] dot_grid = new int[dot_width][dot_width];
+		int d = 0;
+		for( int x = 0; x < dot_grid.length; x++) {
+			for( int y = 0; y < dot_grid.length; y++) {
+				dot_grid[x][y] = dot_connections[d++];
+			}
+		}
+		return dot_grid;
+	}
+	public int[][] cloneGrid(int[][] sourceGrid) {
+		int[][] dot_grid = new int[dot_width][dot_width];
+		for( int x = 0; x < dot_grid.length; x++) {
+			for( int y = 0; y < dot_grid.length; y++) {
+				dot_grid[x][y] = sourceGrid[x][y];
+			}
+		}
+		return dot_grid;
 	}
 	
 	public void perturb(int[][] dot_grid, double rate) {
@@ -105,7 +169,6 @@ public class Visualizer {
 	public double scoreGrid(int[][] dot_grid) {
 		double[] counts = new double[num_vars];
 		double[][] centers = new double[num_vars][2];
-		double[] squared_distances = new double[num_vars];
 		
 		//compute centers
 		for( int x = 0; x < dot_grid.length; x++) {
