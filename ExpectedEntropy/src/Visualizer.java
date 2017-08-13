@@ -67,27 +67,28 @@ public class Visualizer implements Draws {
 			}
 			System.exit(0);
 		}
+		/*
 		double[] Is = new double[]{
 				1.5,
 				1,
 				1,
 				0.5
-		};
-		/*
+		};*/
+		
 		double[] Is = new double[]{
-				3.5,
+				3.25,
 				1,
 				1,
 				0.5,
 				2,
-				0,
+				0.25,
 				0,
 				0,
 				
 		};
-		*/
+		
 		Visualizer v = new Visualizer();
-		v.init(2,640,128,Is);
+		v.init(3,640,128,Is);
 		
 		
 		ToImageFile img = new ToImageFile();
@@ -156,8 +157,8 @@ public class Visualizer implements Draws {
 			perturbScored(grid,(double)dot_connections.length);
 			double score = scoreGrid(grid);
 			all_grids.get(0).a = score;
-			//init_rate = Math.sqrt(4.0*(double)(iterations-i)/(double)iterations);
-			init_rate = 2.0*(double)(iterations-i)/(double)iterations;
+			init_rate = Math.sqrt(4.0*(double)(iterations-i)/(double)iterations);
+			//init_rate = 2.0*(double)(iterations-i)/(double)iterations;
 			//init_rate -= 2.0/(double)iterations;//*= anneal_mult;
 			//init_rate *= anneal_mult;
 			//System.out.println(score);
