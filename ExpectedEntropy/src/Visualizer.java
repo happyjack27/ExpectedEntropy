@@ -34,7 +34,7 @@ public class Visualizer implements Draws {
 	public static final int IMAGE_SIZE = 5;
 	
 	public static boolean use_squared_distance = false;
-	public static boolean divide_by_area = true;
+	public static boolean divide_by_area = false;
 	
 	public static double whitespace_fraction = 0.75;
 	public static boolean shrink_by_area = false;
