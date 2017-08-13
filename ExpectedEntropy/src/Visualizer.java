@@ -33,6 +33,11 @@ public class Visualizer implements Draws {
 	public static final int ITERATIONS = 4;
 	public static final int IMAGE_SIZE = 5;
 	
+	public static boolean use_squared_distance = true;
+	public static boolean divide_by_area = false;
+	public static double whitespace_fraction = 0.75;
+	public static boolean shrink_by_area = false;
+	
 	public static void main(String[] args) {
 		if( args.length > 4) {
 			try {
@@ -76,24 +81,24 @@ public class Visualizer implements Draws {
 		};*/
 		
 		double[] Is = new double[]{
-				3.25,
+				3.00,
 				1,
 				1,
 				0.5,
 				2,
 				0.25,
-				0,
+				0.25,
 				0,
 				
 		};
 		
 		Visualizer v = new Visualizer();
-		v.init(3,640,128,Is);
+		v.init(3,640,640,Is);
 		
 		
 		ToImageFile img = new ToImageFile();
 		System.out.println("drawing...");
-		img.toPNG("visualizer.png", v, 400);
+		img.toPNG("visualizer.png", v, 640);
 		System.out.println("done.");
 	}
 	
@@ -105,7 +110,7 @@ public class Visualizer implements Draws {
 		size = 0x01 << num_vars;
 		I = Is;
 		D = new double[size];
-		dots_per_H = (double)num_dots/totalH;
+		dots_per_H = (1.0-whitespace_fraction)*(double)num_dots/totalH;
 		
 
 		int[] dot_connections = new int[num_dots];
@@ -157,8 +162,11 @@ public class Visualizer implements Draws {
 			perturbScored(grid,(double)dot_connections.length);
 			double score = scoreGrid(grid);
 			all_grids.get(0).a = score;
-			init_rate = Math.sqrt(4.0*(double)(iterations-i)/(double)iterations);
-			//init_rate = 2.0*(double)(iterations-i)/(double)iterations;
+			if( shrink_by_area) {
+				init_rate = Math.sqrt(4.0*(double)(iterations-i)/(double)iterations);
+			} else {
+				init_rate = 2.0*(double)(iterations-i)/(double)iterations;
+			}
 			//init_rate -= 2.0/(double)iterations;//*= anneal_mult;
 			//init_rate *= anneal_mult;
 			//System.out.println(score);
@@ -257,7 +265,20 @@ public class Visualizer implements Draws {
 					if( ((0x01 << i) & dot) != 0 ) {
 						double dx = x - centers[i][0];
 						double dy = y - centers[i][1];
-						ssd += dx*dx + dy*dy;
+						double dd = dx*dx + dy*dy;
+						if( !use_squared_distance) {
+							dd = Math.sqrt(dd);
+						}
+						if( divide_by_area) {
+							double area = I[(0x01 << i)];
+							if( !use_squared_distance) {
+								area = Math.sqrt(area);
+							}
+							if( area != 0) {
+								dd /= area;
+							}
+						}
+						ssd += dd; 
 					}
 				}
 			}
@@ -283,23 +304,75 @@ public class Visualizer implements Draws {
 					if( ((0x01 << i) & dot1) != 0 ) {
 						double dx = x1 - centers[i][0];
 						double dy = y1 - centers[i][1];
-						ssd0 -= dx*dx + dy*dy;
+						double dd = dx*dx + dy*dy;
+						if( !use_squared_distance) {
+							dd = Math.sqrt(dd);
+						}
+						if( divide_by_area) {
+							double area = I[(0x01 << i)];
+							if( !use_squared_distance) {
+								area = Math.sqrt(area);
+							}
+							if( area != 0) {
+								dd /= area;
+							}
+						}
+						ssd0 -= dd;
 					}
 					if( ((0x01 << i) & dot2) != 0 ) {
 						double dx = x2 - centers[i][0];
 						double dy = y2 - centers[i][1];
-						ssd0 -= dx*dx + dy*dy;
+						double dd = dx*dx + dy*dy;
+						if( !use_squared_distance) {
+							dd = Math.sqrt(dd);
+						}
+						if( divide_by_area) {
+							double area = I[(0x01 << i)];
+							if( !use_squared_distance) {
+								area = Math.sqrt(area);
+							}
+							if( area != 0) {
+								dd /= area;
+							}
+						}
+						ssd0 -= dd;
 					}
 					
 					if( ((0x01 << i) & dot1) != 0 ) {
 						double dx = x2 - centers[i][0];
 						double dy = y2 - centers[i][1];
-						ssd0 += dx*dx + dy*dy;
+						double dd = dx*dx + dy*dy;
+						if( !use_squared_distance) {
+							dd = Math.sqrt(dd);
+						}
+						if( divide_by_area) {
+							double area = I[(0x01 << i)];
+							if( !use_squared_distance) {
+								area = Math.sqrt(area);
+							}
+							if( area != 0) {
+								dd /= area;
+							}
+						}
+						ssd0 += dd;
 					}
 					if( ((0x01 << i) & dot2) != 0 ) {
 						double dx = x1 - centers[i][0];
 						double dy = y1 - centers[i][1];
-						ssd0 += dx*dx + dy*dy;
+						double dd = dx*dx + dy*dy;
+						if( !use_squared_distance) {
+							dd = Math.sqrt(dd);
+						}
+						if( divide_by_area) {
+							double area = I[(0x01 << i)];
+							if( !use_squared_distance) {
+								area = Math.sqrt(area);
+							}
+							if( area != 0) {
+								dd /= area;
+							}
+						}
+						ssd0 += dd;
 					}
 				}
 				if( ssd0 < 0) {
@@ -357,7 +430,11 @@ public class Visualizer implements Draws {
 					if( ((0x01 << i) & dot) != 0 ) {
 						double dx = x - centers[i][0];
 						double dy = y - centers[i][1];
-						ssd += dx*dx + dy*dy;
+						if( use_squared_distance) {
+							ssd += dx*dx + dy*dy;
+						} else {
+							ssd += Math.sqrt(dx*dx + dy*dy);
+						}
 					}
 				}
 			}
