@@ -3,3 +3,8 @@
 /util/
 /ProcessArgs.class
 /Visualizer.class
+/ToImageFile.class
+/FrameDraw.class
+/FrameDraw$DrawScaled.class
+/FrameDraw$PiePanel.class
+/Draws.class

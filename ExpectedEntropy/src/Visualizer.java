@@ -1,9 +1,10 @@
+import java.awt.*;
 import java.io.*;
 import java.util.*;
 
 import util.Pair;
 
-public class Visualizer {
+public class Visualizer implements Draws {
 	
 	double totalH = 4;
 	double dots_per_H = 0;
@@ -17,17 +18,20 @@ public class Visualizer {
 	int last_dot = 0;
 	int[] dot_connections = new int[num_dots];
 	int[][] dot_coords = new int[num_dots][2];
+	static int[][] dot_grid = null;
 	static Vector<Pair<Double,int[][]>> all_grids = new Vector<Pair<Double,int[][]>>();
 	int num_grids = 100;
 	
 	double init_rate = 2;
 	double anneal_mult = 0.99;
+	static int image_size = 512;
 	
 	public static final int OUTPUT_FILE = 0;
 	public static final int INPUT_FILE = 1;
 	public static final int VARS = 2;
 	public static final int GRIDSIZE = 3;
 	public static final int ITERATIONS = 4;
+	public static final int IMAGE_SIZE = 5;
 	
 	public static void main(String[] args) {
 		if( args.length > 4) {
@@ -36,6 +40,10 @@ public class Visualizer {
 				int iterations = Integer.parseInt(args[ITERATIONS]);
 				int numVars = Integer.parseInt(args[VARS]);
 				File f = new File(args[INPUT_FILE]);
+				if( args.length > 5) {
+					image_size = Integer.parseInt(args[IMAGE_SIZE]);
+				}
+				
 				FileInputStream fis = new FileInputStream(f);
 				BufferedReader buf = new BufferedReader(new InputStreamReader(fis));
 				double[] Is = new double[0x01 << numVars];
@@ -45,8 +53,13 @@ public class Visualizer {
 				Visualizer v = new Visualizer();
 				v.init(numVars,gridSize,iterations,Is);
 				
-				int[][] grid = v.all_grids.get(0).b;
-				v.toCsv(grid, args[OUTPUT_FILE]);
+				dot_grid = v.all_grids.get(0).b;
+				v.toCsv(dot_grid, args[OUTPUT_FILE]);
+				
+				ToImageFile img = new ToImageFile();
+				System.out.println("drawing...");
+				img.toPNG("visualizer.png", new Visualizer(), image_size);
+				System.out.println("done.");
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -54,14 +67,13 @@ public class Visualizer {
 			}
 			System.exit(0);
 		}
-		/*
-		 * double[] Is = new double[]{
+		double[] Is = new double[]{
 				1.5,
 				1,
 				1,
 				0.5
 		};
-		*/
+		/*
 		double[] Is = new double[]{
 				3.5,
 				1,
@@ -73,8 +85,15 @@ public class Visualizer {
 				0,
 				
 		};
+		*/
 		Visualizer v = new Visualizer();
-		v.init(3,640,640,Is);
+		v.init(2,640,128,Is);
+		
+		
+		ToImageFile img = new ToImageFile();
+		System.out.println("drawing...");
+		img.toPNG("visualizer.png", v, 400);
+		System.out.println("done.");
 	}
 	
 	public void init(int num, int gridSize, int iterations, double[] Is) {
@@ -137,7 +156,9 @@ public class Visualizer {
 			perturbScored(grid,(double)dot_connections.length);
 			double score = scoreGrid(grid);
 			all_grids.get(0).a = score;
-			init_rate -= 2.0/(double)iterations;//*= anneal_mult;
+			//init_rate = Math.sqrt(4.0*(double)(iterations-i)/(double)iterations);
+			init_rate = 2.0*(double)(iterations-i)/(double)iterations;
+			//init_rate -= 2.0/(double)iterations;//*= anneal_mult;
 			//init_rate *= anneal_mult;
 			//System.out.println(score);
 		}
@@ -160,7 +181,7 @@ public class Visualizer {
 		
 		//now print out best grid
 		//System.out.println("start grid:");
-		int[][] dot_grid = all_grids.get(0).b;
+		dot_grid = all_grids.get(0).b;
 		for( int x = 0; x < dot_grid.length; x++) {
 			for( int y = 0; y < dot_grid.length; y++) {
 				int dot = dot_grid[x][y];
@@ -385,6 +406,49 @@ public class Visualizer {
 			sb.append(""+s);
 		}
 		sb.append("\n");
+	}
+	
+	int[][] minusRGBs = new int[][]{
+		new int[]{128,0,0},
+		new int[]{0,128,0},
+		new int[]{0,0,128},
+		new int[]{0,64,64},
+		new int[]{64,0,64},
+		new int[]{64,64,0},
+		
+		new int[]{32,96,0},
+		new int[]{0,32,96},
+		new int[]{96,0,32},
+		new int[]{96,32,0},
+		new int[]{0,96,32},
+		new int[]{32,0,96},
+	};
+
+	@Override
+	public void draw(Graphics2D d, int width, int height) {
+		double inc = (double)width/(double)dot_width;
+		for( int x = 0; x < dot_width; x++) {
+			for( int y = 0; y < dot_width; y++) {
+				int x0 = (int)Math.round(inc*(double)x);
+				int x1 = (int)Math.round(inc*(double)(x+1));
+				int y0 = (int)Math.round(inc*(double)y);
+				int y1 = (int)Math.round(inc*(double)(y+1));
+				int dot = dot_grid[x][y];
+				int[] c = new int[]{255,255,255};
+				for( int i = 0; i < minusRGBs.length; i++) {
+					if( (dot & (0x01 << i)) != 0) {
+						c[0] -= minusRGBs[i][0];
+						c[1] -= minusRGBs[i][1];
+						c[2] -= minusRGBs[i][2];
+					}
+				}
+				d.setColor(new Color(c[0],c[1],c[2]));
+				d.fillRect(x0, y0, x1-x0, y1-y0);
+			}	
+		}
+		
+		// TODO Auto-generated method stub
+		
 	}
 
 }
