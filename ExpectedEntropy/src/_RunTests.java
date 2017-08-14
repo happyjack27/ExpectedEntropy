@@ -11,7 +11,7 @@ public class _RunTests {
 	static int max_n = 25;
 	static int num_runs = 50;//1000;//25;
 	static boolean divide_log_likelihood_by_n = false;
-	static int MONTE_CARLO_RESOLUTION = 200;
+	static int MONTE_CARLO_RESOLUTION = 100;
 	
 	static int number_of_bits = 10;
 	public static int max_size = 10;
@@ -48,6 +48,8 @@ public class _RunTests {
 	static double constrained_min_total_e_saved_per_p = 1;
 	
 	static boolean use_neg_entropy = true;
+	
+	static boolean use_prior_on_p = false;
 
 	
 	static double C = 10;
@@ -55,7 +57,6 @@ public class _RunTests {
 	static int METRIC = 0;
 
 
-	public static boolean prior_is_on_H = true;
 	//0 - wire
 	//1 - and/or/xor
 	//2 - half add
@@ -64,6 +65,9 @@ public class _RunTests {
 			0,1,2,8,
 			0,1,2,8,
 			0,1,2,8,
+			0,1,2,8,
+			//0,1,2,8,
+			//0,1,2,8,
 			//0,1,2,8,
 			//8,8,8,
 			//8,8,8,
@@ -95,6 +99,12 @@ public class _RunTests {
 			*/
 	};
 	public static double[] noises = new double[]{
+			0.1,0.1,0.1,0.1,
+			0.1,0.1,0.1,0.1,
+			0.1,0.1,0.1,0.1,
+			0.1,0.1,0.1,0.1,
+			0.1,0.1,0.1,0.1,
+			
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
@@ -123,14 +133,19 @@ public class _RunTests {
 			0.2,0.2,0.2,0.2,//0.2,0.2,0.2,0.2,
 	};
 	public static int[] metrics = new int[]{
+			//METRIC_BEES_START_WITH_1,METRIC_BEES_START_WITH_1,METRIC_BEES_START_WITH_1,METRIC_BEES_START_WITH_1,
 			//METRIC_AIC,
 			//METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
 			//METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
 			//METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,
+			//METRIC_AICc,METRIC_AICc,METRIC_AICc,METRIC_AICc,
+			//METRIC_BIC,METRIC_BIC,METRIC_BIC,METRIC_BIC,
+			
+			METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,
 			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
-			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
-			METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PENALIZED_MULT,
 			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+			//METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PENALIZED_MULT,METRIC_BEES_PENALIZED_MULT,
 			//METRIC_BEES,
 			//METRIC_LOG_LIKELIHOOD,
 			//METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,
@@ -822,7 +837,7 @@ public class _RunTests {
 				Integer[] ii = bucket(samples,ss);
 				cat.setNumberOfCategories(ii.length);
 				double v = 0;
-				cat.prior_is_on_H = prior_is_on_H;
+				cat.prior_is_on_H = true;
 				
 				switch(METRIC) {
 				case METRIC_BEES:
@@ -831,11 +846,15 @@ public class _RunTests {
 				case METRIC_BEES_PENALIZED_MULT:
 				case METRIC_BEES_CONSTRAINED:
 				case METRIC_BEES_PENALIZED_K_N_NEG:
-					Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii,MONTE_CARLO_RESOLUTION);
-					if( at_percentile > 0) {
-						v = cat.getAtPercentile(curve, at_percentile);
+					if( use_prior_on_p) {
+						v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
 					} else {
-						v = cat.integrateSortedEntropyCurve(curve);
+						Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii,MONTE_CARLO_RESOLUTION);
+						if( at_percentile > 0) {
+							v = cat.getAtPercentile(curve, at_percentile);
+						} else {
+							v = cat.integrateSortedEntropyCurve(curve);
+						}
 					}
 
 					
@@ -877,9 +896,16 @@ public class _RunTests {
 					for( int k = 0; k < ii.length; k++) {
 						ii4[k] = ii[k]+1;
 					}
-					v = cat.getSummaryStats(ii4,MONTE_CARLO_RESOLUTION)[0];
-					//System.out.print(".");
-					//v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
+					if( use_prior_on_p) {
+						v = Functions.getExpectedEntropy(ii4,1,1)/Math.log(2);
+					} else {
+						Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii4,MONTE_CARLO_RESOLUTION);
+						if( at_percentile > 0) {
+							v = cat.getAtPercentile(curve, at_percentile);
+						} else {
+							v = cat.integrateSortedEntropyCurve(curve);
+						}
+					}
 					break;
 				case METRIC_BEES_PRIOR_NOT_H:
 					v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
