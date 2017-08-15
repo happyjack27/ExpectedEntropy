@@ -522,6 +522,22 @@ sum(ylnx+y)=0;
 		return ret;
 	}
 	
+	public double integrateDiscrete(Vector<double[]> results) {
+		if( results.size() == 0) {
+			return 0;
+		}
+		
+		//integrate
+		double sumP = 0;
+		double sumHP = 0;
+		for( int i = 0; i < results.size(); i++) {
+			double h = results.get(i)[0];
+			double p = results.get(i)[1];
+			sumHP += h*p;
+			sumP  += p;
+		}
+		return (sumHP/sumP);/////Math.log(2);
+	}	
 	public double integrateSortedEntropyCurve(Vector<double[]> results) {
 		if( results.size() == 0) {
 			return 0;
@@ -674,8 +690,93 @@ sum(ylnx+y)=0;
 	
 		return rets;
 	}
+
+	public double getBayesianActualEntropy(Integer[] ii, double[] actual_dist, int num_samples) {
+		if( num_samples == 0) { num_samples = 100; }
+		
+		Vector<double[]> results = new Vector<double[]>();
+		Vector<Pair<Double,double[]>> samples = new Vector<Pair<Double,double[]>>(); 
+		
+		for( int i = 0; i < num_samples; i++) {
+			double[] thetas = getRandomThetas(ii.length,false);
+			if( i == 0) {
+				//thetas = getMaxEntropyThetas(ii.length);
+			}
+			if( i == 1) {
+				thetas = actual_dist.clone();
+			}
+			double logp_theta_given_data = 0;
+			boolean ok = true;
+			for( int j = 0; j < thetas.length; j++) {
+				if( thetas[j] != 0) {
+					logp_theta_given_data += ((double)ii[j]) * Math.log(thetas[j]);
+				} else if( ii[j] != 0) {
+					ok = false;
+					break;
+				}
+			}
+			if( !ok) { //p=0
+				continue;
+			}
+			
+			logp_theta_given_data = Math.exp(logp_theta_given_data);
+			
+			for( int j = 0; j < thetas.length; j++) {
+				if( thetas[j] != 0) {
+					double H = -Math.log(thetas[j]);
+					double p = actual_dist[j] * logp_theta_given_data;
+					samples.add(new Pair<Double,double[]>(H,new double[]{H,p}));
+				}
+			}
+		}
+		Collections.sort(samples);
+		//results.add
+		for(int i = 0; i < samples.size(); i++) {
+			results.add(samples.get(i).b);
+		}		
+		
+		return integrateDiscrete(results);
+		//return integrateSortedEntropyCurve(results);
+	}
 	
-	private double[] getMLEThetas(Integer[] data) {
+	public double getBayesianActualEntropy_old(Integer[] ii, double[] actual_dist, int samples) {
+		if( samples == 0) { samples = 100; }
+		
+		Vector<double[]> hpVect = new Vector<double[]>();
+		
+		double total_kldp = 0;
+		double total_p = 0;
+		for( int i = 0; i < samples; i++) {
+			double[] thetas = getRandomThetas(ii.length,false);
+			double kld = 0;
+			double lp = 0;
+			for( int j = 0; j < thetas.length; j++) {
+				if( thetas[j] != 0) {
+					kld += -actual_dist[j] * Math.log(thetas[j]);//(Math.log(thetas[j]) - Math.log(actual_dist[j])); //can't do kldiv because using different model would be lower entropy
+					lp += ((double)ii[j]) * Math.log(thetas[j]);
+				} else {
+					if( ii[j] > 0) {
+						// then =*0^(x<>0), so p = 0.
+						//otherwise, it's =*1.
+						continue;
+					} else {
+						//0^a*p*0^0 / p*0^0 
+						//what to do?
+						
+						//numerator is : numerator + a * log(0) * 0^0
+						//denominator = 0
+					}
+				}
+			}
+			double p = Math.exp(lp);
+			total_kldp += p*kld;
+			total_p += p;
+		}
+		
+		return total_kldp/total_p;
+	}
+	
+	public double[] getMLEThetas(Integer[] data) {
 		double[] thetas = new double[data.length];
 		double tot = 0;
 		for( int i = 0; i < data.length; i++) {

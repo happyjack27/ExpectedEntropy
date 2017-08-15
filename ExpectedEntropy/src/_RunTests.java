@@ -13,6 +13,10 @@ public class _RunTests {
 	static int MONTE_CARLO_RESOLUTION = 100;
 	static double penalty = 1.0;
 	static boolean adjust_num_params = true;
+	static boolean use_prior_on_p = false;
+	
+	public static boolean DO_ALL_SCORES = false;
+
 	
 	static int number_of_bits = 10;
 	static double number_of_nats = number_of_bits*Math.log(2.0);
@@ -21,6 +25,12 @@ public class _RunTests {
 	static double at_percentile = 0;
 	static boolean show_detail = false;
 	
+	static final int SCORE_MODE_DISTANCE = 0;
+	static final int SCORE_MODE_RANK = 1;
+	static final int SCORE_MODE_FUTURE_ENTROPY = 2;
+	static int SCORE_MODE = SCORE_MODE_FUTURE_ENTROPY;
+	static int ACTUAL_THETA_SAMPLES = 100000;
+	static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 100;	
 	
 	//entropy at percentile
 	//percentile at entropy
@@ -49,9 +59,6 @@ public class _RunTests {
 	//static double min_e_per_p = 0.1;
 	static double constrained_min_total_e_saved_per_p = 1;
 	
-	static boolean use_neg_entropy = true;
-	
-	static boolean use_prior_on_p = false;
 
 	
 	static double C = 10;
@@ -64,6 +71,9 @@ public class _RunTests {
 	//2 - half add
 	//8 - full add
 	public static double[] penalties = new double[]{
+			1.0,1.0,1.0,1.0,
+			1.0,1.0,1.0,1.0,
+			
 			0.5,0.5,0.5,0.5,
 			0.5,0.5,0.5,0.5,
 			1.0,1.0,1.0,1.0,
@@ -75,12 +85,15 @@ public class _RunTests {
 	public static int[] choices = new int[]{
 			0,1,2,8,
 			0,1,2,8,
-			
+			/*
 			0,1,2,8,
 			0,1,2,8,
 			
 			0,1,2,8,
 			0,1,2,8,
+			*/
+			
+			
 			//0,1,2,8,
 			//0,1,2,8,
 			//0,1,2,8,
@@ -128,9 +141,16 @@ public class _RunTests {
 			
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
+			
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
+
 			0.0,0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,
+
+			0.0,0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,
+
 			0.1,0.1,0.1,0.1,
 			//0.0,0.0,0.1,0.1,
 			/*
@@ -163,6 +183,14 @@ public class _RunTests {
 			//METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,
 			//METRIC_AICc,METRIC_AICc,METRIC_AICc,METRIC_AICc,
 			//METRIC_BIC,METRIC_BIC,METRIC_BIC,METRIC_BIC,
+			METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,
+			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
+			
+			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+
+			METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,
+			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
 			
 			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
 			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
@@ -345,15 +373,25 @@ public class _RunTests {
 	public static boolean optimize_cover = true;
 	static Vector<Integer> target_cover = new Vector<Integer>();
 
-	static int[][] sets = null;	
+	static int[][] sets = null;
+	static double[][] set_actual_thetas = null;
 	static Vector<Vector<Integer>> all_covers = new Vector<Vector<Integer>>();	
 	
-	static Vector<double[]> runs = new Vector<double[]>(); 
-	static double[] results = new double[max_n];
-	static double[] run_avg = new double[max_n];
-	static double[][] run_avgs = new double[choices.length][max_n];
+	
+	static Vector<double[][]> runs = new Vector<double[][]>(); 
+	static double[][] results = new double[max_n][3];
+	static double[][] run_avg = new double[max_n][3];
+	static double[][][] run_avgs = new double[choices.length][max_n][3];
 	
 	public static Vector<Pair<Double,Vector<Integer>>> covers = new Vector<Pair<Double,Vector<Integer>>>();
+	
+	public static double[][] deep_clone(double[][] d1) {
+		double[][] d2 = new double[d1.length][];
+		for( int i = 0; i < d1.length; i++) {
+			d2[i] = d1[i].clone();
+		}
+		return d2;
+	}
 	
 	public static void main( String[] args) {
 		for( cur_choice = 0; cur_choice < choices.length; cur_choice++) {
@@ -407,24 +445,47 @@ public class _RunTests {
 			}
 			System.exit(0);
 			*/
+			//computeActualParams
+			{
+				System.out.println("computing actual thetas...");
+				CategoricalDistribution cat = new CategoricalDistribution();
+				Vector<boolean[]> samples = new Vector<boolean[]>();
+				for( int i = 0; i < ACTUAL_THETA_SAMPLES; i++) {
+					samples.add(getSample());
+				}
+				set_actual_thetas = new double[sets.length][];
+				for( int j = 0; j < sets.length; j++) {
+					Integer[] ii = bucket(samples,sets[j]);
+					set_actual_thetas[j] = cat.getMLEThetas(ii);
+				}
+				System.out.println("done computing actual thetas.");
 				
+			}
 			for( int i = 0; i < num_runs; i++) {
 				doRun();
 				runs.add(results);
-				results = new double[max_n];
+				results = new double[max_n][3];
 			}
 			double m = 1.0/(double)num_runs;
 			for( int i = 0; i < max_n; i++) {
-				run_avg[i]*=m;
-				System.out.println(run_avg[i]);
+				run_avg[i][0]*=m;
+				run_avg[i][1]*=m;
+				run_avg[i][2]*=m;
+				System.out.println(run_avg[i][0]+", "+run_avg[i][1]+", "+run_avg[i][2]);
 			}
-			run_avgs[cur_choice] = run_avg.clone();
+			run_avgs[cur_choice] = deep_clone(run_avg);
 			System.out.println();
 		}
 		System.out.println();
 		for( int i = 0; i < max_n; i++) {
 			for( int j = 0; j < run_avgs.length; j++) {
-				System.out.print(run_avgs[j][i]+", ");
+				System.out.print(run_avgs[j][i][0]+", ");
+			}
+			for( int j = 0; j < run_avgs.length; j++) {
+				System.out.print(run_avgs[j][i][1]+", ");
+			}
+			for( int j = 0; j < run_avgs.length; j++) {
+				System.out.print(run_avgs[j][i][2]+", ");
 			}
 			System.out.println();
 		}
@@ -457,6 +518,47 @@ public class _RunTests {
 			current.remove(current.size()-1);
 		}
 	}
+	public static double scoreCover(Vector<Integer> cover, double[] entropies, double N) {
+		double e = getTotalEntropy(cover,entropies);
+		double k = getTotalParams(cover);
+		//if( use_neg_entropy || METRIC == METRIC_BEES_PENALIZED_K_N_NEG) {
+			//e -= number_of_nats;
+		//}
+		e *= N;
+		
+		
+		if( METRIC == METRIC_BEES_CONSTRAINED) {
+			if( -e / k < constrained_min_total_e_saved_per_p) {
+				e /= k;
+			}
+		}
+		if( METRIC == METRIC_BEES_PENALIZED_MULT) {
+			e /= k;//Math.log(p)*min_entropy_reduction_per_parameter_for_k_n;
+		}
+		if( METRIC == METRIC_BEES_PENALIZED_LOG) {
+			e += Math.log(k)*penalty;
+		}
+		if( METRIC == METRIC_BEES_PENALIZED_K_N) {
+			//if( METRIC == METRIC_BEES || METRIC == METRIC_BEES_PRIOR_NOT_H || METRIC == METRIC_BEES_START_WITH_1) {
+			//max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter_for_k_n / N;
+			e += k*penalty;
+			//e += min_entropy_reduction_per_parameter_for_k_n*p / N;
+		}
+		e += k*0.00000000000000000000000000000000000000001; //if = score, prefer fewer params
+		return e;
+	}
+	
+	public static int getTargetCoverRank( double[] entropies, double N) {
+		int rank = -1; //since we're going to count ourselves once.
+		double targetScore = scoreCover(target_cover,entropies,N);
+		for( Vector<Integer> cover : all_covers) {
+			double e = scoreCover(cover,entropies,N);
+			if( e <= targetScore) { //count ties pessimisticly.
+				rank++;
+			}
+		}
+		return rank;
+	}
 	
 	public static Vector<Integer> scoreAndStuff( double[] entropies, double N) {
 		double best_e = 999999999999999999999999999.9;
@@ -468,41 +570,18 @@ public class _RunTests {
 	static final int METRIC_BEES_START_WITH_1 = 8;
 		 */
 		for( Vector<Integer> cover : all_covers) {
-			double e = getTotalEntropy(cover,entropies);
-			double p = getTotalParams(cover);
 			double max_e = best_e;
-			//if( use_neg_entropy || METRIC == METRIC_BEES_PENALIZED_K_N_NEG) {
-				//e -= number_of_nats;
-			//}
-			e *= N;
+			double e = scoreCover(cover,entropies,N);
+			double k = getTotalParams(cover);
 			
-			
-			if( METRIC == METRIC_BEES_CONSTRAINED) {
-				if( -e / p < constrained_min_total_e_saved_per_p) {
-					e /= p;
-				}
-			}
-			if( METRIC == METRIC_BEES_PENALIZED_MULT) {
-				e /= p;//Math.log(p)*min_entropy_reduction_per_parameter_for_k_n;
-			}
-			if( METRIC == METRIC_BEES_PENALIZED_LOG) {
-				e += Math.log(p)*penalty;
-			}
-			if( METRIC == METRIC_BEES_PENALIZED_K_N) {
-				//if( METRIC == METRIC_BEES || METRIC == METRIC_BEES_PRIOR_NOT_H || METRIC == METRIC_BEES_START_WITH_1) {
-				//max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter_for_k_n / N;
-				e += p*penalty;
-				//e += min_entropy_reduction_per_parameter_for_k_n*p / N;
-			}
 			//min_entropy_reduction_per_parameter
-			if( e < max_e || e == max_e && p < best_e_param_count) {
+			if( e < max_e || e == max_e && k < best_e_param_count) {
 				best_e = e;
-				best_e_param_count = p;
+				best_e_param_count = k;
 				best_cover = cover;
 			}
 		}
 		return best_cover;
-
 	}
 	
 	private static double getTotalParams(Vector<Integer> cover) {
@@ -870,8 +949,8 @@ public class _RunTests {
 			
 			double[] entropies = new double[sets.length];
 			for(int j = 0; j < sets.length; j++) {//
-				int[] ss = sets[j];
-				Integer[] ii = bucket(samples,ss);
+				//int[] ss = sets[j];
+				Integer[] ii = bucket(samples,sets[j]);
 				cat.setNumberOfCategories(ii.length);
 				double v = 0;
 				cat.prior_is_on_H = true;
@@ -964,39 +1043,54 @@ public class _RunTests {
 				entropies[j] = v;
 			}
 			
-			best_cover = scoreAndStuff(entropies,samples.size());
-			double best_e = getTotalEntropy(best_cover,entropies);
-
-			
-
-			
-			int num = getDistance(best_cover,target_cover);
-			if( show_detail) {
-				System.out.print(i+": best cover e: "+best_e+" : ");
-				for( int s : best_cover) {
-					int[] ii = sets[s]; 
-					System.out.print(s+":{");
-					//System.out.print("{");
-					for( int j = 0; j < ii.length; j++) {
-						if( j > 0)
-							System.out.print(",");
-							System.out.print(ii[j]);
+			int num0 = 0;
+			int num1 = 0;
+			int num2 = 0;
+			if( SCORE_MODE == SCORE_MODE_DISTANCE || DO_ALL_SCORES) {
+				best_cover = scoreAndStuff(entropies,samples.size());
+				double best_e = getTotalEntropy(best_cover,entropies);
+				
+				num0 = getDistance(best_cover,target_cover);
+				if( show_detail) {
+					System.out.print(i+": best cover e: "+best_e+" : ");
+					for( int s : best_cover) {
+						int[] ii = sets[s]; 
+						System.out.print(s+":{");
+						//System.out.print("{");
+						for( int j = 0; j < ii.length; j++) {
+							if( j > 0)
+								System.out.print(",");
+								System.out.print(ii[j]);
+						}
+						System.out.print("} ");
 					}
-					System.out.print("} ");
+					System.out.print(": "+num0);
+					System.out.println();
 				}
-				System.out.print(": "+num);
-				System.out.println();
 			}
-			
+			if( SCORE_MODE == SCORE_MODE_RANK || DO_ALL_SCORES) {
+				num1 = getTargetCoverRank(entropies,samples.size());
+			}
+			if( SCORE_MODE == SCORE_MODE_FUTURE_ENTROPY || DO_ALL_SCORES) {
+				best_cover = scoreAndStuff(entropies,samples.size());
+				for( int s : best_cover) {
+					Integer[] ii = bucket(samples,sets[s]);
+					num2 += cat.getBayesianActualEntropy(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES);
+				}
+			}
 			
 
 			if( i % 100 == 0) {
 				System.out.print(".");
 			}
-			results[i] = num;
-			run_avg[i] += num;
+			results[i][0] = num0;
+			results[i][1] = num1;
+			results[i][2] = num2;
+			run_avg[i][0] += num0;
+			run_avg[i][1] += num1;
+			run_avg[i][2] += num2;
 
-			if( num == 0) {
+			if( num0 == 0) {
 				//System.exit(0);
 			}
 		}
