@@ -26,6 +26,9 @@ public class Visualizer implements Draws {
 	double anneal_mult = 0.99;
 	static int image_size = 512;
 	
+	public static int min_swaps_to_repeat = 0;
+	public static double min_swap_ratio = 0.25;
+	
 	public static final int OUTPUT_FILE = 0;
 	public static final int INPUT_FILE = 1;
 	public static final int VARS = 2;
@@ -33,10 +36,14 @@ public class Visualizer implements Draws {
 	public static final int ITERATIONS = 4;
 	public static final int IMAGE_SIZE = 5;
 	
-	public static boolean use_squared_distance = false;
-	public static boolean divide_by_area = false;
+	public static final int TIMES_TO_REPEAT_IF_IMPROVED = 0;
 	
-	public static double whitespace_fraction = 0.75;
+	public static boolean use_squared_distance = true;
+	public static boolean divide_by_area = false;
+	public static boolean shrink_geometrically = false;
+	
+	public static double whitespace_fraction = 0.6666;
+	public static int DEFAULT_ITERATIONS = 160;
 	public static boolean shrink_by_area = false;
 	
 	public static void main(String[] args) {
@@ -64,6 +71,7 @@ public class Visualizer implements Draws {
 				
 				ToImageFile img = new ToImageFile();
 				System.out.println("drawing...");
+				//img.toPNG("visualizer_"+use_squared_distance+"_"+divide_by_area+".png", new Visualizer(), image_size);
 				img.toPNG("visualizer.png", new Visualizer(), image_size);
 				System.out.println("done.");
 
@@ -82,24 +90,25 @@ public class Visualizer implements Draws {
 		};*/
 		
 		double[] Is = new double[]{
-				3.00,
+				2.8,
 				1,
 				1,
 				0.5,
 				2,
 				0.25,
 				0.25,
-				0,
+				0.1,
 				
 		};
 		
 		Visualizer v = new Visualizer();
-		v.init(3,320,320,Is);
+		v.init(3,640,DEFAULT_ITERATIONS,Is);
 		
 		
 		ToImageFile img = new ToImageFile();
 		System.out.println("drawing...");
-		img.toPNG("visualizer.png", v, 640);
+		img.toPNG("visualizer_"+use_squared_distance+"_"+divide_by_area+"_"+shrink_geometrically+".png", v, 640);
+		//img.toPNG("visualizer.png", v, 640);
 		System.out.println("done.");
 	}
 	
@@ -112,7 +121,7 @@ public class Visualizer implements Draws {
 		I = Is;
 		D = new double[size];
 		dots_per_H = (1.0-whitespace_fraction)*(double)num_dots/totalH;
-		
+		min_swaps_to_repeat = (int)(min_swap_ratio * (double)(num_dots));
 
 		int[] dot_connections = new int[num_dots];
 		int[][] dot_coords = new int[num_dots][2];
@@ -164,14 +173,21 @@ public class Visualizer implements Draws {
 			double score = scoreGrid(grid);
 			all_grids.get(0).a = score;
 			if( shrink_by_area) {
-				init_rate = Math.sqrt(4.0*(double)(iterations-i)/(double)iterations);
+				init_rate = Math.sqrt((double)(iterations-i)/(double)iterations);
 			} else {
-				init_rate = 2.0*(double)(iterations-i)/(double)iterations;
+				init_rate = (double)(iterations-i)/(double)iterations;
 			}
+			if( shrink_geometrically) {
+				init_rate = 1.0-init_rate;
+				double min = -Math.log((double)dot_connections.length/2.0);
+				init_rate = Math.exp(min*init_rate);
+			}
+			init_rate *= 1;
 			//init_rate -= 2.0/(double)iterations;//*= anneal_mult;
 			//init_rate *= anneal_mult;
 			//System.out.println(score);
 		}
+		
 		/*
 		while( init_rate*(double)dot_connections.length > 1.0) {
 			for( int g = 0; g < num_grids*3; g++) {
@@ -237,148 +253,161 @@ public class Visualizer implements Draws {
 	public void perturbScored( int[][] dot_grid, double rate) {
 		double[] counts = new double[num_vars];
 		double[][] centers = new double[num_vars][2];
-		
-		//compute centers
-		for( int x = 0; x < dot_grid.length; x++) {
-			for( int y = 0; y < dot_grid.length; y++) {
-				int dot = dot_grid[x][y];
-				for( int i = 0; i < num_vars; i++) {
-					if( ((0x01 << i) & dot) != 0 ) {
-						counts[i]++;
-						centers[i][0] += x;//dot_coords[i][0];
-						centers[i][1] += y;//dot_coords[i][1];
+		long swaps = 9999999;
+		boolean first_time = true;
+		while(swaps > min_swaps_to_repeat || first_time) {
+			swaps = 0;
+			first_time = false;
+			
+			//compute centers
+			for( int x = 0; x < dot_grid.length; x++) {
+				for( int y = 0; y < dot_grid.length; y++) {
+					int dot = dot_grid[x][y];
+					for( int i = 0; i < num_vars; i++) {
+						if( ((0x01 << i) & dot) != 0 ) {
+							counts[i]++;
+							centers[i][0] += x;//dot_coords[i][0];
+							centers[i][1] += y;//dot_coords[i][1];
+						}
 					}
 				}
 			}
-		}
-		for( int i = 0; i < num_vars; i++) {
-			counts[i] = 1.0 / counts[i];
-			centers[i][0] *= counts[i];
-			centers[i][1] *= counts[i];
-		}
-		
-		//compute sum squared distance
-		double ssd = 0;
-		for( int x = 0; x < dot_grid.length; x++) {
-			for( int y = 0; y < dot_grid.length; y++) {
-				int dot = dot_grid[x][y];
-				for( int i = 0; i < num_vars; i++) {
-					if( ((0x01 << i) & dot) != 0 ) {
-						double dx = x - centers[i][0];
-						double dy = y - centers[i][1];
-						double dd = dx*dx + dy*dy;
-						if( !use_squared_distance) {
-							dd = Math.sqrt(dd);
-						}
-						if( divide_by_area) {
-							double area = I[(0x01 << i)];
+			for( int i = 0; i < num_vars; i++) {
+				counts[i] = 1.0 / counts[i];
+				centers[i][0] *= counts[i];
+				centers[i][1] *= counts[i];
+			}
+			
+			//compute sum squared distance
+			double ssd = 0;
+			for( int x = 0; x < dot_grid.length; x++) {
+				for( int y = 0; y < dot_grid.length; y++) {
+					int dot = dot_grid[x][y];
+					for( int i = 0; i < num_vars; i++) {
+						if( ((0x01 << i) & dot) != 0 ) {
+							double dx = x - centers[i][0];
+							double dy = y - centers[i][1];
+							double dd = dx*dx + dy*dy;
 							if( !use_squared_distance) {
-								area = Math.sqrt(area);
+								dd = Math.sqrt(dd);
 							}
-							if( area != 0) {
-								dd /= area;
+							if( divide_by_area) {
+								double area = I[(0x01 << i)];
+								if( !use_squared_distance) {
+									area = Math.sqrt(area);
+								}
+								if( area != 0) {
+									dd /= area;
+								}
 							}
+							ssd += dd; 
 						}
-						ssd += dd; 
 					}
 				}
 			}
-		}
-
-		int N = (int)rate; //better to poisson estimate this.
-		//for( int n = 0; n < N; n++) {
-		for( int x1 = 0; x1 < dot_grid.length; x1++) {
-			for( int y1 = 0; y1 < dot_grid.length; y1++) {
-				//int x1 = (int)((Math.random())*(double)dot_grid.length);
-				//int y1 = (int)((Math.random())*(double)dot_grid.length);
-				int idx = (int)((Math.random()-0.5)*init_rate*(double)dot_grid.length);
-				int idy = (int)((Math.random()-0.5)*init_rate*(double)dot_grid.length);
-				//int x2 = (int)((Math.random())*(double)dot_grid.length);
-				//int y2 = (int)((Math.random())*(double)dot_grid.length);
-				int x2 = (x1+idx) < 0 ? x1 : (x1+idx) >= dot_grid.length ? x1 : (x1+idx);
-				int y2 = (y1+idy) < 0 ? y1 : (y1+idy) >= dot_grid.length ? y1 : (y1+idy);
-				
-				int dot1 = dot_grid[x1][y1];
-				int dot2 = dot_grid[x2][y2];
-				double ssd0 = 0;
-				for( int i = 0; i < num_vars; i++) {
-					if( ((0x01 << i) & dot1) != 0 ) {
-						double dx = x1 - centers[i][0];
-						double dy = y1 - centers[i][1];
-						double dd = dx*dx + dy*dy;
-						if( !use_squared_distance) {
-							dd = Math.sqrt(dd);
-						}
-						if( divide_by_area) {
-							double area = I[(0x01 << i)];
-							if( !use_squared_distance) {
-								area = Math.sqrt(area);
+	
+			int N = (int)rate; //better to poisson estimate this.
+			//for( int n = 0; n < N; n++) {
+			for( int x1 = 0; x1 < dot_grid.length; x1++) {
+				for( int y1 = 0; y1 < dot_grid.length; y1++) {
+					int repeat = 1;
+					while( repeat > 0) {
+						repeat--;
+						//int x1 = (int)((Math.random())*(double)dot_grid.length);
+						//int y1 = (int)((Math.random())*(double)dot_grid.length);
+						int idx = (int)((Math.random()-0.5)*init_rate*(double)dot_grid.length);
+						int idy = (int)((Math.random()-0.5)*init_rate*(double)dot_grid.length);
+						//int x2 = (int)((Math.random())*(double)dot_grid.length);
+						//int y2 = (int)((Math.random())*(double)dot_grid.length);
+						int x2 = (x1+idx) < 0 ? x1 : (x1+idx) >= dot_grid.length ? x1 : (x1+idx);
+						int y2 = (y1+idy) < 0 ? y1 : (y1+idy) >= dot_grid.length ? y1 : (y1+idy);
+						
+						int dot1 = dot_grid[x1][y1];
+						int dot2 = dot_grid[x2][y2];
+						double ssd0 = 0;
+						for( int i = 0; i < num_vars; i++) {
+							if( ((0x01 << i) & dot1) != 0 ) {
+								double dx = x1 - centers[i][0];
+								double dy = y1 - centers[i][1];
+								double dd = dx*dx + dy*dy;
+								if( !use_squared_distance) {
+									dd = Math.sqrt(dd);
+								}
+								if( divide_by_area) {
+									double area = I[(0x01 << i)];
+									if( !use_squared_distance) {
+										area = Math.sqrt(area);
+									}
+									if( area != 0) {
+										dd /= area;
+									}
+								}
+								ssd0 -= dd;
 							}
-							if( area != 0) {
-								dd /= area;
+							if( ((0x01 << i) & dot2) != 0 ) {
+								double dx = x2 - centers[i][0];
+								double dy = y2 - centers[i][1];
+								double dd = dx*dx + dy*dy;
+								if( !use_squared_distance) {
+									dd = Math.sqrt(dd);
+								}
+								if( divide_by_area) {
+									double area = I[(0x01 << i)];
+									if( !use_squared_distance) {
+										area = Math.sqrt(area);
+									}
+									if( area != 0) {
+										dd /= area;
+									}
+								}
+								ssd0 -= dd;
+							}
+							
+							if( ((0x01 << i) & dot1) != 0 ) {
+								double dx = x2 - centers[i][0];
+								double dy = y2 - centers[i][1];
+								double dd = dx*dx + dy*dy;
+								if( !use_squared_distance) {
+									dd = Math.sqrt(dd);
+								}
+								if( divide_by_area) {
+									double area = I[(0x01 << i)];
+									if( !use_squared_distance) {
+										area = Math.sqrt(area);
+									}
+									if( area != 0) {
+										dd /= area;
+									}
+								}
+								ssd0 += dd;
+							}
+							if( ((0x01 << i) & dot2) != 0 ) {
+								double dx = x1 - centers[i][0];
+								double dy = y1 - centers[i][1];
+								double dd = dx*dx + dy*dy;
+								if( !use_squared_distance) {
+									dd = Math.sqrt(dd);
+								}
+								if( divide_by_area) {
+									double area = I[(0x01 << i)];
+									if( !use_squared_distance) {
+										area = Math.sqrt(area);
+									}
+									if( area != 0) {
+										dd /= area;
+									}
+								}
+								ssd0 += dd;
 							}
 						}
-						ssd0 -= dd;
+						//repeat = false;
+						if( ssd0 < 0) {
+							dot_grid[x1][y1] = dot2;
+							dot_grid[x2][y2] = dot1;
+							repeat = TIMES_TO_REPEAT_IF_IMPROVED;
+							swaps++;
+						}
 					}
-					if( ((0x01 << i) & dot2) != 0 ) {
-						double dx = x2 - centers[i][0];
-						double dy = y2 - centers[i][1];
-						double dd = dx*dx + dy*dy;
-						if( !use_squared_distance) {
-							dd = Math.sqrt(dd);
-						}
-						if( divide_by_area) {
-							double area = I[(0x01 << i)];
-							if( !use_squared_distance) {
-								area = Math.sqrt(area);
-							}
-							if( area != 0) {
-								dd /= area;
-							}
-						}
-						ssd0 -= dd;
-					}
-					
-					if( ((0x01 << i) & dot1) != 0 ) {
-						double dx = x2 - centers[i][0];
-						double dy = y2 - centers[i][1];
-						double dd = dx*dx + dy*dy;
-						if( !use_squared_distance) {
-							dd = Math.sqrt(dd);
-						}
-						if( divide_by_area) {
-							double area = I[(0x01 << i)];
-							if( !use_squared_distance) {
-								area = Math.sqrt(area);
-							}
-							if( area != 0) {
-								dd /= area;
-							}
-						}
-						ssd0 += dd;
-					}
-					if( ((0x01 << i) & dot2) != 0 ) {
-						double dx = x1 - centers[i][0];
-						double dy = y1 - centers[i][1];
-						double dd = dx*dx + dy*dy;
-						if( !use_squared_distance) {
-							dd = Math.sqrt(dd);
-						}
-						if( divide_by_area) {
-							double area = I[(0x01 << i)];
-							if( !use_squared_distance) {
-								area = Math.sqrt(area);
-							}
-							if( area != 0) {
-								dd /= area;
-							}
-						}
-						ssd0 += dd;
-					}
-				}
-				if( ssd0 < 0) {
-					dot_grid[x1][y1] = dot2;
-					dot_grid[x2][y2] = dot1;
 				}
 			}
 		}
@@ -525,9 +554,6 @@ public class Visualizer implements Draws {
 				d.fillRect(x0, y0, x1-x0, y1-y0);
 			}	
 		}
-		
-		// TODO Auto-generated method stub
-		
 	}
 
 }

@@ -426,7 +426,7 @@ sum(ylnx+y)=0;
 		for(int i = 0; i < samples.size(); i++) {
 			results.add(samples.get(i).b);
 		}
-		double maxH = Math.log((double)data.length);///Math.log(2.0);
+		double maxH = Math.log((double)data.length);/////Math.log(2);
 		
 		//integrate
 		double sumP = 0;
@@ -456,7 +456,7 @@ sum(ylnx+y)=0;
 		}
 		//System.out.println("sums "+sumHP+" "+sumP);
 
-		return (sumHP/sumP)/Math.log(2.0);
+		return (sumHP/sumP);/////Math.log(2);
 	}
 	public double getAtPercentile(Vector<double[]> results, double percentile) {
 		if( results.size() == 0) {
@@ -504,7 +504,7 @@ sum(ylnx+y)=0;
 			}
 			while( sumP > targetP) {
 				double prevP = sumP - dP;
-				ret[n] = (last_h + dH*(targetP - prevP)/dP)/Math.log(2);
+				ret[n] = (last_h + dH*(targetP - prevP)/dP);/////Math.log(2);
 				n++;
 				if( n >= percentiles.length) {
 					break;
@@ -555,11 +555,11 @@ sum(ylnx+y)=0;
 		}
 		//System.out.println("sums "+sumHP+" "+sumP);
 
-		return (sumHP/sumP)/Math.log(2.0);
+		return (sumHP/sumP);/////Math.log(2);
 	}	
 	public double getEntropyOfSortedEntropyCurve(Vector<double[]> results) {
 		double res = 10.0/(double)results.size();//Math.exp(-Math.log((double)results.size())*0.5);
-		double maxH = results.get(results.size()-1)[0]/Math.log(2); 
+		double maxH = results.get(results.size()-1)[0];///Math.log(2); 
 		//System.out.println("maxH: "+maxH);
 		
 		double[] percentiles = new double[(int)Math.ceil((double)1.0 / res)];
@@ -580,7 +580,7 @@ sum(ylnx+y)=0;
 			double dH = (hs[i] - hs[i-1])/maxH;
 			e -= res * Math.log(dH);
 		}
-		return (e-max_e)/Math.log(2.0);
+		return (e-max_e);/////Math.log(2);
 	}	
 	
 	//if you want the conditional entropy of X given Y, the marginal categories should be the categories for Y.
@@ -836,7 +836,7 @@ sum(ylnx+y)=0;
 		for(int i = 0; i < samples.size(); i++) {
 			results.add(samples.get(i).b);
 		}
-		double maxH = Math.log((double)data.length);///Math.log(2.0);
+		double maxH = Math.log((double)data.length);/////Math.log(2);
 		
 		//integrate
 		double sumP = 0;
@@ -869,7 +869,7 @@ sum(ylnx+y)=0;
 		//compute normalizing constant
 		for( int i = 0; i < samples.size(); i++) {
 			double[] result = samples.get(i);
-			double h = result[0]/Math.log(2);
+			double h = result[0];///Math.log(2);
 			double ph = result[1];
 			double delta_h = h-last_h;
 			double delta_ph = ph-last_ph;
@@ -885,7 +885,7 @@ sum(ylnx+y)=0;
 		last_ph = 0;
 		for( int i = 0; i < samples.size(); i++) {
 			double[] result = samples.get(i);
-			double h = result[0]/Math.log(2);
+			double h = result[0];///Math.log(2);
 			double ph = result[1]/total_ph;
 			double delta_h = h-last_h;
 			double delta_ph = ph-last_ph;
@@ -921,7 +921,7 @@ sum(ylnx+y)=0;
 			last_ph = ph;
 			last_h = h;
 		}
-		total_e /= Math.log(2);
+		//total_e /= //Math.log(2);
 		return new double[]{total_h_ph,0-total_e,total_ph};
 	}
 	public static double integral(double a, double b, double x) {
@@ -979,7 +979,7 @@ sum(ylnx+y)=0;
 		for(int i = 0; i < samples.size(); i++) {
 			results.add(samples.get(i).b);
 		}
-		double maxH = Math.log((double)data.length);///Math.log(2.0);
+		double maxH = Math.log((double)data.length);/////Math.log(2);
 
 		Vector<double[]> dd = bin(results,num_bins,0,1,maxH);
 		//Vector<double[]> samples, int num_bins, int h_col, int p_col) {

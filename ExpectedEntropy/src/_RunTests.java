@@ -1,5 +1,4 @@
 
-
 import java.util.*;
 
 import distributions.CategoricalDistribution;
@@ -14,6 +13,7 @@ public class _RunTests {
 	static int MONTE_CARLO_RESOLUTION = 100;
 	
 	static int number_of_bits = 10;
+	static double number_of_nats = number_of_bits*Math.log(2.0);
 	public static int max_size = 10;
 
 	static double at_percentile = 0;
@@ -63,9 +63,10 @@ public class _RunTests {
 	//8 - full add
 	public static int[] choices = new int[]{
 			0,1,2,8,
-			0,1,2,8,
-			0,1,2,8,
-			0,1,2,8,
+			//0,1,2,8,
+			//0,1,2,8,
+			//0,1,2,8,
+			
 			//0,1,2,8,
 			//0,1,2,8,
 			//0,1,2,8,
@@ -99,12 +100,16 @@ public class _RunTests {
 			*/
 	};
 	public static double[] noises = new double[]{
+			/*
 			0.1,0.1,0.1,0.1,
 			0.1,0.1,0.1,0.1,
 			0.1,0.1,0.1,0.1,
 			0.1,0.1,0.1,0.1,
 			0.1,0.1,0.1,0.1,
+			*/
 			
+			0.0,0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
@@ -141,6 +146,8 @@ public class _RunTests {
 			//METRIC_AICc,METRIC_AICc,METRIC_AICc,METRIC_AICc,
 			//METRIC_BIC,METRIC_BIC,METRIC_BIC,METRIC_BIC,
 			
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+
 			METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,
 			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
 			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
@@ -441,7 +448,7 @@ public class _RunTests {
 			double p = getTotalParams(cover);
 			double max_e = best_e;
 			//if( use_neg_entropy || METRIC == METRIC_BEES_PENALIZED_K_N_NEG) {
-				e -= number_of_bits;
+				e -= number_of_nats;
 			//}
 			e *= N;
 			
@@ -847,7 +854,7 @@ public class _RunTests {
 				case METRIC_BEES_CONSTRAINED:
 				case METRIC_BEES_PENALIZED_K_N_NEG:
 					if( use_prior_on_p) {
-						v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
+						v = Functions.getExpectedEntropy(ii,1,1);///Math.log(2);
 					} else {
 						Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii,MONTE_CARLO_RESOLUTION);
 						if( at_percentile > 0) {
@@ -897,7 +904,7 @@ public class _RunTests {
 						ii4[k] = ii[k]+1;
 					}
 					if( use_prior_on_p) {
-						v = Functions.getExpectedEntropy(ii4,1,1)/Math.log(2);
+						v = Functions.getExpectedEntropy(ii4,1,1);///Math.log(2);
 					} else {
 						Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii4,MONTE_CARLO_RESOLUTION);
 						if( at_percentile > 0) {
@@ -908,7 +915,7 @@ public class _RunTests {
 					}
 					break;
 				case METRIC_BEES_PRIOR_NOT_H:
-					v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
+					v = Functions.getExpectedEntropy(ii,1,1);///Math.log(2);
 					break;
 				case METRIC_AIC:
 					v = getAIC(ii);
