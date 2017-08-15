@@ -741,9 +741,7 @@ sum(ylnx+y)=0;
 	
 	public double getBayesianActualEntropy_old(Integer[] ii, double[] actual_dist, int samples) {
 		if( samples == 0) { samples = 100; }
-		
-		Vector<double[]> hpVect = new Vector<double[]>();
-		
+			
 		double total_kldp = 0;
 		double total_p = 0;
 		for( int i = 0; i < samples; i++) {

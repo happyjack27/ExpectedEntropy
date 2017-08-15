@@ -15,7 +15,7 @@ public class _RunTests {
 	static boolean adjust_num_params = true;
 	static boolean use_prior_on_p = false;
 	
-	public static boolean DO_ALL_SCORES = false;
+	public static boolean DO_ALL_SCORES = true;
 
 	
 	static int number_of_bits = 10;
@@ -30,7 +30,7 @@ public class _RunTests {
 	static final int SCORE_MODE_FUTURE_ENTROPY = 2;
 	static int SCORE_MODE = SCORE_MODE_FUTURE_ENTROPY;
 	static int ACTUAL_THETA_SAMPLES = 100000;
-	static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 100;	
+	static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 250;	
 	
 	//entropy at percentile
 	//percentile at entropy
@@ -71,13 +71,18 @@ public class _RunTests {
 	//2 - half add
 	//8 - full add
 	public static double[] penalties = new double[]{
-			1.0,1.0,1.0,1.0,
-			1.0,1.0,1.0,1.0,
+			//1.0,1.0,1.0,1.0,
+			//1.0,1.0,1.0,1.0,
+			
+			0.0,0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,
 			
 			0.5,0.5,0.5,0.5,
 			0.5,0.5,0.5,0.5,
+			
 			1.0,1.0,1.0,1.0,
 			1.0,1.0,1.0,1.0,
+			
 			2.0,2.0,2.0,2.0,
 			2.0,2.0,2.0,2.0,
 			
@@ -85,13 +90,16 @@ public class _RunTests {
 	public static int[] choices = new int[]{
 			0,1,2,8,
 			0,1,2,8,
-			/*
+			
 			0,1,2,8,
 			0,1,2,8,
 			
 			0,1,2,8,
 			0,1,2,8,
-			*/
+			
+			0,1,2,8,
+			0,1,2,8,
+			
 			
 			
 			//0,1,2,8,
@@ -176,6 +184,14 @@ public class _RunTests {
 			0.2,0.2,0.2,0.2,//0.2,0.2,0.2,0.2,
 	};
 	public static int[] metrics = new int[]{
+			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
+			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
+			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
+			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
+			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
 			//METRIC_BEES_START_WITH_1,METRIC_BEES_START_WITH_1,METRIC_BEES_START_WITH_1,METRIC_BEES_START_WITH_1,
 			//METRIC_AIC,
 			//METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
