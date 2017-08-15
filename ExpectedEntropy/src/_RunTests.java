@@ -8,9 +8,11 @@ import util.*;
 
 public class _RunTests {
 	static int max_n = 25;
-	static int num_runs = 50;//1000;//25;
+	static int num_runs = 100;//1000;//25;
 	static boolean divide_log_likelihood_by_n = false;
 	static int MONTE_CARLO_RESOLUTION = 100;
+	static double penalty = 1.0;
+	static boolean adjust_num_params = true;
 	
 	static int number_of_bits = 10;
 	static double number_of_nats = number_of_bits*Math.log(2.0);
@@ -43,7 +45,7 @@ public class _RunTests {
 	static final int METRIC_BEES_PENALIZED_MULT = 14;
 	static final int METRIC_BEES_CONSTRAINED = 15;
 	//static double min_entropy_reduction_per_parameter = 0.1;
-	static double min_entropy_reduction_per_parameter_for_k_n = 1.0;
+
 	//static double min_e_per_p = 0.1;
 	static double constrained_min_total_e_saved_per_p = 1;
 	
@@ -61,7 +63,23 @@ public class _RunTests {
 	//1 - and/or/xor
 	//2 - half add
 	//8 - full add
+	public static double[] penalties = new double[]{
+			0.5,0.5,0.5,0.5,
+			0.5,0.5,0.5,0.5,
+			1.0,1.0,1.0,1.0,
+			1.0,1.0,1.0,1.0,
+			2.0,2.0,2.0,2.0,
+			2.0,2.0,2.0,2.0,
+			
+	};
 	public static int[] choices = new int[]{
+			0,1,2,8,
+			0,1,2,8,
+			
+			0,1,2,8,
+			0,1,2,8,
+			
+			0,1,2,8,
 			0,1,2,8,
 			//0,1,2,8,
 			//0,1,2,8,
@@ -146,6 +164,11 @@ public class _RunTests {
 			//METRIC_AICc,METRIC_AICc,METRIC_AICc,METRIC_AICc,
 			//METRIC_BIC,METRIC_BIC,METRIC_BIC,METRIC_BIC,
 			
+			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
 			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
 
 			METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,METRIC_LOG_LIKELIHOOD,
@@ -346,6 +369,7 @@ public class _RunTests {
 			choice = choices[cur_choice];
 			noise = noises[cur_choice];
 			METRIC = metrics[cur_choice];
+			penalty = penalties[cur_choice];
 			
 			Vector<int[]> vsets = allSubSets(number_of_bits,max_size);
 			sets = new int[vsets.size()][];
@@ -462,12 +486,12 @@ public class _RunTests {
 				e /= p;//Math.log(p)*min_entropy_reduction_per_parameter_for_k_n;
 			}
 			if( METRIC == METRIC_BEES_PENALIZED_LOG) {
-				e += Math.log(p)*min_entropy_reduction_per_parameter_for_k_n;
+				e += Math.log(p)*penalty;
 			}
 			if( METRIC == METRIC_BEES_PENALIZED_K_N) {
 				//if( METRIC == METRIC_BEES || METRIC == METRIC_BEES_PRIOR_NOT_H || METRIC == METRIC_BEES_START_WITH_1) {
 				//max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter_for_k_n / N;
-				e += p*min_entropy_reduction_per_parameter_for_k_n;
+				e += p*penalty;
 				//e += min_entropy_reduction_per_parameter_for_k_n*p / N;
 			}
 			//min_entropy_reduction_per_parameter
@@ -485,6 +509,9 @@ public class _RunTests {
 		double tot = 0;
 		for( int i : cover) {
 			tot += 0x01 << sets[i].length;
+		}
+		if(adjust_num_params) {
+			tot--;
 		}
 		return tot;
 	}
@@ -752,6 +779,9 @@ public class _RunTests {
 	
 	public static double getAIC(Integer[] buckets) {
 		double k = buckets.length;
+		if( adjust_num_params) {
+			k--;
+		}
 		
 		double total_log_probability = 0;
 		
@@ -771,7 +801,7 @@ public class _RunTests {
 			total_log_probability /= n;
 		}
 		
-		return k - total_log_probability;
+		return penalty*k - total_log_probability;
 	}
 	public static double getAICc(Integer[] buckets) {
 		double k = buckets.length;
