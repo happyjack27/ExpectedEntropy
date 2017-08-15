@@ -448,7 +448,7 @@ public class _RunTests {
 			double p = getTotalParams(cover);
 			double max_e = best_e;
 			//if( use_neg_entropy || METRIC == METRIC_BEES_PENALIZED_K_N_NEG) {
-				e -= number_of_nats;
+				//e -= number_of_nats;
 			//}
 			e *= N;
 			
