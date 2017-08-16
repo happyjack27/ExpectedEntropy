@@ -31,10 +31,10 @@ import org.apache.commons.math3.stat.descriptive.rank.Min;
 import org.apache.commons.math3.stat.descriptive.summary.Sum;
 import org.apache.commons.math3.stat.descriptive.summary.SumOfLogs;
 import org.apache.commons.math3.stat.descriptive.summary.SumOfSquares;
-import org.apache.commons.math3.util.MathUtils;
-import org.apache.commons.math3.util.MathArrays;
-import org.apache.commons.math3.util.Precision;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * <p>Computes summary statistics for a stream of n-tuples added using the

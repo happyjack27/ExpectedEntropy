@@ -21,7 +21,7 @@ import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.NumberIsTooLargeException;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /**
  * Abstract base class for all implementations of the

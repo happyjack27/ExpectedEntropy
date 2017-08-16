@@ -22,7 +22,7 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.Locale;
 
-import org.apache.commons.math3.util.CompositeFormat;
+import org.apache.commons.math3.util.*;
 import org.apache.commons.math3.exception.MathParseException;
 
 /**

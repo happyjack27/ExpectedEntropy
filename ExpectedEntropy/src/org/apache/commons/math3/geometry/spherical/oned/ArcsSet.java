@@ -32,9 +32,9 @@ import org.apache.commons.math3.geometry.partitioning.BSPTree;
 import org.apache.commons.math3.geometry.partitioning.BoundaryProjection;
 import org.apache.commons.math3.geometry.partitioning.Side;
 import org.apache.commons.math3.geometry.partitioning.SubHyperplane;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /** This class represents a region of a circle: a set of arcs.
  * <p>

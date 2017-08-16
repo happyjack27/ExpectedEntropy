@@ -22,7 +22,7 @@ import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.NonMonotonicSequenceException;
 import org.apache.commons.math3.exception.NumberIsTooSmallException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /**
  * Computes a natural (also known as "free", "unclamped") cubic spline interpolation for the data set.

@@ -21,8 +21,8 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.exception.ConvergenceException;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class provides computation methods related to Bessel
@@ -47,7 +47,7 @@ import org.apache.commons.math3.util.MathArrays;
  * References:</p>
  * <ul>
  * <li>"A Note on Backward Recurrence Algorithms," Olver, F. W. J., and Sookne,
- * D. J., Math. Comp. 26, 1972, pp 941-947.</li>
+ * D. J., FastMath. Comp. 26, 1972, pp 941-947.</li>
  * <li>"Bessel Functions of Real Argument and Integer Order," Sookne, D. J., NBS
  * Jour. of Res. B. 77B, 1973, pp 125-132.</li>
  * </ul> </p>

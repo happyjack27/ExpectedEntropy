@@ -27,7 +27,7 @@ import org.apache.commons.math3.linear.NonSquareMatrixException;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SingularMatrixException;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
 
 /**
  * Implementation of a Kalman filter to estimate the state <i>x<sub>k</sub></i>

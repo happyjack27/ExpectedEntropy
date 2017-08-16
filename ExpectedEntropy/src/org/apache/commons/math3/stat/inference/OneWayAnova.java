@@ -27,7 +27,7 @@ import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
 
 /**
  * Implements one-way ANOVA (analysis of variance) statistics.

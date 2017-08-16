@@ -25,8 +25,8 @@ import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.stat.descriptive.AbstractStorelessUnivariateStatistic;
 import org.apache.commons.math3.stat.descriptive.StorelessUnivariateStatistic;
 import org.apache.commons.math3.stat.descriptive.summary.SumOfLogs;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Returns the <a href="http://www.xycoon.com/geometric_mean.htm">

@@ -23,8 +23,8 @@ import org.apache.commons.math3.FieldElement;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.exception.NullArgumentException;
-import org.apache.commons.math3.util.ArithmeticUtils;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Representation of a rational number.

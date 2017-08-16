@@ -23,8 +23,8 @@ import org.apache.commons.math3.exception.MathUnsupportedOperationException;
 import org.apache.commons.math3.exception.MaxCountExceededException;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.Precision;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Calculates the eigen decomposition of a real matrix.
@@ -32,7 +32,7 @@ import org.apache.commons.math3.util.FastMath;
  * V and D such that A = V &times; D &times; V<sup>T</sup>.
  * A, V and D are all m &times; m matrices.</p>
  * <p>This class is similar in spirit to the <code>EigenvalueDecomposition</code>
- * class from the <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a>
+ * class from the <a href="http://FastMath.nist.gov/javanumerics/jama/">JAMA</a>
  * library, with the following changes:</p>
  * <ul>
  *   <li>a {@link #getVT() getVt} method has been added,</li>

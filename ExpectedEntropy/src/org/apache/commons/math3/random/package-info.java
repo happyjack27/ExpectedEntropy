@@ -44,7 +44,7 @@
  *      Monte-Carlo simulation. It is equidistributed for generating vectors up to dimension 623
  *      and has a huge period: 2<sup>19937</sup> - 1 (which is a Mersenne prime). This generator
  *      is described in a paper by Makoto Matsumoto and Takuji Nishimura in 1998: <a
- *      href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/ARTICLES/mt.pdf">Mersenne Twister:
+ *      href="http://www.FastMath.sci.hiroshima-u.ac.jp/~m-mat/MT/ARTICLES/mt.pdf">Mersenne Twister:
  *      A 623-Dimensionally Equidistributed Uniform Pseudo-Random Number Generator</a>, ACM
  *      Transactions on Modeling and Computer Simulation, Vol. 8, No. 1, January 1998, pp 3--30.
  *      The WELL generators are a family of generators with period ranging from 2<sup>512</sup> - 1

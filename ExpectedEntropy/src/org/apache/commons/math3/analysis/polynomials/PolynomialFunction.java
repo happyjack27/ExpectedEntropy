@@ -27,8 +27,8 @@ import org.apache.commons.math3.analysis.differentiation.UnivariateDifferentiabl
 import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Immutable representation of a real polynomial function with real coefficients.

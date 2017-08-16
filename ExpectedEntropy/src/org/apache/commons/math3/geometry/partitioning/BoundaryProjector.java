@@ -22,7 +22,7 @@ import java.util.List;
 import org.apache.commons.math3.geometry.Point;
 import org.apache.commons.math3.geometry.Space;
 import org.apache.commons.math3.geometry.partitioning.Region.Location;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** Local tree visitor to compute projection on boundary.
  * @param <S> Type of the space.

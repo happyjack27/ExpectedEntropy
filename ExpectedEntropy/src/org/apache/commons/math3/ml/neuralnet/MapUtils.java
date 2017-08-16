@@ -27,7 +27,7 @@ import java.util.Comparator;
 import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.ml.distance.DistanceMeasure;
 import org.apache.commons.math3.ml.neuralnet.twod.NeuronSquareMesh2D;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
 
 /**
  * Utilities for network maps.

@@ -23,7 +23,7 @@ import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.NumberIsTooLargeException;
 import org.apache.commons.math3.exception.OutOfRangeException;
-import org.apache.commons.math3.util.OpenIntToDoubleHashMap;
+import org.apache.commons.math3.util.*;
 
 /**
  * Sparse matrix implementation based on an open addressed map.

@@ -18,7 +18,7 @@ package org.apache.commons.math3.analysis.integration.gauss;
 
 import java.util.Map;
 import java.util.TreeMap;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;

@@ -18,7 +18,7 @@
 package org.apache.commons.math3.analysis.solvers;
 
 import org.apache.commons.math3.analysis.DifferentiableUnivariateFunction;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 import org.apache.commons.math3.exception.TooManyEvaluationsException;
 
 /**

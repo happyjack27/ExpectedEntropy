@@ -24,10 +24,8 @@ import org.apache.commons.math3.exception.MathInternalError;
 import org.apache.commons.math3.exception.NoBracketingException;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.NumberIsTooSmallException;
-import org.apache.commons.math3.util.IntegerSequence;
-import org.apache.commons.math3.util.MathArrays;
-import org.apache.commons.math3.util.MathUtils;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+
 
 /**
  * This class implements a modification of the <a

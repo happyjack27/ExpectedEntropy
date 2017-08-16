@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.math3.exception.MathParseException;
-import org.apache.commons.math3.util.CompositeFormat;
+import org.apache.commons.math3.util.*;
 
 /**
  * Formats a {@code nxm} matrix in components list format

@@ -28,7 +28,7 @@ import org.apache.commons.math3.exception.ZeroException;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.optimization.DifferentiableMultivariateVectorOptimizer;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * Fits points to a {@link

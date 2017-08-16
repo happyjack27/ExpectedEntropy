@@ -18,7 +18,7 @@ package org.apache.commons.math3.random;
 
 import java.io.Serializable;
 
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 
 /** This class implements a powerful pseudo-random number generator
@@ -28,12 +28,12 @@ import org.apache.commons.math3.util.FastMath;
  * <p>This generator features an extremely long period
  * (2<sup>19937</sup>-1) and 623-dimensional equidistribution up to 32
  * bits accuracy. The home page for this generator is located at <a
- * href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html">
- * http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html</a>.</p>
+ * href="http://www.FastMath.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html">
+ * http://www.FastMath.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html</a>.</p>
 
  * <p>This generator is described in a paper by Makoto Matsumoto and
  * Takuji Nishimura in 1998: <a
- * href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/ARTICLES/mt.pdf">Mersenne
+ * href="http://www.FastMath.sci.hiroshima-u.ac.jp/~m-mat/MT/ARTICLES/mt.pdf">Mersenne
  * Twister: A 623-Dimensionally Equidistributed Uniform Pseudo-Random
  * Number Generator</a>, ACM Transactions on Modeling and Computer
  * Simulation, Vol. 8, No. 1, January 1998, pp 3--30</p>

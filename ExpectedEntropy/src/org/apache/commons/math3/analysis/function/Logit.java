@@ -26,7 +26,7 @@ import org.apache.commons.math3.analysis.differentiation.UnivariateDifferentiabl
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.OutOfRangeException;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * <a href="http://en.wikipedia.org/wiki/Logit">

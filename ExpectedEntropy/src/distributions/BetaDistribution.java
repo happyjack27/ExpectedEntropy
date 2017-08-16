@@ -2,6 +2,7 @@ package distributions;
 
 import distributions.interfaces.PriorDistribution;
 import util.*;
+import org.apache.commons.math3.util.*;
 
 public class BetaDistribution implements PriorDistribution<double[],Double,Integer> {
 	double[] hyperParameters;
@@ -21,7 +22,7 @@ public class BetaDistribution implements PriorDistribution<double[],Double,Integ
 	}
 
 	public double getPriorProbabilityOfTheta(Double theta) {
-		return multiplier*Math.pow(theta,a-1)*Math.pow(1-theta,b-1);
+		return multiplier*FastMath.pow(theta,a-1)*FastMath.pow(1-theta,b-1);
 	}
 
 	public void setHyperParameters(double[] hyperParameters) {

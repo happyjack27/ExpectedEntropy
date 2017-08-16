@@ -22,8 +22,8 @@ import java.text.ParsePosition;
 
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.exception.NullArgumentException;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Formats a Fraction number in proper format.  The number format for each of

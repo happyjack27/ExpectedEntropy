@@ -23,7 +23,7 @@ import org.apache.commons.math3.geometry.partitioning.Region;
 import org.apache.commons.math3.geometry.spherical.oned.Arc;
 import org.apache.commons.math3.geometry.spherical.oned.ArcsSet;
 import org.apache.commons.math3.geometry.spherical.oned.Sphere1D;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** This class represents a sub-hyperplane for {@link Circle}.
  * @since 3.3

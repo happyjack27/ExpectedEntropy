@@ -23,7 +23,7 @@ import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.stat.descriptive.AbstractStorelessUnivariateStatistic;
 import org.apache.commons.math3.stat.descriptive.WeightedEvaluation;
 import org.apache.commons.math3.stat.descriptive.summary.Sum;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
 
 /**
  * <p>Computes the arithmetic mean of a set of values. Uses the definitional

@@ -31,7 +31,7 @@ import org.apache.commons.math3.random.RandomVectorGenerator;
  * Base class for all implementations of a multi-start optimizer.
  *
  * This interface is mainly intended to enforce the internal coherence of
- * Commons-Math. Users of the API are advised to base their code on
+ * Commons-FastMath. Users of the API are advised to base their code on
  * {@link MultivariateMultiStartOptimizer} or on
  * {@link DifferentiableMultivariateMultiStartOptimizer}.
  *

@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 import org.apache.commons.math3.ode.EquationsMapper;
 import org.apache.commons.math3.ode.sampling.AbstractStepInterpolator;
 import org.apache.commons.math3.ode.sampling.StepInterpolator;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class implements an interpolator for the Gragg-Bulirsch-Stoer

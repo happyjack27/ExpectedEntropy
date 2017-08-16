@@ -26,9 +26,9 @@ import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.exception.MathInternalError;
 import org.apache.commons.math3.exception.NotPositiveException;
 import org.apache.commons.math3.exception.NumberIsTooLargeException;
-import org.apache.commons.math3.util.CombinatoricsUtils;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /** Class holding "compiled" computation rules for derivative structures.
  * <p>This class implements the computation rules described in Dan Kalman's paper <a

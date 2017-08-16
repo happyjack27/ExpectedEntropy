@@ -19,8 +19,8 @@ package org.apache.commons.math3.special;
 import org.apache.commons.math3.exception.MaxCountExceededException;
 import org.apache.commons.math3.exception.NumberIsTooLargeException;
 import org.apache.commons.math3.exception.NumberIsTooSmallException;
-import org.apache.commons.math3.util.ContinuedFraction;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * <p>
@@ -46,7 +46,7 @@ import org.apache.commons.math3.util.FastMath;
  * <a href="http://www.dtic.mil/dtic/pdf/announcements/CopyrightGuidance.pdf">Copyright guidance</a>
  * indicates that unless otherwise stated in the code, all FORTRAN functions in
  * this library are license free. Since no such notice appears in the code these
- * functions can safely be ported to Commons-Math.
+ * functions can safely be ported to Commons-FastMath.
  * </p>
  *
  */

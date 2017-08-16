@@ -25,7 +25,7 @@ import java.util.Locale;
 import org.apache.commons.math3.exception.MathParseException;
 import org.apache.commons.math3.geometry.Vector;
 import org.apache.commons.math3.geometry.VectorFormat;
-import org.apache.commons.math3.util.CompositeFormat;
+import org.apache.commons.math3.util.*;
 
 /**
  * Formats a 2D vector in components list format "{x; y}".

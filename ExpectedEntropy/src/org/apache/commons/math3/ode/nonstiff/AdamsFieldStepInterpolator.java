@@ -24,7 +24,7 @@ import org.apache.commons.math3.linear.Array2DRowFieldMatrix;
 import org.apache.commons.math3.ode.FieldEquationsMapper;
 import org.apache.commons.math3.ode.FieldODEStateAndDerivative;
 import org.apache.commons.math3.ode.sampling.AbstractFieldStepInterpolator;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class implements an interpolator for Adams integrators using Nordsieck representation.

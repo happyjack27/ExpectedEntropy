@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 import distributions.*;
 import distributions.interfaces.PosteriorDistribution;
 import util.Functions;
+import org.apache.commons.math3.util.*;
 
 public class Main {
 	public static int verbosity = 0;
@@ -17,9 +18,9 @@ public class Main {
 		System.out.println(s);
 	}
 	public static int[] getSample() {
-		int a = Math.random() > 0.5 ? 1 : 0;
-		int b = Math.random() > 0.5 ? 1 : 0;
-		int c = Math.random() > 0.5 ? 1 : 0;
+		int a = FastMath.random() > 0.5 ? 1 : 0;
+		int b = FastMath.random() > 0.5 ? 1 : 0;
+		int c = FastMath.random() > 0.5 ? 1 : 0;
 		int d = b * c;
 		int e = b + c > 0 ? 1 : 0;
 		int f = 0;
@@ -110,7 +111,7 @@ public class Main {
 		for( int i = 0; i < pdf.size(); i++) {
 			double[] dd = pdf.get(i);
 			double[] dd2 = pdf2.get(i);
-			System.out.print((dd[0]/Math.log(2))+", "+dd[1] +", "+ (2.0*dd2[0]/Math.log(2))+", "+dd2[1]);
+			System.out.print((dd[0]/FastMath.log(2))+", "+dd[1] +", "+ (2.0*dd2[0]/FastMath.log(2))+", "+dd2[1]);
 			for( int j = 0; j < dd.length; j++) {
 				//System.out.print(dd[j]+", ");
 			}
@@ -123,15 +124,15 @@ public class Main {
 		
 		/*
 		double d;
-		d = Functions.getExpectedEntropy(new Integer[]{0,0}, 1, 1)/Math.log(2.0);
+		d = Functions.getExpectedEntropy(new Integer[]{0,0}, 1, 1)/FastMath.log(2.0);
 		System.out.println("d: "+d);
-		d = Functions.getExpectedEntropy(new Integer[]{1,0}, 1, 1)/Math.log(2.0);
+		d = Functions.getExpectedEntropy(new Integer[]{1,0}, 1, 1)/FastMath.log(2.0);
 		System.out.println("d: "+d);
-		d = Functions.getExpectedEntropy(new Integer[]{1,1}, 1, 1)/Math.log(2.0);
+		d = Functions.getExpectedEntropy(new Integer[]{1,1}, 1, 1)/FastMath.log(2.0);
 		System.out.println("d: "+d);
-		d = Functions.getExpectedEntropy(new Integer[]{10,1}, 1, 1)/Math.log(2.0);
+		d = Functions.getExpectedEntropy(new Integer[]{10,1}, 1, 1)/FastMath.log(2.0);
 		System.out.println("d: "+d);
-		d = Functions.getExpectedEntropy(new Integer[]{100,1}, 1, 1)/Math.log(2.0);
+		d = Functions.getExpectedEntropy(new Integer[]{100,1}, 1, 1)/FastMath.log(2.0);
 		System.out.println("d: "+d);
 		System.exit(0);
 		*/
@@ -162,8 +163,8 @@ public class Main {
 			double theta = ((double)i) / (num_sample_points*2);
 			
 			//this produces samples tat are more uniform across entropy
-			double t2 = 1.0/Math.log(1-theta);
-			theta = 1.0/Math.log(theta);
+			double t2 = 1.0/FastMath.log(1-theta);
+			theta = 1.0/FastMath.log(theta);
 			theta = theta/(theta+t2);
 			
 			results[i] = posterior.getEntropyAndProbabilityAtTheta(theta, new Integer[]{zeros, ones});
@@ -177,7 +178,7 @@ public class Main {
 		double total_ph = 0;
 		double total_e = 0;
 		for( int i = 0; i < num_sample_points; i++) {
-			double h = results[i][0]/Math.log(2);
+			double h = results[i][0]/FastMath.log(2);
 			double ph = results[i][1]/sump;
 			double delta_h = h-last_h;
 			double delta_ph = ph-last_ph;
@@ -191,7 +192,7 @@ public class Main {
 		last_h = 0;
 		last_ph = 0;
 		for( int i = 0; i < num_sample_points; i++) {
-			double h = results[i][0]/Math.log(2);
+			double h = results[i][0]/FastMath.log(2);
 			double ph = results[i][1]/(sump*total_ph);
 			double delta_h = h-last_h;
 			double delta_ph = ph-last_ph;
@@ -227,7 +228,7 @@ public class Main {
 			log(1,h+", "+ph);//+", "+delta_h_ph+", "+delta_p);
 			
 		}
-		total_e /= Math.log(2);
+		total_e /= FastMath.log(2);
 		//log(1,"E(H) = "+(total_h_ph/total_ph));
 		log(1,"E(H) = "+(total_h_ph));
 		log(1,"H(H) = "+(0-total_e));
@@ -243,6 +244,6 @@ public class Main {
 		if( y == 0) {
 			y = Double.MIN_VALUE;
 		}
-		return y*y*(2.0*Math.log(y)-1.0) / (4.0*b);
+		return y*y*(2.0*FastMath.log(y)-1.0) / (4.0*b);
 	}
 }

@@ -21,8 +21,8 @@ import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.geometry.Point;
 import org.apache.commons.math3.geometry.Space;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /** This class represents a point on the 2-sphere.
  * <p>

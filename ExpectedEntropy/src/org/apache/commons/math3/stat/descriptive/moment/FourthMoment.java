@@ -19,7 +19,7 @@ package org.apache.commons.math3.stat.descriptive.moment;
 import java.io.Serializable;
 
 import org.apache.commons.math3.exception.NullArgumentException;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
 
 /**
  * Computes a statistic related to the Fourth Central Moment.  Specifically,

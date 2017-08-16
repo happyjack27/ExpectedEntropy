@@ -2,6 +2,7 @@ package distributions;
 
 import util.Functions;
 import distributions.interfaces.PriorDistribution;
+import org.apache.commons.math3.util.*;
 
 
 public class DirichletDistribution implements PriorDistribution<double[],double[],Integer> {
@@ -18,7 +19,7 @@ public class DirichletDistribution implements PriorDistribution<double[],double[
 		}
 		double m = 1;
 		for( int i = 0; i < theta.length; i++) {
-			m *= Math.pow(theta[i],a[i]-1);
+			m *= FastMath.pow(theta[i],a[i]-1);
 		}
 		return normalizing_constant*m;
 		
@@ -29,9 +30,9 @@ public class DirichletDistribution implements PriorDistribution<double[],double[
 				continue;
 				//return 0;
 			}
-			m += Math.log(theta[i])*(a[i]-1);
+			m += FastMath.log(theta[i])*(a[i]-1);
 		}
-		return normalizing_constant*Math.exp(m);
+		return normalizing_constant*FastMath.exp(m);
 		*/
 	}
 
@@ -56,7 +57,7 @@ public class DirichletDistribution implements PriorDistribution<double[],double[
 			bottom += a[i];
 		}
 		
-		normalizing_constant =  Functions.gamma(bottom)/Math.exp(top);
+		normalizing_constant =  Functions.gamma(bottom)/FastMath.exp(top);
 	}
 	
 

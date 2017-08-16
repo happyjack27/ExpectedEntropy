@@ -26,7 +26,7 @@ import org.apache.commons.math3.exception.NoBracketingException;
 import org.apache.commons.math3.ode.FieldODEState;
 import org.apache.commons.math3.ode.FieldODEStateAndDerivative;
 import org.apache.commons.math3.ode.sampling.FieldStepInterpolator;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** This class handles the state for one {@link EventHandler
  * event handler} during integration steps.

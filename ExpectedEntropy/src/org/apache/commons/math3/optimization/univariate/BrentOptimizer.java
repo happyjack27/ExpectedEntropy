@@ -16,8 +16,8 @@
  */
 package org.apache.commons.math3.optimization.univariate;
 
-import org.apache.commons.math3.util.Precision;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 import org.apache.commons.math3.exception.NumberIsTooSmallException;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.optimization.ConvergenceChecker;
@@ -74,7 +74,7 @@ public class BrentOptimizer extends BaseAbstractUnivariateOptimizer {
      * @param checker Additional, user-defined, convergence checking
      * procedure.
      * @throws NotStrictlyPositiveException if {@code abs <= 0}.
-     * @throws NumberIsTooSmallException if {@code rel < 2 * Math.ulp(1d)}.
+     * @throws NumberIsTooSmallException if {@code rel < 2 * FastMath.ulp(1d)}.
      */
     public BrentOptimizer(double rel,
                           double abs,
@@ -104,7 +104,7 @@ public class BrentOptimizer extends BaseAbstractUnivariateOptimizer {
      * @param rel Relative threshold.
      * @param abs Absolute threshold.
      * @throws NotStrictlyPositiveException if {@code abs <= 0}.
-     * @throws NumberIsTooSmallException if {@code rel < 2 * Math.ulp(1d)}.
+     * @throws NumberIsTooSmallException if {@code rel < 2 * FastMath.ulp(1d)}.
      */
     public BrentOptimizer(double rel,
                           double abs) {

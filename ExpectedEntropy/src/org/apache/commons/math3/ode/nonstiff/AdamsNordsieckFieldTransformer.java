@@ -28,7 +28,7 @@ import org.apache.commons.math3.linear.ArrayFieldVector;
 import org.apache.commons.math3.linear.FieldDecompositionSolver;
 import org.apache.commons.math3.linear.FieldLUDecomposition;
 import org.apache.commons.math3.linear.FieldMatrix;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /** Transformer to Nordsieck vectors for Adams integrators.
  * <p>This class is used by {@link AdamsBashforthIntegrator Adams-Bashforth} and

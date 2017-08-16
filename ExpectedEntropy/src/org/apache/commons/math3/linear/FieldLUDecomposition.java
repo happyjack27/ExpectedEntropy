@@ -20,7 +20,7 @@ package org.apache.commons.math3.linear;
 import org.apache.commons.math3.Field;
 import org.apache.commons.math3.FieldElement;
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /**
  * Calculates the LUP-decomposition of a square matrix.
@@ -33,7 +33,7 @@ import org.apache.commons.math3.util.MathArrays;
  * a zero pivot element, no attempt is done to get the largest pivot
  * element.</p>
  * <p>This class is based on the class with similar name from the
- * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library.</p>
+ * <a href="http://FastMath.nist.gov/javanumerics/jama/">JAMA</a> library.</p>
  * <ul>
  *   <li>a {@link #getP() getP} method has been added,</li>
  *   <li>the {@code det} method has been renamed as {@link #getDeterminant()

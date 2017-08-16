@@ -42,10 +42,10 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
-import org.apache.commons.math3.util.CombinatoricsUtils;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathArrays;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Implementation of the <a href="http://en.wikipedia.org/wiki/Kolmogorov-Smirnov_test">
@@ -524,7 +524,7 @@ public class KolmogorovSmirnovTest {
             }
             return res;
         } else if (1 - ninv <= d && d < 1) {
-            return 1 - 2 * Math.pow(1 - d, n);
+            return 1 - 2 * FastMath.pow(1 - d, n);
         } else if (1 <= d) {
             return 1;
         }
@@ -552,7 +552,7 @@ public class KolmogorovSmirnovTest {
     private double exactK(double d, int n)
         throws MathArithmeticException {
 
-        final int k = (int) Math.ceil(n * d);
+        final int k = (int) FastMath.ceil(n * d);
 
         final FieldMatrix<BigFraction> H = this.createExactH(d, n);
         final FieldMatrix<BigFraction> Hpower = H.power(n);
@@ -580,7 +580,7 @@ public class KolmogorovSmirnovTest {
      */
     private double roundedK(double d, int n) {
 
-        final int k = (int) Math.ceil(n * d);
+        final int k = (int) FastMath.ceil(n * d);
         final RealMatrix H = this.createRoundedH(d, n);
         final RealMatrix Hpower = H.power(n);
 
@@ -747,7 +747,7 @@ public class KolmogorovSmirnovTest {
     private FieldMatrix<BigFraction> createExactH(double d, int n)
         throws NumberIsTooLargeException, FractionConversionException {
 
-        final int k = (int) Math.ceil(n * d);
+        final int k = (int) FastMath.ceil(n * d);
         final int m = 2 * k - 1;
         final double hDouble = k - n * d;
         if (hDouble >= 1) {
@@ -836,7 +836,7 @@ public class KolmogorovSmirnovTest {
     private RealMatrix createRoundedH(double d, int n)
         throws NumberIsTooLargeException {
 
-        final int k = (int) Math.ceil(n * d);
+        final int k = (int) FastMath.ceil(n * d);
         final int m = 2 * k - 1;
         final double h = k - n * d;
         if (h >= 1) {

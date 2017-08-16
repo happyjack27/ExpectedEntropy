@@ -19,7 +19,7 @@ package org.apache.commons.math3.ode;
 
 import org.apache.commons.math3.Field;
 import org.apache.commons.math3.RealFieldElement;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /** Container for time, main and secondary state vectors.
 

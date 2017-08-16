@@ -23,7 +23,7 @@ import org.apache.commons.math3.RealFieldElement;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /**
  * Class mapping the part of a complete state or derivative that pertains

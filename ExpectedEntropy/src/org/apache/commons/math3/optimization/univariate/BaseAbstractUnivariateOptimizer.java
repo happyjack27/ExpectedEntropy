@@ -17,7 +17,7 @@
 
 package org.apache.commons.math3.optimization.univariate;
 
-import org.apache.commons.math3.util.Incrementor;
+import org.apache.commons.math3.util.*;
 import org.apache.commons.math3.exception.MaxCountExceededException;
 import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.apache.commons.math3.exception.NullArgumentException;

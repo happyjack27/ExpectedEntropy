@@ -18,7 +18,7 @@ package org.apache.commons.math3.optim;
 
 import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.apache.commons.math3.exception.TooManyIterationsException;
-import org.apache.commons.math3.util.Incrementor;
+import org.apache.commons.math3.util.*;
 
 /**
  * Base class for implementing optimization problems. It contains the boiler-plate code

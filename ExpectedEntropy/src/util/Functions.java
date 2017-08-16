@@ -1,6 +1,7 @@
 package util;
 
 import org.apache.commons.math3.special.*;
+import org.apache.commons.math3.util.*;
 
 public class Functions {
 	
@@ -9,15 +10,15 @@ public class Functions {
 	/*************************************
 	 An ANSI-C implementation of the digamma-function for real arguments based
 	 on the Chebyshev expansion proposed in appendix E of 
-	 http://arXiv.org/abs/math.CA/0403344 . This is identical to the implementation
-	 by Jet Wimp, Math. Comp. vol 15 no 74 (1961) pp 174 (see Table 1).
+	 http://arXiv.org/abs/FastMath.CA/0403344 . This is identical to the implementation
+	 by Jet Wimp, FastMath. Comp. vol 15 no 74 (1961) pp 174 (see Table 1).
 	 For other implementations see
 	 the GSL implementation for Psi(Digamma) in
 	 http://www.gnu.org/software/gsl/manual/html_node/Psi-_0028Digamma_0029-Function.html
 
 	Richard J. Mathar, 2005-11-24
 	**************************************/
-	//#include <math.h>
+	//#include <FastMath.h>
 
 	//#ifndef M_PIl
 	/** The constant Pi in high precision */
@@ -48,7 +49,7 @@ public class Functions {
 	{
 		/* force into the interval 1..3 */
 		if( x < 0.0 )
-			return digammal(1.0-x)+Math.PI/Math.tan(Math.PI*(1.0-x)) ;	/* reflection formula */
+			return digammal(1.0-x)+FastMath.PI/FastMath.tan(FastMath.PI*(1.0-x)) ;	/* reflection formula */
 		else if( x < 1.0 )
 			return digammal(1.0+x)-1.0/x ;
 		else if ( x == 1.0)
@@ -131,7 +132,7 @@ public static double digammalAlt( double x, int n)
 {
 	/* force into the interval 1..3 */
 	if( x < 0.0 )
-		return digammalAlt(1.0-x,n)+Math.PI/Math.tan(Math.PI*(1.0-x)) ;	/* reflection formula */
+		return digammalAlt(1.0-x,n)+FastMath.PI/FastMath.tan(FastMath.PI*(1.0-x)) ;	/* reflection formula */
 	else if( x < 1.0 )
 		return digammalAlt(1.0+x,n)-1.0/x ;
 	else if ( x == 1.0)
@@ -209,7 +210,7 @@ public static double getExpectedEntropyVariance(Integer[] buckets) {
 	double sum1 = 0;
 	for( int i = 0; i < g.length; i++) {
 		double amt = (
-				Math.pow(digamma(ag[i]+2)-digamma(a+2), 2)
+				FastMath.pow(digamma(ag[i]+2)-digamma(a+2), 2)
 				+Gamma.trigamma(ag[i]+2)-Gamma.trigamma(a+2)
 				)
 				*g[i]*(ag[i]+1)/(a+1)
@@ -239,13 +240,13 @@ public static double getExpectedEntropyVariance(Integer[] buckets) {
 	
 
 	public static double logGamma(double x) {
-		double tmp = (x - 0.5) * Math.log(x + 4.5) - (x + 4.5);
+		double tmp = (x - 0.5) * FastMath.log(x + 4.5) - (x + 4.5);
 		double ser = 1.0 + 76.18009173    / (x + 0)   - 86.50532033    / (x + 1)
 		                       + 24.01409822    / (x + 2)   -  1.231739516   / (x + 3)
 		                       +  0.00120858003 / (x + 4)   -  0.00000536382 / (x + 5);
-		return tmp + Math.log(ser * Math.sqrt(2 * Math.PI));
+		return tmp + FastMath.log(ser * FastMath.sqrt(2 * FastMath.PI));
 	}
-	public static double gamma(double x) { return Math.exp(logGamma(x)); }
+	public static double gamma(double x) { return FastMath.exp(logGamma(x)); }
 	public static double digamma(double x) {
 
 	    double value = 0;
@@ -265,7 +266,7 @@ public static double getExpectedEntropyVariance(Integer[] buckets) {
 
 	        if (x >= C_LIMIT) {
 	            double inv = 1 / (x * x);
-	            return value + Math.log(x) - 0.5 / x - inv
+	            return value + FastMath.log(x) - 0.5 / x - inv
 	                    * ((1.0 / 12) + inv * (1.0 / 120 - inv / 252));
 	        }
 

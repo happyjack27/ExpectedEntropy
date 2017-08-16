@@ -16,8 +16,8 @@
  */
 package org.apache.commons.math3.optim.nonlinear.scalar.noderiv;
 
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 import org.apache.commons.math3.exception.NumberIsTooSmallException;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.MathUnsupportedOperationException;
@@ -85,7 +85,7 @@ public class PowellOptimizer
      * @param abs Absolute threshold.
      * @param checker Convergence checker.
      * @throws NotStrictlyPositiveException if {@code abs <= 0}.
-     * @throws NumberIsTooSmallException if {@code rel < 2 * Math.ulp(1d)}.
+     * @throws NumberIsTooSmallException if {@code rel < 2 * FastMath.ulp(1d)}.
      */
     public PowellOptimizer(double rel,
                            double abs,
@@ -104,7 +104,7 @@ public class PowellOptimizer
      * @param lineAbs Absolute threshold for the internal line search optimizer.
      * @param checker Convergence checker.
      * @throws NotStrictlyPositiveException if {@code abs <= 0}.
-     * @throws NumberIsTooSmallException if {@code rel < 2 * Math.ulp(1d)}.
+     * @throws NumberIsTooSmallException if {@code rel < 2 * FastMath.ulp(1d)}.
      */
     public PowellOptimizer(double rel,
                            double abs,
@@ -138,7 +138,7 @@ public class PowellOptimizer
      * @param rel Relative threshold.
      * @param abs Absolute threshold.
      * @throws NotStrictlyPositiveException if {@code abs <= 0}.
-     * @throws NumberIsTooSmallException if {@code rel < 2 * Math.ulp(1d)}.
+     * @throws NumberIsTooSmallException if {@code rel < 2 * FastMath.ulp(1d)}.
      */
     public PowellOptimizer(double rel,
                            double abs) {
@@ -153,7 +153,7 @@ public class PowellOptimizer
      * @param lineRel Relative threshold for the internal line search optimizer.
      * @param lineAbs Absolute threshold for the internal line search optimizer.
      * @throws NotStrictlyPositiveException if {@code abs <= 0}.
-     * @throws NumberIsTooSmallException if {@code rel < 2 * Math.ulp(1d)}.
+     * @throws NumberIsTooSmallException if {@code rel < 2 * FastMath.ulp(1d)}.
      */
     public PowellOptimizer(double rel,
                            double abs,

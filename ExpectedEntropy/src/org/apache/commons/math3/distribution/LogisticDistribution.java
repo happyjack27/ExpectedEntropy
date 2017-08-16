@@ -21,8 +21,8 @@ import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class implements the Logistic distribution.
@@ -120,7 +120,7 @@ public class LogisticDistribution extends AbstractRealDistribution {
         } else if (p == 1) {
             return Double.POSITIVE_INFINITY;
         }
-        return s * Math.log(p / (1.0 - p)) + mu;
+        return s * FastMath.log(p / (1.0 - p)) + mu;
     }
 
     /** {@inheritDoc} */

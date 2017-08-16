@@ -31,7 +31,7 @@ import org.apache.commons.math3.geometry.partitioning.Hyperplane;
 import org.apache.commons.math3.geometry.partitioning.Region;
 import org.apache.commons.math3.geometry.partitioning.Region.Location;
 import org.apache.commons.math3.geometry.partitioning.SubHyperplane;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** This class represents a sub-hyperplane for {@link Line}.
  * @since 3.0

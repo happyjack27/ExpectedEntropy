@@ -29,7 +29,7 @@ import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.optimization.GoalType;
 import org.apache.commons.math3.optimization.PointValuePair;
 import org.apache.commons.math3.optimization.MultivariateOptimizer;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * Powell's BOBYQA algorithm. This implementation is translated and

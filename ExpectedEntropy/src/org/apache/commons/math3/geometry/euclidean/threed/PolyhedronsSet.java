@@ -39,7 +39,7 @@ import org.apache.commons.math3.geometry.partitioning.Region;
 import org.apache.commons.math3.geometry.partitioning.RegionFactory;
 import org.apache.commons.math3.geometry.partitioning.SubHyperplane;
 import org.apache.commons.math3.geometry.partitioning.Transform;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** This class represents a 3D region: a set of polyhedrons.
  * @since 3.0

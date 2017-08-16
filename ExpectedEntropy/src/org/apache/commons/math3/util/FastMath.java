@@ -26,8 +26,8 @@ import org.apache.commons.math3.exception.util.LocalizedFormats;
  * {@link StrictMath} for large scale computation.
  * <p>
  * FastMath is a drop-in replacement for both Math and StrictMath. This
- * means that for any method in Math (say {@code Math.sin(x)} or
- * {@code Math.cbrt(y)}), user can directly change the class and use the
+ * means that for any method in Math (say {@code FastMath.sin(x)} or
+ * {@code FastMath.cbrt(y)}), user can directly change the class and use the
  * methods as is (using {@code FastMath.sin(x)} or {@code FastMath.cbrt(y)}
  * in the previous example).
  * </p>
@@ -2527,7 +2527,7 @@ public class FastMath {
      */
     private static double atan(double xa, double xb, boolean leftPlane) {
         if (xa == 0.0) { // Matches +/- 0.0; return correct sign
-            return leftPlane ? copySign(Math.PI, xa) : xa;
+            return leftPlane ? copySign(FastMath.PI, xa) : xa;
         }
 
         final boolean negate;
@@ -2541,7 +2541,7 @@ public class FastMath {
         }
 
         if (xa > 1.633123935319537E16) { // Very large input
-            return (negate ^ leftPlane) ? (-Math.PI * F_1_2) : (Math.PI * F_1_2);
+            return (negate ^ leftPlane) ? (-FastMath.PI * F_1_2) : (FastMath.PI * F_1_2);
         }
 
         /* Estimate the closest tabulated arctan value, compute eps = xa-tangentTable */
@@ -2692,15 +2692,15 @@ public class FastMath {
                 if (x > 0) {
                     return y; // return +/- 0.0
                 } else {
-                    return copySign(Math.PI, y);
+                    return copySign(FastMath.PI, y);
                 }
             }
 
             if (x < 0 || invx < 0) {
                 if (y < 0 || invy < 0) {
-                    return -Math.PI;
+                    return -FastMath.PI;
                 } else {
-                    return Math.PI;
+                    return FastMath.PI;
                 }
             } else {
                 return result;
@@ -2711,26 +2711,26 @@ public class FastMath {
 
         if (y == Double.POSITIVE_INFINITY) {
             if (x == Double.POSITIVE_INFINITY) {
-                return Math.PI * F_1_4;
+                return FastMath.PI * F_1_4;
             }
 
             if (x == Double.NEGATIVE_INFINITY) {
-                return Math.PI * F_3_4;
+                return FastMath.PI * F_3_4;
             }
 
-            return Math.PI * F_1_2;
+            return FastMath.PI * F_1_2;
         }
 
         if (y == Double.NEGATIVE_INFINITY) {
             if (x == Double.POSITIVE_INFINITY) {
-                return -Math.PI * F_1_4;
+                return -FastMath.PI * F_1_4;
             }
 
             if (x == Double.NEGATIVE_INFINITY) {
-                return -Math.PI * F_3_4;
+                return -FastMath.PI * F_3_4;
             }
 
-            return -Math.PI * F_1_2;
+            return -FastMath.PI * F_1_2;
         }
 
         if (x == Double.POSITIVE_INFINITY) {
@@ -2746,11 +2746,11 @@ public class FastMath {
         if (x == Double.NEGATIVE_INFINITY)
         {
             if (y > 0.0 || 1 / y > 0.0) {
-                return Math.PI;
+                return FastMath.PI;
             }
 
             if (y < 0 || 1 / y < 0) {
-                return -Math.PI;
+                return -FastMath.PI;
             }
         }
 
@@ -2758,11 +2758,11 @@ public class FastMath {
 
         if (x == 0) {
             if (y > 0 || 1 / y > 0) {
-                return Math.PI * F_1_2;
+                return FastMath.PI * F_1_2;
             }
 
             if (y < 0 || 1 / y < 0) {
-                return -Math.PI * F_1_2;
+                return -FastMath.PI * F_1_2;
             }
         }
 
@@ -2809,11 +2809,11 @@ public class FastMath {
       }
 
       if (x == 1.0) {
-          return Math.PI/2.0;
+          return FastMath.PI/2.0;
       }
 
       if (x == -1.0) {
-          return -Math.PI/2.0;
+          return -FastMath.PI/2.0;
       }
 
       if (x == 0.0) { // Matches +/- 0.0; return correct sign
@@ -2885,7 +2885,7 @@ public class FastMath {
       }
 
       if (x == -1.0) {
-          return Math.PI;
+          return FastMath.PI;
       }
 
       if (x == 1.0) {
@@ -2893,7 +2893,7 @@ public class FastMath {
       }
 
       if (x == 0) {
-          return Math.PI/2.0;
+          return FastMath.PI/2.0;
       }
 
       /* Compute acos(x) = atan(sqrt(1-x*x)/x) */
@@ -2937,7 +2937,7 @@ public class FastMath {
 
       // Did r overflow?
       if (Double.isInfinite(r)) { // x is effectively zero
-          return Math.PI/2; // so return the appropriate value
+          return FastMath.PI/2; // so return the appropriate value
       }
 
       double ra = doubleHighPart(r);

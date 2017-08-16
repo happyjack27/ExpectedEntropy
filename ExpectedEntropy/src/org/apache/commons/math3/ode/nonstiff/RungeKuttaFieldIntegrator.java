@@ -30,7 +30,7 @@ import org.apache.commons.math3.ode.FieldExpandableODE;
 import org.apache.commons.math3.ode.FirstOrderFieldDifferentialEquations;
 import org.apache.commons.math3.ode.FieldODEState;
 import org.apache.commons.math3.ode.FieldODEStateAndDerivative;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class implements the common part of all fixed step Runge-Kutta

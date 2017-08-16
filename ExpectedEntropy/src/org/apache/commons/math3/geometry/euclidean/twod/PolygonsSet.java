@@ -33,8 +33,8 @@ import org.apache.commons.math3.geometry.partitioning.BoundaryAttribute;
 import org.apache.commons.math3.geometry.partitioning.Hyperplane;
 import org.apache.commons.math3.geometry.partitioning.Side;
 import org.apache.commons.math3.geometry.partitioning.SubHyperplane;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /** This class represents a 2D region: a set of polygons.
  * @since 3.0

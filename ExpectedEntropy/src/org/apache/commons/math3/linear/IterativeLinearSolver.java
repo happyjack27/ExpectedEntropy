@@ -19,8 +19,8 @@ package org.apache.commons.math3.linear;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.MaxCountExceededException;
 import org.apache.commons.math3.exception.NullArgumentException;
-import org.apache.commons.math3.util.IterationManager;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * This abstract class defines an iterative solver for the linear system A

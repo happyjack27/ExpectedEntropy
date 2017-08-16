@@ -28,7 +28,7 @@ import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.random.UnitSphereRandomVectorGenerator;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * Interpolating function that implements the

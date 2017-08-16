@@ -17,7 +17,7 @@
 package org.apache.commons.math3.linear;
 
 import org.apache.commons.math3.analysis.function.Sqrt;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class implements the standard Jacobi (diagonal) preconditioner. For a

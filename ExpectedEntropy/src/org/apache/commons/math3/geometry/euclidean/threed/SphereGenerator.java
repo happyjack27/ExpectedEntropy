@@ -25,7 +25,7 @@ import org.apache.commons.math3.geometry.enclosing.SupportBallGenerator;
 import org.apache.commons.math3.geometry.euclidean.twod.DiskGenerator;
 import org.apache.commons.math3.geometry.euclidean.twod.Euclidean2D;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** Class generating an enclosing ball from its support points.
  * @since 3.3

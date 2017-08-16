@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.apache.commons.math3.exception.NotPositiveException;
 import org.apache.commons.math3.exception.NullArgumentException;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
 
 /**
  * DBSCAN (density-based spatial clustering of applications with noise) algorithm.

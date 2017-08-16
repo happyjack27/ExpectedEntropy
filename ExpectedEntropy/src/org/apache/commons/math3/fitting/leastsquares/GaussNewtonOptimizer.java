@@ -31,8 +31,8 @@ import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SingularMatrixException;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.commons.math3.optim.ConvergenceChecker;
-import org.apache.commons.math3.util.Incrementor;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Gauss-Newton least-squares solver.

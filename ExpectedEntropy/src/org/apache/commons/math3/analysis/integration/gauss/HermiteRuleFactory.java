@@ -17,8 +17,8 @@
 package org.apache.commons.math3.analysis.integration.gauss;
 
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.util.Pair;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Factory that creates a
@@ -118,7 +118,7 @@ public class HermiteRuleFactory extends BaseRuleFactory<Double> {
             double hc = H1 * c;
             boolean done = false;
             while (!done) {
-                done = b - a <= Math.ulp(c);
+                done = b - a <= FastMath.ulp(c);
                 hmc = H0;
                 hc = H1 * c;
                 for (int j = 1; j < numberOfPoints; j++) {

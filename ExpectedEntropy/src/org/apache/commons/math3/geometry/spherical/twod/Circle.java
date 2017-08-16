@@ -27,7 +27,7 @@ import org.apache.commons.math3.geometry.spherical.oned.Arc;
 import org.apache.commons.math3.geometry.spherical.oned.ArcsSet;
 import org.apache.commons.math3.geometry.spherical.oned.S1Point;
 import org.apache.commons.math3.geometry.spherical.oned.Sphere1D;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** This class represents an oriented great circle on the 2-sphere.
 

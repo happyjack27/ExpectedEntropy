@@ -16,7 +16,7 @@
  */
 package org.apache.commons.math3.exception;
 
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 
 /**

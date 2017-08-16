@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
 
 
 /**

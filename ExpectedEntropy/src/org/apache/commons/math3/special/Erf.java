@@ -16,7 +16,7 @@
  */
 package org.apache.commons.math3.special;
 
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * This is a utility class that provides computation methods related to the
@@ -31,9 +31,9 @@ public class Erf {
      * More precisely, the current implementations of
      * {@link #erf(double)} and {@link #erfc(double)} satisfy:<br/>
      * {@code erf(X_CRIT) < 0.5},<br/>
-     * {@code erf(Math.nextUp(X_CRIT) > 0.5},<br/>
+     * {@code erf(FastMath.nextUp(X_CRIT) > 0.5},<br/>
      * {@code erfc(X_CRIT) = 0.5}, and<br/>
-     * {@code erfc(Math.nextUp(X_CRIT) < 0.5}
+     * {@code erfc(FastMath.nextUp(X_CRIT) < 0.5}
      */
     private static final double X_CRIT = 0.4769362762044697;
 

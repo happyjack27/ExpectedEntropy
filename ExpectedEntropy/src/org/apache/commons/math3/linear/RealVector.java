@@ -32,7 +32,7 @@ import org.apache.commons.math3.analysis.function.Multiply;
 import org.apache.commons.math3.analysis.function.Divide;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * Class defining a real-valued vector with basic algebraic operations.

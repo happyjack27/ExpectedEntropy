@@ -16,8 +16,8 @@
  */
 package org.apache.commons.math3.analysis.interpolation;
 
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Utility class for the {@link MicrosphereProjectionInterpolator} algorithm.

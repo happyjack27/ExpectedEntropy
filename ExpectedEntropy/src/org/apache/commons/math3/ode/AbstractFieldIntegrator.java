@@ -39,8 +39,8 @@ import org.apache.commons.math3.ode.events.FieldEventHandler;
 import org.apache.commons.math3.ode.events.FieldEventState;
 import org.apache.commons.math3.ode.sampling.AbstractFieldStepInterpolator;
 import org.apache.commons.math3.ode.sampling.FieldStepHandler;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.IntegerSequence;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Base class managing common boilerplate for all integrators.

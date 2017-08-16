@@ -19,8 +19,8 @@ package org.apache.commons.math3.analysis.integration.gauss;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.NonMonotonicSequenceException;
-import org.apache.commons.math3.util.MathArrays;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Class that implements the Gaussian rule for

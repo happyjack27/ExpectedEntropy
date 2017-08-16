@@ -17,7 +17,7 @@
 
 package org.apache.commons.math3.random;
 
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class implements a normalized uniform random generator.

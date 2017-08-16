@@ -11,6 +11,7 @@ import util.Pair;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import org.apache.commons.math3.util.*;
 
 public class FrameDraw extends JFrame {
 	int size = 1000;
@@ -117,7 +118,7 @@ public class FrameDraw extends JFrame {
 
 			    		
 			    		graphics.fillRect(x, (size-100)-height, length, height);
-			    		String s = ""+(Math.round(bins.get(i).a * 1000.0)/1000.0);
+			    		String s = ""+(FastMath.round(bins.get(i).a * 1000.0)/1000.0);
 			    		int textx = x + length/2 - graphics.stringWidth(s)/2;
 			    		if( textx > min_x) {
 			    			graphics.drawString(s, textx, size-80);
@@ -229,11 +230,11 @@ public class FrameDraw extends JFrame {
 	    	
 		}
 		double transformx(double x) {
-    		//return Math.round(2.0*(500-x*500));
+    		//return FastMath.round(2.0*(500-x*500));
     		return 2.0*(500-x*500);
     	}
 		double transformy(double y) {
-    		//return Math.round(2.0*(-y*5+400));
+    		//return FastMath.round(2.0*(-y*5+400));
     		return 2.0*(-y*5+450);
     	}
 	}
@@ -269,19 +270,19 @@ public class FrameDraw extends JFrame {
 			graphics.drawRect(tx(x0),ty(y0),tx(x1),ty(y1));
 		}
 		public int stringWidth(String s) {
-			return (int)Math.round(graphics.getFontMetrics().stringWidth(s)/scalex);
+			return (int)FastMath.round(graphics.getFontMetrics().stringWidth(s)/scalex);
 		}
 
 		public Graphics2D getGraphics() { return graphics; }
 		
 	    public int tx(double x) {
-	    	return (int)Math.round(x *scalex);
+	    	return (int)FastMath.round(x *scalex);
 	    }
 	    public int ty(double x) {
-	    	return (int)Math.round(x * scaley);
+	    	return (int)FastMath.round(x * scaley);
 	    }
 	    public int ts(double x) {
-	    	return (int)Math.round(x * strokescale);
+	    	return (int)FastMath.round(x * strokescale);
 	    }
 	}
 

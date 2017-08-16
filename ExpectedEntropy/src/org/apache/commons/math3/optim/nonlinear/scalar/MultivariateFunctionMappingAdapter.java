@@ -22,8 +22,8 @@ import org.apache.commons.math3.analysis.function.Logit;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.NumberIsTooSmallException;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * <p>Adapter for mapping bounded {@link MultivariateFunction} to unbounded ones.</p>

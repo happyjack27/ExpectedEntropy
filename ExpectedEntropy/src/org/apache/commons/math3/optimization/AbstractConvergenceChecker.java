@@ -17,7 +17,7 @@
 
 package org.apache.commons.math3.optimization;
 
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
 
 /**
  * Base class for all convergence checker implementations.

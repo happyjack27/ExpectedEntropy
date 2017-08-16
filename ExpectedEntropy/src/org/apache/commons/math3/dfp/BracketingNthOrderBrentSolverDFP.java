@@ -23,7 +23,7 @@ import org.apache.commons.math3.analysis.solvers.FieldBracketingNthOrderBrentSol
 import org.apache.commons.math3.exception.NoBracketingException;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.NumberIsTooSmallException;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class implements a modification of the <a

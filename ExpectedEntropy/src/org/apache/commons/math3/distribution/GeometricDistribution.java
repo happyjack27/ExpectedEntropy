@@ -20,7 +20,7 @@ import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * Implementation of the geometric distribution.
@@ -180,6 +180,6 @@ public class GeometricDistribution extends AbstractIntegerDistribution {
         if (p == 0) {
             return 0;
         }
-        return Math.max(0, (int) Math.ceil(FastMath.log1p(-p)/log1mProbabilityOfSuccess-1));
+        return FastMath.max(0, (int) FastMath.ceil(FastMath.log1p(-p)/log1mProbabilityOfSuccess-1));
     }
 }

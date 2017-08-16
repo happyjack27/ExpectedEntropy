@@ -28,8 +28,8 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.commons.math3.geometry.hull.ConvexHull;
 import org.apache.commons.math3.geometry.partitioning.Region;
 import org.apache.commons.math3.geometry.partitioning.RegionFactory;
-import org.apache.commons.math3.util.MathArrays;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class represents a convex hull in an two-dimensional euclidean space.

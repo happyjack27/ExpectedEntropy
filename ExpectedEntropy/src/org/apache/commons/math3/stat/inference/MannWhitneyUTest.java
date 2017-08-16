@@ -24,7 +24,7 @@ import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.stat.ranking.NaNStrategy;
 import org.apache.commons.math3.stat.ranking.NaturalRanking;
 import org.apache.commons.math3.stat.ranking.TiesStrategy;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * An implementation of the Mann-Whitney U test (also called Wilcoxon rank-sum test).

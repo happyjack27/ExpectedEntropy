@@ -27,7 +27,7 @@ import org.apache.commons.math3.geometry.euclidean.twod.PolygonsSet;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.commons.math3.geometry.partitioning.Embedding;
 import org.apache.commons.math3.geometry.partitioning.Hyperplane;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** The class represent planes in a three dimensional space.
  * @since 3.0

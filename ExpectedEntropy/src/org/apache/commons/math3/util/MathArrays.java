@@ -736,15 +736,15 @@ public class MathArrays {
         }
         double norm;
         if (s1 != 0) {
-            norm = x1max * Math.sqrt(s1 + (s2 / x1max) / x1max);
+            norm = x1max * FastMath.sqrt(s1 + (s2 / x1max) / x1max);
         } else {
             if (s2 == 0) {
-                norm = x3max * Math.sqrt(s3);
+                norm = x3max * FastMath.sqrt(s3);
             } else {
                 if (s2 >= x3max) {
-                    norm = Math.sqrt(s2 * (1 + (x3max / s2) * (x3max * s3)));
+                    norm = FastMath.sqrt(s2 * (1 + (x3max / s2) * (x3max * s3)));
                 } else {
-                    norm = Math.sqrt(x3max * ((s2 / x3max) + (x3max * s3)));
+                    norm = FastMath.sqrt(x3max * ((s2 / x3max) + (x3max * s3)));
                 }
             }
         }

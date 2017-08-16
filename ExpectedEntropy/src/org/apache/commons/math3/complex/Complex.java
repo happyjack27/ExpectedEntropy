@@ -25,9 +25,9 @@ import org.apache.commons.math3.FieldElement;
 import org.apache.commons.math3.exception.NotPositiveException;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Representation of a Complex number, i.e. a number which has both a
@@ -1161,11 +1161,11 @@ public class Complex implements FieldElement<Complex>, Serializable  {
      * negative imaginary parts.
      * <p>
      * If either real or imaginary part (or both) is NaN, NaN is returned.
-     * Infinite parts are handled as {@code Math.atan2} handles them,
+     * Infinite parts are handled as {@code FastMath.atan2} handles them,
      * essentially treating finite parts as zero in the presence of an
      * infinite coordinate and returning a multiple of pi/4 depending on
      * the signs of the infinite parts.
-     * See the javadoc for {@code Math.atan2} for full details.
+     * See the javadoc for {@code FastMath.atan2} for full details.
      *
      * @return the argument of {@code this}.
      */

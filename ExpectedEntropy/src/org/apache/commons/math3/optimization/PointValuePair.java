@@ -19,7 +19,7 @@ package org.apache.commons.math3.optimization;
 
 import java.io.Serializable;
 
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class holds a point and the value of an objective function at

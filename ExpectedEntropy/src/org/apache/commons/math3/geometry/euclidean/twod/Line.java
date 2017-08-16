@@ -30,9 +30,9 @@ import org.apache.commons.math3.geometry.partitioning.Embedding;
 import org.apache.commons.math3.geometry.partitioning.Hyperplane;
 import org.apache.commons.math3.geometry.partitioning.SubHyperplane;
 import org.apache.commons.math3.geometry.partitioning.Transform;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathArrays;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /** This class represents an oriented line in the 2D plane.
 

@@ -18,7 +18,7 @@ package org.apache.commons.math3.fitting.leastsquares;
 
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresProblem.Evaluation;
 import org.apache.commons.math3.optim.ConvergenceChecker;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
 
 /**
  * Check if an optimization has converged based on the change in computed RMS.

@@ -18,9 +18,9 @@ package org.apache.commons.math3.stat.regression;
 
 import java.util.Arrays;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.Precision;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class is a concrete implementation of the {@link UpdatingMultipleLinearRegression} interface.

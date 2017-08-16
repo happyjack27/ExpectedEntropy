@@ -17,8 +17,8 @@
 
 package org.apache.commons.math3.linear;
 
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Class transforming a general real matrix to Hessenberg form.
@@ -32,7 +32,7 @@ import org.apache.commons.math3.util.Precision;
  * of this explicitly limited scope, many methods directly returns references to
  * internal arrays, not copies.</p>
  * <p>This class is based on the method orthes in class EigenvalueDecomposition
- * from the <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library.</p>
+ * from the <a href="http://FastMath.nist.gov/javanumerics/jama/">JAMA</a> library.</p>
  *
  * @see <a href="http://mathworld.wolfram.com/HessenbergDecomposition.html">MathWorld</a>
  * @see <a href="http://en.wikipedia.org/wiki/Householder_transformation">Householder Transformations</a>

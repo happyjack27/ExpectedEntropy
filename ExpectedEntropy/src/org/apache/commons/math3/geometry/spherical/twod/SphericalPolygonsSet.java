@@ -36,8 +36,8 @@ import org.apache.commons.math3.geometry.partitioning.BoundaryProjection;
 import org.apache.commons.math3.geometry.partitioning.RegionFactory;
 import org.apache.commons.math3.geometry.partitioning.SubHyperplane;
 import org.apache.commons.math3.geometry.spherical.oned.Sphere1D;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /** This class represents a region on the 2-sphere: a set of spherical polygons.
  * @since 3.3

@@ -17,8 +17,8 @@
 
 package org.apache.commons.math3.ode.events;
 
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 
 /** Transformer for {@link EventHandler#g(double, double[]) g functions}.

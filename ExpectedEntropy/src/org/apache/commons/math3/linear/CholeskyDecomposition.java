@@ -18,7 +18,7 @@
 package org.apache.commons.math3.linear;
 
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 
 /**
@@ -27,7 +27,7 @@ import org.apache.commons.math3.util.FastMath;
  * matrix A consists of a lower triangular matrix L with same size such
  * that: A = LL<sup>T</sup>. In a sense, this is the square root of A.</p>
  * <p>This class is based on the class with similar name from the
- * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library, with the
+ * <a href="http://FastMath.nist.gov/javanumerics/jama/">JAMA</a> library, with the
  * following changes:</p>
  * <ul>
  *   <li>a {@link #getLT() getLT} method has been added,</li>

@@ -28,7 +28,7 @@ import org.apache.commons.math3.geometry.partitioning.BSPTreeVisitor;
 import org.apache.commons.math3.geometry.partitioning.BoundaryAttribute;
 import org.apache.commons.math3.geometry.partitioning.RegionFactory;
 import org.apache.commons.math3.geometry.partitioning.SubHyperplane;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** Extractor for {@link PolygonsSet polyhedrons sets} outlines.
  * <p>This class extracts the 2D outlines from {{@link PolygonsSet

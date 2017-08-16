@@ -27,7 +27,7 @@ import org.apache.commons.math3.exception.MathParseException;
 import org.apache.commons.math3.exception.NoDataException;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.CompositeFormat;
+import org.apache.commons.math3.util.*;
 
 /**
  * Formats a Complex number in cartesian format "Re(c) + Im(c)i".  'i' can

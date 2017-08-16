@@ -1,5 +1,7 @@
 package distributions.interfaces;
 
+import org.apache.commons.math3.util.*;
+
 public abstract class DefaultUnivariateDiscretePosteriorDistribution<TTheta> implements PosteriorDistribution<double[],TTheta,Integer>  {
 
 		public boolean prior_is_on_H = false;
@@ -28,7 +30,7 @@ public abstract class DefaultUnivariateDiscretePosteriorDistribution<TTheta> imp
 			double pDO = getProbabilityOfDataGivenThetaPermuted(thetas, data);
 			double dHdO = getDerivOfEntropyGivenTheta(thetas);
 			double pO = prior.getPriorProbabilityOfTheta(thetas);
-			double ph = pDO*pO / ( prior_is_on_H ? 1 : Math.abs(dHdO));
+			double ph = pDO*pO / ( prior_is_on_H ? 1 : FastMath.abs(dHdO));
 			//System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
 			/*
 			if( prior_is_on_H)

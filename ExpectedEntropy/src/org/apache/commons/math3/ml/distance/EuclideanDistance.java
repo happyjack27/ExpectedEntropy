@@ -17,7 +17,7 @@
 package org.apache.commons.math3.ml.distance;
 
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /**
  * Calculates the L<sub>2</sub> (Euclidean) distance between two points.

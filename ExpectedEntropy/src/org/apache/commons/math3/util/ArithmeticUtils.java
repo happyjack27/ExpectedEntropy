@@ -351,8 +351,8 @@ public final class ArithmeticUtils {
         //  "b" becomes the minimum of the current values.
         while (a != b) {
             final int delta = a - b;
-            b = Math.min(a, b);
-            a = Math.abs(delta);
+            b = FastMath.min(a, b);
+            a = FastMath.abs(delta);
 
             // Remove any power of 2 in "a" ("b" is guaranteed to be odd).
             a >>= Integer.numberOfTrailingZeros(a);

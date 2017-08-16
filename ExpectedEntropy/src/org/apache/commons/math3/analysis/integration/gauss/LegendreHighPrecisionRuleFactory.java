@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
 
 /**
  * Factory that creates Gauss-type quadrature rule using Legendre polynomials.

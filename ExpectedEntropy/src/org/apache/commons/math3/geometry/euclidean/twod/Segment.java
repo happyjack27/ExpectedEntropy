@@ -17,7 +17,7 @@
 package org.apache.commons.math3.geometry.euclidean.twod;
 
 import org.apache.commons.math3.geometry.Point;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** Simple container for a two-points segment.
  * @since 3.0

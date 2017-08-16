@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /**
  * A simple implementation of {@link Clusterable} for points with integer coordinates.

@@ -17,7 +17,7 @@
 
 package org.apache.commons.math3.optimization.univariate;
 
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.optimization.AbstractConvergenceChecker;
 

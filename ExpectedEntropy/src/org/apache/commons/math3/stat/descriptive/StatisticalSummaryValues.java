@@ -18,9 +18,9 @@ package org.apache.commons.math3.stat.descriptive;
 
 import java.io.Serializable;
 
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathUtils;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  *  Value object representing the results of a univariate statistical summary.

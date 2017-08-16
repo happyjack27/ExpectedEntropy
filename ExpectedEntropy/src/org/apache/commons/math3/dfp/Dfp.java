@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 import org.apache.commons.math3.RealFieldElement;
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  *  Decimal floating point library for Java

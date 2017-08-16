@@ -20,7 +20,7 @@ import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.MaxCountExceededException;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.util.ExceptionContext;
-import org.apache.commons.math3.util.IterationManager;
+import org.apache.commons.math3.util.*;
 
 /**
  * <p>

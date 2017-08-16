@@ -3,6 +3,7 @@ import java.io.*;
 import java.util.*;
 
 import util.Pair;
+import org.apache.commons.math3.util.*;
 
 public class Visualizer implements Draws {
 	
@@ -166,21 +167,21 @@ public class Visualizer implements Draws {
 			all_grids.add(new Pair<Double,int[][]>(scoreGrid(grid),grid));
 		}
 		Collections.sort(all_grids);
-		anneal_mult = Math.exp((Math.log(2.0)-Math.log(0.01))/(double)iterations);
+		anneal_mult = FastMath.exp((FastMath.log(2.0)-FastMath.log(0.01))/(double)iterations);
 		for( int i = 0; i < iterations; i++) {
 			int[][] grid = all_grids.get(0).b;
 			perturbScored(grid,(double)dot_connections.length);
 			double score = scoreGrid(grid);
 			all_grids.get(0).a = score;
 			if( shrink_by_area) {
-				init_rate = Math.sqrt((double)(iterations-i)/(double)iterations);
+				init_rate = FastMath.sqrt((double)(iterations-i)/(double)iterations);
 			} else {
 				init_rate = (double)(iterations-i)/(double)iterations;
 			}
 			if( shrink_geometrically) {
 				init_rate = 1.0-init_rate;
-				double min = -Math.log((double)dot_connections.length/2.0);
-				init_rate = Math.exp(min*init_rate);
+				double min = -FastMath.log((double)dot_connections.length/2.0);
+				init_rate = FastMath.exp(min*init_rate);
 			}
 			init_rate *= 1;
 			//init_rate -= 2.0/(double)iterations;//*= anneal_mult;
@@ -191,7 +192,7 @@ public class Visualizer implements Draws {
 		/*
 		while( init_rate*(double)dot_connections.length > 1.0) {
 			for( int g = 0; g < num_grids*3; g++) {
-				int c = (int)(Math.random()*(double)num_grids);
+				int c = (int)(FastMath.random()*(double)num_grids);
 				int[][] grid = cloneGrid(all_grids.get(c).b);
 				perturbScored(grid,init_rate*(double)dot_connections.length);
 				all_grids.add(new Pair<Double,int[][]>(scoreGrid(grid),grid));
@@ -224,7 +225,7 @@ public class Visualizer implements Draws {
 	public int[][] randomGrid(int[] dot_connections) {
 		//randomize array
 		for( int d = 0; d < dot_connections.length; d++) {
-			int d2 = (int)(Math.random()*(double)dot_connections.length);
+			int d2 = (int)(FastMath.random()*(double)dot_connections.length);
 			int t = dot_connections[d];
 			dot_connections[d] = dot_connections[d2];
 			dot_connections[d2] = t;
@@ -289,12 +290,12 @@ public class Visualizer implements Draws {
 							double dy = y - centers[i][1];
 							double dd = dx*dx + dy*dy;
 							if( !use_squared_distance) {
-								dd = Math.sqrt(dd);
+								dd = FastMath.sqrt(dd);
 							}
 							if( divide_by_area) {
 								double area = I[(0x01 << i)];
 								if( !use_squared_distance) {
-									area = Math.sqrt(area);
+									area = FastMath.sqrt(area);
 								}
 								if( area != 0) {
 									dd /= area;
@@ -313,12 +314,12 @@ public class Visualizer implements Draws {
 					int repeat = 1;
 					while( repeat > 0) {
 						repeat--;
-						//int x1 = (int)((Math.random())*(double)dot_grid.length);
-						//int y1 = (int)((Math.random())*(double)dot_grid.length);
-						int idx = (int)((Math.random()-0.5)*init_rate*(double)dot_grid.length);
-						int idy = (int)((Math.random()-0.5)*init_rate*(double)dot_grid.length);
-						//int x2 = (int)((Math.random())*(double)dot_grid.length);
-						//int y2 = (int)((Math.random())*(double)dot_grid.length);
+						//int x1 = (int)((FastMath.random())*(double)dot_grid.length);
+						//int y1 = (int)((FastMath.random())*(double)dot_grid.length);
+						int idx = (int)((FastMath.random()-0.5)*init_rate*(double)dot_grid.length);
+						int idy = (int)((FastMath.random()-0.5)*init_rate*(double)dot_grid.length);
+						//int x2 = (int)((FastMath.random())*(double)dot_grid.length);
+						//int y2 = (int)((FastMath.random())*(double)dot_grid.length);
 						int x2 = (x1+idx) < 0 ? x1 : (x1+idx) >= dot_grid.length ? x1 : (x1+idx);
 						int y2 = (y1+idy) < 0 ? y1 : (y1+idy) >= dot_grid.length ? y1 : (y1+idy);
 						
@@ -331,12 +332,12 @@ public class Visualizer implements Draws {
 								double dy = y1 - centers[i][1];
 								double dd = dx*dx + dy*dy;
 								if( !use_squared_distance) {
-									dd = Math.sqrt(dd);
+									dd = FastMath.sqrt(dd);
 								}
 								if( divide_by_area) {
 									double area = I[(0x01 << i)];
 									if( !use_squared_distance) {
-										area = Math.sqrt(area);
+										area = FastMath.sqrt(area);
 									}
 									if( area != 0) {
 										dd /= area;
@@ -349,12 +350,12 @@ public class Visualizer implements Draws {
 								double dy = y2 - centers[i][1];
 								double dd = dx*dx + dy*dy;
 								if( !use_squared_distance) {
-									dd = Math.sqrt(dd);
+									dd = FastMath.sqrt(dd);
 								}
 								if( divide_by_area) {
 									double area = I[(0x01 << i)];
 									if( !use_squared_distance) {
-										area = Math.sqrt(area);
+										area = FastMath.sqrt(area);
 									}
 									if( area != 0) {
 										dd /= area;
@@ -368,12 +369,12 @@ public class Visualizer implements Draws {
 								double dy = y2 - centers[i][1];
 								double dd = dx*dx + dy*dy;
 								if( !use_squared_distance) {
-									dd = Math.sqrt(dd);
+									dd = FastMath.sqrt(dd);
 								}
 								if( divide_by_area) {
 									double area = I[(0x01 << i)];
 									if( !use_squared_distance) {
-										area = Math.sqrt(area);
+										area = FastMath.sqrt(area);
 									}
 									if( area != 0) {
 										dd /= area;
@@ -386,12 +387,12 @@ public class Visualizer implements Draws {
 								double dy = y1 - centers[i][1];
 								double dd = dx*dx + dy*dy;
 								if( !use_squared_distance) {
-									dd = Math.sqrt(dd);
+									dd = FastMath.sqrt(dd);
 								}
 								if( divide_by_area) {
 									double area = I[(0x01 << i)];
 									if( !use_squared_distance) {
-										area = Math.sqrt(area);
+										area = FastMath.sqrt(area);
 									}
 									if( area != 0) {
 										dd /= area;
@@ -416,10 +417,10 @@ public class Visualizer implements Draws {
 	public void perturb(int[][] dot_grid, double rate) {
 		int N = (int)rate; //better to poisson estimate this.
 		for( int i = 0; i < N; i++) {
-			int x = (int)(Math.random()*(double)dot_grid.length);
-			int y = (int)(Math.random()*(double)dot_grid.length);
-			int dx = (int)(Math.random()*3.0-1.0); 
-			int dy = (int)(Math.random()*3.0-1.0); 
+			int x = (int)(FastMath.random()*(double)dot_grid.length);
+			int y = (int)(FastMath.random()*(double)dot_grid.length);
+			int dx = (int)(FastMath.random()*3.0-1.0); 
+			int dy = (int)(FastMath.random()*3.0-1.0); 
 			int x2 = (x+dx) < 0 ? x : (x+dx) >= dot_grid.length ? x : (x+dx);
 			int y2 = (y+dy) < 0 ? y : (y+dy) >= dot_grid.length ? y : (y+dy);
 			int t = dot_grid[x][y];
@@ -463,7 +464,7 @@ public class Visualizer implements Draws {
 						if( use_squared_distance) {
 							ssd += dx*dx + dy*dy;
 						} else {
-							ssd += Math.sqrt(dx*dx + dy*dy);
+							ssd += FastMath.sqrt(dx*dx + dy*dy);
 						}
 					}
 				}
@@ -537,10 +538,10 @@ public class Visualizer implements Draws {
 		double inc = (double)width/(double)dot_width;
 		for( int x = 0; x < dot_width; x++) {
 			for( int y = 0; y < dot_width; y++) {
-				int x0 = (int)Math.round(inc*(double)x);
-				int x1 = (int)Math.round(inc*(double)(x+1));
-				int y0 = (int)Math.round(inc*(double)y);
-				int y1 = (int)Math.round(inc*(double)(y+1));
+				int x0 = (int)FastMath.round(inc*(double)x);
+				int x1 = (int)FastMath.round(inc*(double)(x+1));
+				int y0 = (int)FastMath.round(inc*(double)y);
+				int y1 = (int)FastMath.round(inc*(double)(y+1));
 				int dot = dot_grid[x][y];
 				int[] c = new int[]{255,255,255};
 				for( int i = 0; i < minusRGBs.length; i++) {

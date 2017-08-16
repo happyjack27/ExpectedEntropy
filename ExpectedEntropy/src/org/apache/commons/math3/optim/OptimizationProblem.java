@@ -16,7 +16,7 @@
  */
 package org.apache.commons.math3.optim;
 
-import org.apache.commons.math3.util.Incrementor;
+import org.apache.commons.math3.util.*;
 
 /**
  * Common settings for all optimization problems. Includes divergence and convergence

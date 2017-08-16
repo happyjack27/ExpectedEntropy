@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.apache.commons.math3.exception.MaxCountExceededException;
 import org.apache.commons.math3.optimization.PointValuePair;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
 
 
 /**

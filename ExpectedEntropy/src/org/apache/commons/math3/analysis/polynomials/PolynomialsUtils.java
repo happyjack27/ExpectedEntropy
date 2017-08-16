@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math3.fraction.BigFraction;
-import org.apache.commons.math3.util.CombinatoricsUtils;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * A collection of static methods that operate on or return polynomials.

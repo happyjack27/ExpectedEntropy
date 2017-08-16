@@ -18,7 +18,7 @@ package org.apache.commons.math3.fitting.leastsquares;
 
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
 
 /**
  * A interface for functions that compute a vector of values and can compute their

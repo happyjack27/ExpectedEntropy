@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Arrays;
 
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
 
 /**
  * A simple implementation of {@link Clusterable} for points with double coordinates.

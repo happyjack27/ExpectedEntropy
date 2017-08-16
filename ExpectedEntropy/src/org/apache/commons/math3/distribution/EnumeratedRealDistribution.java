@@ -30,7 +30,7 @@ import org.apache.commons.math3.exception.NotPositiveException;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
 
 /**
  * <p>Implementation of a real-valued {@link EnumeratedDistribution}.

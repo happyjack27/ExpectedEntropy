@@ -28,7 +28,7 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * Abstract base class for implementations of MultipleLinearRegression.

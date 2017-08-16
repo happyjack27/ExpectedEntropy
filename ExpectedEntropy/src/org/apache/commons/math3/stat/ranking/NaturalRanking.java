@@ -26,7 +26,7 @@ import org.apache.commons.math3.exception.MathInternalError;
 import org.apache.commons.math3.exception.NotANumberException;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 
 /**

@@ -19,7 +19,7 @@ package org.apache.commons.math3.ml.neuralnet.sofm.util;
 
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.NumberIsTooLargeException;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * Exponential decay function: <code>a e<sup>-x / b</sup></code>,

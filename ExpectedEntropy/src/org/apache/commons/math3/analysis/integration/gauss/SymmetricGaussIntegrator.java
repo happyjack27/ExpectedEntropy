@@ -19,7 +19,7 @@ package org.apache.commons.math3.analysis.integration.gauss;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.NonMonotonicSequenceException;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class's implements {@link #integrate(UnivariateFunction) integrate}

@@ -28,8 +28,8 @@ import org.apache.commons.math3.analysis.differentiation.UnivariateDifferentiabl
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * <a href="http://en.wikipedia.org/wiki/Gaussian_function">
@@ -79,7 +79,7 @@ public class Gaussian implements UnivariateDifferentiableFunction, Differentiabl
     public Gaussian(double mean,
                     double sigma)
         throws NotStrictlyPositiveException {
-        this(1 / (sigma * FastMath.sqrt(2 * Math.PI)), mean, sigma);
+        this(1 / (sigma * FastMath.sqrt(2 * FastMath.PI)), mean, sigma);
     }
 
     /**

@@ -18,8 +18,8 @@ package org.apache.commons.math3.stat.regression;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 import org.apache.commons.math3.exception.OutOfRangeException;
 
 /**

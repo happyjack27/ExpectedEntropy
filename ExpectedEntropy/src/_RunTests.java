@@ -1,8 +1,11 @@
 
 import java.util.*;
 
+import org.apache.commons.math3.util.*;
+
 import distributions.CategoricalDistribution;
 import util.*;
+import util.Pair;
 
 // http://www.sortie-nd.org/lme/Statistical%20Papers/Burnham_and_Anderson_2004_Multimodel_Inference.pdf
 
@@ -19,7 +22,7 @@ public class _RunTests {
 
 	
 	static int number_of_bits = 10;
-	static double number_of_nats = number_of_bits*Math.log(2.0);
+	static double number_of_nats = number_of_bits*FastMath.log(2.0);
 	public static int max_size = 10;
 
 	static double at_percentile = 0;
@@ -29,8 +32,8 @@ public class _RunTests {
 	static final int SCORE_MODE_RANK = 1;
 	static final int SCORE_MODE_FUTURE_ENTROPY = 2;
 	static int SCORE_MODE = SCORE_MODE_FUTURE_ENTROPY;
-	static int ACTUAL_THETA_SAMPLES = 100000;
-	static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 250;	
+	static int ACTUAL_THETA_SAMPLES = 102400;
+	static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 256;	
 	
 	//entropy at percentile
 	//percentile at entropy
@@ -436,10 +439,10 @@ public class _RunTests {
 			
 			//cat.prior_is_on_H = true;
 			/*
-			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,0})/Math.log(2));
-			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0})/Math.log(2));
-			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0,0,0,0})/Math.log(2));
-			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,1,1,0,0,0,0,0,0})/Math.log(2));
+			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,0})/FastMath.log(2));
+			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0})/FastMath.log(2));
+			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,0,0,0,0,0})/FastMath.log(2));
+			System.out.println(""+cat.getEntropyGivenTheta(new double[]{1,1,1,1,0,0,0,0,0,0})/FastMath.log(2));
 			*/
 			//System.exit(0);
 			
@@ -457,7 +460,7 @@ public class _RunTests {
 			for( int i = 0; i < vdd.size(); i++) {
 				double[] dd = vdd.get(i);
 				ddp += dd[1];
-				System.out.println(""+dd[0]/Math.log(2)+", "+dd[1]+", "+ddp);
+				System.out.println(""+dd[0]/FastMath.log(2)+", "+dd[1]+", "+ddp);
 			}
 			System.exit(0);
 			*/
@@ -487,11 +490,14 @@ public class _RunTests {
 				run_avg[i][0]*=m;
 				run_avg[i][1]*=m;
 				run_avg[i][2]*=m;
-				System.out.println(run_avg[i][0]+", "+run_avg[i][1]+", "+run_avg[i][2]);
+				//System.out.println(run_avg[i][0]+", "+run_avg[i][1]+", "+run_avg[i][2]);
 			}
 			run_avgs[cur_choice] = deep_clone(run_avg);
-			System.out.println();
+			//System.out.println();
+			printAll();
 		}
+	}
+	public static void printAll() {
 		System.out.println();
 		for( int i = 0; i < max_n; i++) {
 			for( int j = 0; j < run_avgs.length; j++) {
@@ -505,6 +511,7 @@ public class _RunTests {
 			}
 			System.out.println();
 		}
+		
 	}
 	
 	public static void addAllCovers() {
@@ -549,10 +556,10 @@ public class _RunTests {
 			}
 		}
 		if( METRIC == METRIC_BEES_PENALIZED_MULT) {
-			e /= k;//Math.log(p)*min_entropy_reduction_per_parameter_for_k_n;
+			e /= k;//FastMath.log(p)*min_entropy_reduction_per_parameter_for_k_n;
 		}
 		if( METRIC == METRIC_BEES_PENALIZED_LOG) {
-			e += Math.log(k)*penalty;
+			e += FastMath.log(k)*penalty;
 		}
 		if( METRIC == METRIC_BEES_PENALIZED_K_N) {
 			//if( METRIC == METRIC_BEES || METRIC == METRIC_BEES_PRIOR_NOT_H || METRIC == METRIC_BEES_START_WITH_1) {
@@ -615,7 +622,7 @@ public class _RunTests {
 		if( select.length == 0) {
 			return new Integer[0];
 		}
-		int pow = (int)(Math.pow(2, select.length));
+		int pow = (int)(FastMath.pow(2, select.length));
 		Integer[] buckets = new Integer[pow];
 		for(int i = 0; i < buckets.length; i++) {
 			buckets[i] = new Integer(0);
@@ -703,7 +710,7 @@ public class _RunTests {
 	public static Vector<Integer> getRandomFullCover() {
 		Vector<Integer> cover = new Vector<Integer>();
 		while( !doesCover(cover)) {
-			cover.add((int)(Math.random()*(double)sets.length));
+			cover.add((int)(FastMath.random()*(double)sets.length));
 		}
 		optimizeFullCover(cover);
 		return cover;
@@ -711,7 +718,7 @@ public class _RunTests {
 	public static void optimizeFullCover(Vector<Integer> v) {
 		//randomize first
 		for( int i = 0; i < v.size(); i++) {
-			int r = v.remove((int)(Math.random()*(double)v.size()));
+			int r = v.remove((int)(FastMath.random()*(double)v.size()));
 			v.add(r);
 		}
 		for( int i = 0; i < v.size(); i++) {
@@ -763,7 +770,7 @@ public class _RunTests {
 	public static boolean[] getSample() {
 		boolean[] sample = new boolean[number_of_bits];
 		for( int i = 0; i < sample.length; i++) {
-			sample[i] = Math.random() > 0.5;
+			sample[i] = FastMath.random() > 0.5;
 		}
 		
 		switch(choice) {
@@ -825,16 +832,16 @@ public class _RunTests {
 			break;
 		}
 		for( int i = 0; i < sample.length; i++) {
-			if( Math.random() < noise) {
-				sample[i] = Math.random() > 0.5;
+			if( FastMath.random() < noise) {
+				sample[i] = FastMath.random() > 0.5;
 			}
 		}
 		
 
 		return sample;
 		/*
-		boolean a = Math.random() > 0.5;
-		boolean b = Math.random() > 0.5;
+		boolean a = FastMath.random() > 0.5;
+		boolean b = FastMath.random() > 0.5;
 		boolean c = a ^ b;
 		boolean d = a & b;
 		return new boolean[]{a,b,c,d};
@@ -863,7 +870,7 @@ public class _RunTests {
 			if( p == 0) {
 				continue;
 			}
-			total_log_probability += Math.log(p)*(double)buckets[i];
+			total_log_probability += FastMath.log(p)*(double)buckets[i];
 		}
 		if( divide_log_likelihood_by_n) {
 			total_log_probability /= n;
@@ -890,7 +897,7 @@ public class _RunTests {
 			if( p == 0) {
 				continue;
 			}
-			total_log_probability += Math.log(p)*(double)buckets[i];
+			total_log_probability += FastMath.log(p)*(double)buckets[i];
 		}
 		if( divide_log_likelihood_by_n) {
 			total_log_probability /= n;
@@ -912,7 +919,7 @@ public class _RunTests {
 			if( p == 0) {
 				continue;
 			}
-			total_log_probability += Math.log(p)*(double)buckets[i];
+			total_log_probability += FastMath.log(p)*(double)buckets[i];
 		}
 		if( divide_log_likelihood_by_n) {
 			total_log_probability /= n;
@@ -938,14 +945,14 @@ public class _RunTests {
 			if( p == 0) {
 				continue;
 			}
-			total_log_probability += Math.log(p)*(double)buckets[i];
+			total_log_probability += FastMath.log(p)*(double)buckets[i];
 		}
 		
 		if( divide_log_likelihood_by_n) {
 			total_log_probability /= n;
 		}
 		
-		return Math.log((double)n)*k - 2.0*total_log_probability;
+		return FastMath.log((double)n)*k - 2.0*total_log_probability;
 	}
 	
 
@@ -979,7 +986,7 @@ public class _RunTests {
 				case METRIC_BEES_CONSTRAINED:
 				case METRIC_BEES_PENALIZED_K_N_NEG:
 					if( use_prior_on_p) {
-						v = Functions.getExpectedEntropy(ii,1,1);///Math.log(2);
+						v = Functions.getExpectedEntropy(ii,1,1);///FastMath.log(2);
 					} else {
 						Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii,MONTE_CARLO_RESOLUTION);
 						if( at_percentile > 0) {
@@ -994,7 +1001,7 @@ public class _RunTests {
 					//v = cat.getSummaryStats(ii,MONTE_CARLO_RESOLUTION)[0];
 					//System.out.print(""+ii.length+": "+v);
 					//System.out.print(".");
-					//v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
+					//v = Functions.getExpectedEntropy(ii,1,1)/FastMath.log(2);
 					break;
 				case METRIC_BEES_C_MULT:
 					Integer[] ii1 = new Integer[ii.length];
@@ -1014,22 +1021,22 @@ public class _RunTests {
 					break;
 				case METRIC_BEES_LNMULT:
 					Integer[] ii3 = new Integer[ii.length];
-					double mult3 = Math.log((double)ii.length)/Math.log(2.0);
+					double mult3 = FastMath.log((double)ii.length)/FastMath.log(2.0);
 					for( int k = 0; k < ii.length; k++) {
 						ii3[k] = (int)(mult3*(double)ii[k]);
 					}
 					v = cat.getSummaryStats(ii3,MONTE_CARLO_RESOLUTION)[0];
 					//System.out.print(".");
-					//v = Functions.getExpectedEntropy(ii,1,1)/Math.log(2);
+					//v = Functions.getExpectedEntropy(ii,1,1)/FastMath.log(2);
 					break;
 				case METRIC_BEES_START_WITH_1:
 					Integer[] ii4 = new Integer[ii.length];
-					//double mult3 = Math.log((double)ii.length)/Math.log(2.0);
+					//double mult3 = FastMath.log((double)ii.length)/FastMath.log(2.0);
 					for( int k = 0; k < ii.length; k++) {
 						ii4[k] = ii[k]+1;
 					}
 					if( use_prior_on_p) {
-						v = Functions.getExpectedEntropy(ii4,1,1);///Math.log(2);
+						v = Functions.getExpectedEntropy(ii4,1,1);///FastMath.log(2);
 					} else {
 						Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii4,MONTE_CARLO_RESOLUTION);
 						if( at_percentile > 0) {
@@ -1040,7 +1047,7 @@ public class _RunTests {
 					}
 					break;
 				case METRIC_BEES_PRIOR_NOT_H:
-					v = Functions.getExpectedEntropy(ii,1,1);///Math.log(2);
+					v = Functions.getExpectedEntropy(ii,1,1);///FastMath.log(2);
 					break;
 				case METRIC_AIC:
 					v = getAIC(ii);

@@ -27,7 +27,7 @@ import org.apache.commons.math3.exception.MaxCountExceededException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.ode.sampling.FieldStepHandler;
 import org.apache.commons.math3.ode.sampling.FieldStepInterpolator;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class stores all information provided by an ODE integrator

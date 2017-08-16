@@ -18,7 +18,7 @@ package org.apache.commons.math3.geometry.partitioning.utilities;
 
 import java.util.Arrays;
 
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /** This class implements an ordering operation for T-uples.
  *

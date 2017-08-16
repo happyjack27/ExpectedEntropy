@@ -22,7 +22,7 @@ import org.apache.commons.math3.exception.ZeroException;
 import org.apache.commons.math3.exception.NumberIsTooSmallException;
 import org.apache.commons.math3.exception.MathIllegalStateException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * Class that implements a curve fitting specialized for sinusoids.
@@ -322,7 +322,7 @@ public class HarmonicFitter extends CurveFitter<HarmonicOscillator.Parametric> {
                 if (xRange == 0) {
                     throw new ZeroException();
                 }
-                aOmega[1] = 2 * Math.PI / xRange;
+                aOmega[1] = 2 * FastMath.PI / xRange;
 
                 double yMin = Double.POSITIVE_INFINITY;
                 double yMax = Double.NEGATIVE_INFINITY;

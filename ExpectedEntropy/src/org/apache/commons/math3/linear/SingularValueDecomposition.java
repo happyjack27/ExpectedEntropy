@@ -18,8 +18,8 @@ package org.apache.commons.math3.linear;
 
 import org.apache.commons.math3.exception.NumberIsTooLargeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Calculates the compact Singular Value Decomposition of a matrix.
@@ -32,7 +32,7 @@ import org.apache.commons.math3.util.Precision;
  * p=min(m,n).
  * </p>
  * <p>This class is similar to the class with similar name from the
- * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library, with the
+ * <a href="http://FastMath.nist.gov/javanumerics/jama/">JAMA</a> library, with the
  * following changes:</p>
  * <ul>
  *   <li>the {@code norm2} method which has been renamed as {@link #getNorm()

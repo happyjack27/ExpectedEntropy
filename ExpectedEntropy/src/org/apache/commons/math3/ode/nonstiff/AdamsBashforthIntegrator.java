@@ -26,7 +26,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.ode.EquationsMapper;
 import org.apache.commons.math3.ode.ExpandableStatefulODE;
 import org.apache.commons.math3.ode.sampling.NordsieckStepInterpolator;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 
 /**

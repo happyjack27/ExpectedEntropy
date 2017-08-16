@@ -20,8 +20,8 @@ import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.linear.BlockRealMatrix;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 import java.util.Arrays;
 import java.util.Comparator;

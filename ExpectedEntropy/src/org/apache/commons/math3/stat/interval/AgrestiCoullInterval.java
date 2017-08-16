@@ -17,7 +17,7 @@
 package org.apache.commons.math3.stat.interval;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * Implements the Agresti-Coull method for creating a binomial proportion confidence interval.

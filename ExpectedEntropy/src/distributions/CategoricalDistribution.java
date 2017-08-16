@@ -7,6 +7,7 @@ import distributions.interfaces.PriorDistribution;
 import util.*;
 import org.apache.commons.math3.*;
 import org.apache.commons.math3.distribution.*;
+import org.apache.commons.math3.util.FastMath;
 
 // http://www.sortie-nd.org/lme/Statistical%20Papers/Burnham_and_Anderson_2004_Multimodel_Inference.pdf
 // http://tuvalu.santafe.edu/~simon/page7/page9/page9.html
@@ -419,14 +420,14 @@ sum(ylnx+y)=0;
 			if( samples.get(i).b[1] != samples.get(i).b[1]) {
 				samples.get(i).b[1] = 0;
 			}
-			samples.get(i).b[1] = Math.exp(samples.get(i).b[1] + 64.0 - max_log_p);
+			samples.get(i).b[1] = FastMath.exp(samples.get(i).b[1] + 64.0 - max_log_p);
 		}
 		
 		//now add all samples to results.
 		for(int i = 0; i < samples.size(); i++) {
 			results.add(samples.get(i).b);
 		}
-		double maxH = Math.log((double)data.length);/////Math.log(2);
+		double maxH = FastMath.log((double)data.length);/////FastMath.log(2);
 		
 		//integrate
 		double sumP = 0;
@@ -456,7 +457,7 @@ sum(ylnx+y)=0;
 		}
 		//System.out.println("sums "+sumHP+" "+sumP);
 
-		return (sumHP/sumP);/////Math.log(2);
+		return (sumHP/sumP);/////FastMath.log(2);
 	}
 	public double getAtPercentile(Vector<double[]> results, double percentile) {
 		if( results.size() == 0) {
@@ -504,7 +505,7 @@ sum(ylnx+y)=0;
 			}
 			while( sumP > targetP) {
 				double prevP = sumP - dP;
-				ret[n] = (last_h + dH*(targetP - prevP)/dP);/////Math.log(2);
+				ret[n] = (last_h + dH*(targetP - prevP)/dP);/////FastMath.log(2);
 				n++;
 				if( n >= percentiles.length) {
 					break;
@@ -536,7 +537,7 @@ sum(ylnx+y)=0;
 			sumHP += h*p;
 			sumP  += p;
 		}
-		return (sumHP/sumP);/////Math.log(2);
+		return (sumHP/sumP);/////FastMath.log(2);
 	}	
 	public double integrateSortedEntropyCurve(Vector<double[]> results) {
 		if( results.size() == 0) {
@@ -571,14 +572,14 @@ sum(ylnx+y)=0;
 		}
 		//System.out.println("sums "+sumHP+" "+sumP);
 
-		return (sumHP/sumP);/////Math.log(2);
+		return (sumHP/sumP);/////FastMath.log(2);
 	}	
 	public double getEntropyOfSortedEntropyCurve(Vector<double[]> results) {
-		double res = 10.0/(double)results.size();//Math.exp(-Math.log((double)results.size())*0.5);
-		double maxH = results.get(results.size()-1)[0];///Math.log(2); 
+		double res = 10.0/(double)results.size();//FastMath.exp(-FastMath.log((double)results.size())*0.5);
+		double maxH = results.get(results.size()-1)[0];///FastMath.log(2); 
 		//System.out.println("maxH: "+maxH);
 		
-		double[] percentiles = new double[(int)Math.ceil((double)1.0 / res)];
+		double[] percentiles = new double[(int)FastMath.ceil((double)1.0 / res)];
 		for( int i = 0; i < percentiles.length; i++) {
 			percentiles[i] = res*(double)i;
 			if( percentiles[i] > 1) {
@@ -590,13 +591,13 @@ sum(ylnx+y)=0;
 		double e = 0;
 		double max_e = 0;
 		for( int i = 1; i < hs.length; i++) {
-			max_e -= res * Math.log(res);
+			max_e -= res * FastMath.log(res);
 		}
 		for( int i = 1; i < hs.length; i++) {
 			double dH = (hs[i] - hs[i-1])/maxH;
-			e -= res * Math.log(dH);
+			e -= res * FastMath.log(dH);
 		}
-		return (e-max_e);/////Math.log(2);
+		return (e-max_e);/////FastMath.log(2);
 	}	
 	
 	//if you want the conditional entropy of X given Y, the marginal categories should be the categories for Y.
@@ -677,7 +678,7 @@ sum(ylnx+y)=0;
 			}
 		
 			for(int i = 0; i < vp.size(); i++) {
-				vp.get(i).b[1] = Math.exp(vp.get(i).b[1] + 0.0 - max_log_p);
+				vp.get(i).b[1] = FastMath.exp(vp.get(i).b[1] + 0.0 - max_log_p);
 			}
 		
 			//now add all samples to results.
@@ -709,7 +710,7 @@ sum(ylnx+y)=0;
 			boolean ok = true;
 			for( int j = 0; j < thetas.length; j++) {
 				if( thetas[j] != 0) {
-					logp_theta_given_data += ((double)ii[j]) * Math.log(thetas[j]);
+					logp_theta_given_data += ((double)ii[j]) * FastMath.log(thetas[j]);
 				} else if( ii[j] != 0) {
 					ok = false;
 					break;
@@ -719,11 +720,11 @@ sum(ylnx+y)=0;
 				continue;
 			}
 			
-			logp_theta_given_data = Math.exp(logp_theta_given_data);
+			logp_theta_given_data = FastMath.exp(logp_theta_given_data);
 			
 			for( int j = 0; j < thetas.length; j++) {
 				if( thetas[j] != 0) {
-					double H = -Math.log(thetas[j]);
+					double H = -FastMath.log(thetas[j]);
 					double p = actual_dist[j] * logp_theta_given_data;
 					samples.add(new Pair<Double,double[]>(H,new double[]{H,p}));
 				}
@@ -750,8 +751,8 @@ sum(ylnx+y)=0;
 			double lp = 0;
 			for( int j = 0; j < thetas.length; j++) {
 				if( thetas[j] != 0) {
-					kld += -actual_dist[j] * Math.log(thetas[j]);//(Math.log(thetas[j]) - Math.log(actual_dist[j])); //can't do kldiv because using different model would be lower entropy
-					lp += ((double)ii[j]) * Math.log(thetas[j]);
+					kld += -actual_dist[j] * FastMath.log(thetas[j]);//(FastMath.log(thetas[j]) - FastMath.log(actual_dist[j])); //can't do kldiv because using different model would be lower entropy
+					lp += ((double)ii[j]) * FastMath.log(thetas[j]);
 				} else {
 					if( ii[j] > 0) {
 						// then =*0^(x<>0), so p = 0.
@@ -766,7 +767,7 @@ sum(ylnx+y)=0;
 					}
 				}
 			}
-			double p = Math.exp(lp);
+			double p = FastMath.exp(lp);
 			total_kldp += p*kld;
 			total_p += p;
 		}
@@ -835,7 +836,7 @@ sum(ylnx+y)=0;
 		}
 	
 		for(int i = 0; i < vp.size(); i++) {
-			vp.get(i).b[1] = Math.exp(vp.get(i).b[1] + 0.0 - max_log_p);
+			vp.get(i).b[1] = FastMath.exp(vp.get(i).b[1] + 0.0 - max_log_p);
 		}
 	
 		//now add all samples to results.
@@ -935,7 +936,7 @@ sum(ylnx+y)=0;
 		for(int i = 0; i < samples.size(); i++) {
 			results.add(samples.get(i).b);
 		}
-		double maxH = Math.log((double)data.length);/////Math.log(2);
+		double maxH = FastMath.log((double)data.length);/////FastMath.log(2);
 		
 		//integrate
 		double sumP = 0;
@@ -954,7 +955,7 @@ sum(ylnx+y)=0;
 			last_h = h;
 			last_p = p;
 		}
-		return new double[]{(sumHP/sumP)/Math.log(2.0)};
+		return new double[]{(sumHP/sumP)/FastMath.log(2.0)};
 	}
 	
 	public static double[] getSummaryStatsForEntropyPDF( Vector<double[]> samples) {
@@ -968,7 +969,7 @@ sum(ylnx+y)=0;
 		//compute normalizing constant
 		for( int i = 0; i < samples.size(); i++) {
 			double[] result = samples.get(i);
-			double h = result[0];///Math.log(2);
+			double h = result[0];///FastMath.log(2);
 			double ph = result[1];
 			double delta_h = h-last_h;
 			double delta_ph = ph-last_ph;
@@ -984,7 +985,7 @@ sum(ylnx+y)=0;
 		last_ph = 0;
 		for( int i = 0; i < samples.size(); i++) {
 			double[] result = samples.get(i);
-			double h = result[0];///Math.log(2);
+			double h = result[0];///FastMath.log(2);
 			double ph = result[1]/total_ph;
 			double delta_h = h-last_h;
 			double delta_ph = ph-last_ph;
@@ -1020,7 +1021,7 @@ sum(ylnx+y)=0;
 			last_ph = ph;
 			last_h = h;
 		}
-		//total_e /= //Math.log(2);
+		//total_e /= //FastMath.log(2);
 		return new double[]{total_h_ph,0-total_e,total_ph};
 	}
 	public static double integral(double a, double b, double x) {
@@ -1033,7 +1034,7 @@ sum(ylnx+y)=0;
 		if( y == 0) {
 			y = Double.MIN_VALUE;
 		}
-		return y*y*(2.0*Math.log(y)-1.0) / (4.0*b);
+		return y*y*(2.0*FastMath.log(y)-1.0) / (4.0*b);
 	}
 	public Vector<double[]> bin(Vector<double[]> samples, int num_bins, int h_col, int p_col, double maxH) {
 		int samples_per_bin = samples.size()/num_bins;
@@ -1078,7 +1079,7 @@ sum(ylnx+y)=0;
 		for(int i = 0; i < samples.size(); i++) {
 			results.add(samples.get(i).b);
 		}
-		double maxH = Math.log((double)data.length);/////Math.log(2);
+		double maxH = FastMath.log((double)data.length);/////FastMath.log(2);
 
 		Vector<double[]> dd = bin(results,num_bins,0,1,maxH);
 		//Vector<double[]> samples, int num_bins, int h_col, int p_col) {
@@ -1107,7 +1108,7 @@ sum(ylnx+y)=0;
 		}
 		for(int j = 0; j < thetas.length; j++) {
 			double r = thetas[j];
-			int k = (int)(Math.random()*(double)thetas.length);
+			int k = (int)(FastMath.random()*(double)thetas.length);
 			thetas[j] = thetas[k];
 			thetas[k] = r;
 		}
@@ -1117,7 +1118,7 @@ sum(ylnx+y)=0;
 		double[] thetas = new double[n];
 		double sum = 0;
 		for(int j = 0; j < thetas.length; j++) {
-			thetas[j] = 1.0/(Math.random());
+			thetas[j] = 1.0/(FastMath.random());
 			sum += thetas[j];
 		}
 		
@@ -1146,7 +1147,7 @@ sum(ylnx+y)=0;
 		} else {
 			pDO = getProbabilityOfDataGivenTheta(thetas, data);
 		}
-		//double pDO = Math.exp(lpDO);
+		//double pDO = FastMath.exp(lpDO);
 		
 		
 		double[] dHdOs = getDerivsOfEntropyGivenTheta(thetas);
@@ -1157,19 +1158,19 @@ sum(ylnx+y)=0;
 		
 		
 		//double dHdO = determinant(getJacobianGivenTheta(thetas));
-		//double lpO = Math.log(prior.getPriorProbabilityOfTheta(thetas));
-		//double lph = lpDO+lpO - ( prior_is_on_H ? 0 : Math.log(Math.abs(dHdO)));
+		//double lpO = FastMath.log(prior.getPriorProbabilityOfTheta(thetas));
+		//double lph = lpDO+lpO - ( prior_is_on_H ? 0 : FastMath.log(FastMath.abs(dHdO)));
 		
-		//double l_add = sum_data;//data.length == 0 ? 0 : Math.log(data.length)*sum_data;
-		//double l_add = data.length == 0 ? 0 : Math.log(data.length)*sum_data;
+		//double l_add = sum_data;//data.length == 0 ? 0 : FastMath.log(data.length)*sum_data;
+		//double l_add = data.length == 0 ? 0 : FastMath.log(data.length)*sum_data;
 		//double l_add = data.length == 0 ? 0 : data.length*sum_data;
 		//l_add -= 1000;
 		//lph += l_add;
 		
-		//double pO = Math.exp(lpO);
-		//double ph = Math.exp(lph);
-		double pO = Math.log(prior.getPriorProbabilityOfTheta(thetas));
-		double ph = pDO*pO / ( prior_is_on_H ? 1 : Math.abs(dHdO));
+		//double pO = FastMath.exp(lpO);
+		//double ph = FastMath.exp(lph);
+		double pO = FastMath.log(prior.getPriorProbabilityOfTheta(thetas));
+		double ph = pDO*pO / ( prior_is_on_H ? 1 : FastMath.abs(dHdO));
 		//System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
 		/*
 		if( prior_is_on_H)
@@ -1186,11 +1187,11 @@ sum(ylnx+y)=0;
 		double h = getEntropyGivenTheta(thetas);
 		double lpDO = 0;
 		if( permuted) {
-			lpDO = Math.log(getProbabilityOfDataGivenThetaPermuted2(thetas, data));
+			lpDO = FastMath.log(getProbabilityOfDataGivenThetaPermuted2(thetas, data));
 		} else {
 			lpDO = getLogProbabilityOfDataGivenTheta(thetas, data);
 		}
-		//double pDO = Math.exp(lpDO);
+		//double pDO = FastMath.exp(lpDO);
 		
 		
 		double[] dHdOs = getDerivsOfEntropyGivenTheta(thetas);
@@ -1201,17 +1202,17 @@ sum(ylnx+y)=0;
 		
 		
 		//double dHdO = determinant(getJacobianGivenTheta(thetas));
-		double lpO = Math.log(prior.getPriorProbabilityOfTheta(thetas));
-		double lph = lpDO+lpO - ( prior_is_on_H ? 0 : Math.log(Math.abs(dHdO)));
+		double lpO = FastMath.log(prior.getPriorProbabilityOfTheta(thetas));
+		double lph = lpDO+lpO - ( prior_is_on_H ? 0 : FastMath.log(FastMath.abs(dHdO)));
 		
-		//double l_add = sum_data;//data.length == 0 ? 0 : Math.log(data.length)*sum_data;
-		//double l_add = data.length == 0 ? 0 : Math.log(data.length)*sum_data;
+		//double l_add = sum_data;//data.length == 0 ? 0 : FastMath.log(data.length)*sum_data;
+		//double l_add = data.length == 0 ? 0 : FastMath.log(data.length)*sum_data;
 		//double l_add = data.length == 0 ? 0 : data.length*sum_data;
 		//l_add -= 1000;
 		//lph += l_add;
 		
-		//double pO = Math.exp(lpO);
-		//double ph = Math.exp(lph);
+		//double pO = FastMath.exp(lpO);
+		//double ph = FastMath.exp(lph);
 		//System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
 		/*
 		if( prior_is_on_H)
@@ -1236,7 +1237,7 @@ sum(ylnx+y)=0;
 		}
 		for( int i = 0; i < theta.length; i++) {
 			double t = theta[i] / sumtheta;
-			p -= t == 0 ? 0 : t*Math.log(t);
+			p -= t == 0 ? 0 : t*FastMath.log(t);
 		}
 		return p;
 
@@ -1282,7 +1283,7 @@ sum(ylnx+y)=0;
                         j2++;
                     }
                 }
-                det += Math.pow(-1.0,1.0+j1+1.0)* A[0][j1] * determinant(m,N-1);
+                det += FastMath.pow(-1.0,1.0+j1+1.0)* A[0][j1] * determinant(m,N-1);
             }
         }
         return det;
@@ -1295,7 +1296,7 @@ sum(ylnx+y)=0;
 		double[][] jacob = new double[thetas.length][thetas.length];
 		
 		for( int i = 0; i < partial_entropies.length; i++) {
-			partial_entropies[i] = (thetas[i] == 0 || thetas[i] == 1) ? 0 : -thetas[i] * Math.log(thetas[i]); 
+			partial_entropies[i] = (thetas[i] == 0 || thetas[i] == 1) ? 0 : -thetas[i] * FastMath.log(thetas[i]); 
 		}
 		for( int i = 0; i < thetas.length; i++) {
 			if( thetas[i] == 1) {
@@ -1310,7 +1311,7 @@ sum(ylnx+y)=0;
 			} else {
 				double a = 1-thetas[i];
 				for( int j = 0; j < thetas.length; j++) {
-					jacob[i][j] = (i == j) ? -Math.log(thetas[i]) : -partial_entropies[j]/a;
+					jacob[i][j] = (i == j) ? -FastMath.log(thetas[i]) : -partial_entropies[j]/a;
 				}
 			}
 		}
@@ -1338,12 +1339,12 @@ sum(ylnx+y)=0;
 				derivs[i] = Double.POSITIVE_INFINITY;
 				continue;
 			} 
-			double partial_entropy = - thetas[i] * Math.log(thetas[i]);
+			double partial_entropy = - thetas[i] * FastMath.log(thetas[i]);
 			
 			double right_part = (base_entropy - partial_entropy)/(1-thetas[i]);
-			double left_part = Math.log(thetas[i]);
+			double left_part = FastMath.log(thetas[i]);
 			
-			derivs[i] = -(left_part+right_part);//thetas[i] == 0 ? 1 : -Math.log(thetas[i])-1;
+			derivs[i] = -(left_part+right_part);//thetas[i] == 0 ? 1 : -FastMath.log(thetas[i])-1;
 			if( print) System.out.print((i > 0 ? "," : "")+derivs[i]);
 		}
 		if( print) System.out.println("]");
@@ -1358,7 +1359,7 @@ sum(ylnx+y)=0;
 		}
 		//System.out.print("] : [");
 		for( int i = 0; i < derivs.length; i++) {
-			derivs[i] = thetas[i] == 0 ? 1 : -Math.log(thetas[i])-1;
+			derivs[i] = thetas[i] == 0 ? 1 : -FastMath.log(thetas[i])-1;
 			//System.out.print((i > 0 ? "," : "")+derivs[i]);
 		}
 		//System.out.println("]");
@@ -1370,11 +1371,11 @@ sum(ylnx+y)=0;
 	public double getProbabilityOfDataGivenTheta(double[] thetas, Integer[] data) {
 		double mult = 1;
 		for(int i = 0; i < thetas.length; i++) {
-			mult *= Math.pow(thetas[i],(double)data[i]);
+			mult *= FastMath.pow(thetas[i],(double)data[i]);
 		}
 		return mult;
 		// TODO Auto-generated method stub
-		//return Math.exp(getLogProbabilityOfDataGivenTheta(thetas,data));
+		//return FastMath.exp(getLogProbabilityOfDataGivenTheta(thetas,data));
 	}
 
 	public double getProbabilityOfThetaGivenData(double[] theta, Integer[] data) {
@@ -1385,7 +1386,7 @@ sum(ylnx+y)=0;
 		/*
 		double mult = 1;
 		for(int i = 0; i < thetas.length; i++) {
-			mult *= Math.pow(thetas[i],(double)data[i]);
+			mult *= FastMath.pow(thetas[i],(double)data[i]);
 		}
 		return mult;
 		*/
@@ -1394,12 +1395,12 @@ sum(ylnx+y)=0;
 		double sum = 0;
 		//double tot = 0;
 		for(int i = 0; i < thetas.length; i++) {
-			sum += Math.log(thetas[i])*(double)data[i];
+			sum += FastMath.log(thetas[i])*(double)data[i];
 			//tot += data[i];
 		}
 		//sum /= tot;
 		return sum;
-		//return Math.exp(sum);
+		//return FastMath.exp(sum);
 		
 		
 	}

@@ -17,7 +17,7 @@
 package org.apache.commons.math3.analysis.integration.gauss;
 
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.math3.util.*;
 
 /**
  * Factory that creates Gauss-type quadrature rule using Legendre polynomials.
@@ -86,7 +86,7 @@ public class LegendreRuleFactory extends BaseRuleFactory<Double> {
             double pc = c;
             boolean done = false;
             while (!done) {
-                done = b - a <= Math.ulp(c);
+                done = b - a <= FastMath.ulp(c);
                 pmc = 1;
                 pc = c;
                 for (int j = 1; j < numberOfPoints; j++) {

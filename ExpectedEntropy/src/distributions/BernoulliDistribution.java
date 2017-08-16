@@ -1,6 +1,8 @@
 package distributions;
 
 import distributions.interfaces.*;
+import org.apache.commons.math3.util.*;
+
 
 public class BernoulliDistribution extends DefaultUnivariateDiscretePosteriorDistribution<Double> implements hasMLE<Double,Integer> {
 	
@@ -15,17 +17,17 @@ public class BernoulliDistribution extends DefaultUnivariateDiscretePosteriorDis
 		if( theta == 0 || theta == 1) {
 			return 0;
 		}
-		return -(theta*Math.log(theta)+(1-theta)*Math.log(1-theta));
+		return -(theta*FastMath.log(theta)+(1-theta)*FastMath.log(1-theta));
 	}
 	
 	public double getDerivOfEntropyGivenTheta(Double theta) {
-		return -Math.log(theta/(1-theta));
+		return -FastMath.log(theta/(1-theta));
 	}
 
 	public double getProbabilityOfDataGivenTheta(Double theta, Integer[] data) {
 		double zeros = data[0];
 		double ones = data[1];
-		return Math.pow(theta,zeros)*Math.pow(1-theta,ones);
+		return FastMath.pow(theta,zeros)*FastMath.pow(1-theta,ones);
 	}
 	
 	public double getProbabilityOfDataGivenThetaPermuted(Double theta, Integer[] data) {

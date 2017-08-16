@@ -18,7 +18,7 @@
 package org.apache.commons.math3.ode.nonstiff;
 
 import org.apache.commons.math3.ode.sampling.StepInterpolator;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class represents an interpolator over the last step during an

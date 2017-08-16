@@ -33,7 +33,7 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
 
 /**
  * A tableau for use in the Simplex method.

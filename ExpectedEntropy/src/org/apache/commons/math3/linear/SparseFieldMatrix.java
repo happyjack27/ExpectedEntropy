@@ -18,7 +18,7 @@ package org.apache.commons.math3.linear;
 
 import org.apache.commons.math3.Field;
 import org.apache.commons.math3.FieldElement;
-import org.apache.commons.math3.util.OpenIntToFieldHashMap;
+import org.apache.commons.math3.util.*;
 
 /**
  * Sparse matrix implementation based on an open addressed map.

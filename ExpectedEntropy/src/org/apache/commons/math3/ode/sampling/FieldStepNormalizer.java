@@ -20,8 +20,8 @@ package org.apache.commons.math3.ode.sampling;
 import org.apache.commons.math3.RealFieldElement;
 import org.apache.commons.math3.exception.MaxCountExceededException;
 import org.apache.commons.math3.ode.FieldODEStateAndDerivative;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class wraps an object implementing {@link FieldFixedStepHandler}

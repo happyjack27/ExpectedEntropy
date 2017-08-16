@@ -21,7 +21,7 @@ import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.Well19937c;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 /**
  * This class implements the Laplace distribution.
@@ -119,7 +119,7 @@ public class LaplaceDistribution extends AbstractRealDistribution {
         } else if (p == 1) {
             return Double.POSITIVE_INFINITY;
         }
-        double x = (p > 0.5) ? -Math.log(2.0 - 2.0 * p) : Math.log(2.0 * p);
+        double x = (p > 0.5) ? -FastMath.log(2.0 - 2.0 * p) : FastMath.log(2.0 * p);
         return mu + beta * x;
     }
 

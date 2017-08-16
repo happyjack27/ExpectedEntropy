@@ -23,9 +23,9 @@ import org.apache.commons.math3.exception.NonMonotonicSequenceException;
 import org.apache.commons.math3.exception.NullArgumentException;
 import org.apache.commons.math3.exception.NumberIsTooSmallException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathArrays;
-import org.apache.commons.math3.util.Precision;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
+import org.apache.commons.math3.util.*;
 
 /**
  * Computes a cubic spline interpolation for the data set using the Akima
@@ -35,7 +35,7 @@ import org.apache.commons.math3.util.Precision;
  * http://doi.acm.org/10.1145/321607.321609
  * <p>
  * This implementation is based on the Akima implementation in the CubicSpline
- * class in the Math.NET Numerics library. The method referenced is
+ * class in the FastMath.NET Numerics library. The method referenced is
  * CubicSpline.InterpolateAkimaSorted
  * </p>
  * <p>
@@ -129,8 +129,8 @@ public class AkimaSplineInterpolator
 
     /**
      * Three point differentiation helper, modeled off of the same method in the
-     * Math.NET CubicSpline class. This is used by both the Apache Math and the
-     * Math.NET Akima Cubic Spline algorithms
+     * FastMath.NET CubicSpline class. This is used by both the Apache Math and the
+     * FastMath.NET Akima Cubic Spline algorithms
      *
      * @param xvals x values to calculate the numerical derivative with
      * @param yvals y values to calculate the numerical derivative with
@@ -162,7 +162,7 @@ public class AkimaSplineInterpolator
     /**
      * Creates a Hermite cubic spline interpolation from the set of (x,y) value
      * pairs and their derivatives. This is modeled off of the
-     * InterpolateHermiteSorted method in the Math.NET CubicSpline class.
+     * InterpolateHermiteSorted method in the FastMath.NET CubicSpline class.
      *
      * @param xvals x values for interpolation
      * @param yvals y values for interpolation

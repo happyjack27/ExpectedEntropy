@@ -20,7 +20,7 @@ package org.apache.commons.math3.linear;
 import java.util.Arrays;
 
 import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.util.FastMath;
+import org.apache.commons.math3.util.*;
 
 
 /**
@@ -33,7 +33,7 @@ import org.apache.commons.math3.util.FastMath;
  * This allows inner loop to iterate inside rows, which is much more cache-efficient
  * in Java.</p>
  * <p>This class is based on the class with similar name from the
- * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> library, with the
+ * <a href="http://FastMath.nist.gov/javanumerics/jama/">JAMA</a> library, with the
  * following changes:</p>
  * <ul>
  *   <li>a {@link #getQT() getQT} method has been added,</li>
