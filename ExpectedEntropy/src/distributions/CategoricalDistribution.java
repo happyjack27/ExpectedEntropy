@@ -522,7 +522,30 @@ sum(ylnx+y)=0;
 		
 		return ret;
 	}
-	
+	public double integrateDiscreteLog(Vector<double[]> results) {
+		if( results.size() == 0) {
+			return 0;
+		}
+		double maxLog = results.get(0)[1];
+		for( int i = 0; i < results.size(); i++) {
+			double l = results.get(i)[1];
+			if( l > maxLog) {
+				maxLog = l;
+			}
+		}
+		
+		//integrate
+		double sumP = 0;
+		double sumHP = 0;
+		for( int i = 0; i < results.size(); i++) {
+			double h = results.get(i)[0];
+			double p = results.get(i)[1];
+			p = FastMath.exp(p - maxLog);
+			sumHP += h*p;
+			sumP  += p;
+		}
+		return (sumHP/sumP);/////FastMath.log(2);
+	}		
 	public double integrateDiscrete(Vector<double[]> results) {
 		if( results.size() == 0) {
 			return 0;
@@ -696,7 +719,13 @@ sum(ylnx+y)=0;
 		if( num_samples == 0) { num_samples = 100; }
 		
 		Vector<double[]> results = new Vector<double[]>();
-		Vector<Pair<Double,double[]>> samples = new Vector<Pair<Double,double[]>>(); 
+		
+		double[] log_actual_dist = new double[actual_dist.length];
+		for( int i = 0; i < actual_dist.length; i++) {
+			log_actual_dist[i] = FastMath.log(actual_dist[i]);
+		}
+		
+		//Vector<Pair<Double,double[]>> samples = new Vector<Pair<Double,double[]>>(); 
 		
 		for( int i = 0; i < num_samples; i++) {
 			double[] thetas = getRandomThetas(ii.length,false);
@@ -720,23 +749,26 @@ sum(ylnx+y)=0;
 				continue;
 			}
 			
-			logp_theta_given_data = FastMath.exp(logp_theta_given_data);
+			//logp_theta_given_data = FastMath.exp(logp_theta_given_data);
 			
 			for( int j = 0; j < thetas.length; j++) {
 				if( thetas[j] != 0) {
 					double H = -FastMath.log(thetas[j]);
-					double p = actual_dist[j] * logp_theta_given_data;
-					samples.add(new Pair<Double,double[]>(H,new double[]{H,p}));
+					double lp = logp_theta_given_data + log_actual_dist[j];
+					results.add(new double[]{H,lp});
+					//samples.add(new Pair<Double,double[]>(H,new double[]{H,lp}));
 				}
 			}
 		}
+		/*
 		Collections.sort(samples);
 		//results.add
 		for(int i = 0; i < samples.size(); i++) {
 			results.add(samples.get(i).b);
-		}		
+		}*/		
 		
-		return integrateDiscrete(results);
+		return integrateDiscreteLog(results);
+		//return integrateDiscrete(results);
 		//return integrateSortedEntropyCurve(results);
 	}
 	

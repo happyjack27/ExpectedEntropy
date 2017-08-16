@@ -27,13 +27,16 @@ public class _RunTests {
 
 	static double at_percentile = 0;
 	static boolean show_detail = false;
-	
+
+	static final int NUM_SCORE_MODES = 3;
 	static final int SCORE_MODE_DISTANCE = 0;
 	static final int SCORE_MODE_RANK = 1;
 	static final int SCORE_MODE_FUTURE_ENTROPY = 2;
+	static final int SCORE_MODE_FUTURE_ENTROPY2 = 3;
 	static int SCORE_MODE = SCORE_MODE_FUTURE_ENTROPY;
 	static int ACTUAL_THETA_SAMPLES = 102400;
-	static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 256;	
+	//static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 256;	
+	static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 100;	
 	
 	//entropy at percentile
 	//percentile at entropy
@@ -398,9 +401,9 @@ public class _RunTests {
 	
 	
 	static Vector<double[][]> runs = new Vector<double[][]>(); 
-	static double[][] results = new double[max_n][3];
-	static double[][] run_avg = new double[max_n][3];
-	static double[][][] run_avgs = new double[choices.length][max_n][3];
+	static double[][] results = new double[max_n][NUM_SCORE_MODES];
+	static double[][] run_avg = new double[max_n][NUM_SCORE_MODES];
+	static double[][][] run_avgs = new double[choices.length][max_n][NUM_SCORE_MODES];
 	
 	public static Vector<Pair<Double,Vector<Integer>>> covers = new Vector<Pair<Double,Vector<Integer>>>();
 	
@@ -483,13 +486,13 @@ public class _RunTests {
 			for( int i = 0; i < num_runs; i++) {
 				doRun();
 				runs.add(results);
-				results = new double[max_n][3];
+				results = new double[max_n][NUM_SCORE_MODES];
 			}
 			double m = 1.0/(double)num_runs;
 			for( int i = 0; i < max_n; i++) {
-				run_avg[i][0]*=m;
-				run_avg[i][1]*=m;
-				run_avg[i][2]*=m;
+				for( int j = 0; j < NUM_SCORE_MODES; j++) {
+					run_avg[i][j]*=m;
+				}
 				//System.out.println(run_avg[i][0]+", "+run_avg[i][1]+", "+run_avg[i][2]);
 			}
 			run_avgs[cur_choice] = deep_clone(run_avg);
@@ -500,14 +503,10 @@ public class _RunTests {
 	public static void printAll() {
 		System.out.println();
 		for( int i = 0; i < max_n; i++) {
-			for( int j = 0; j < run_avgs.length; j++) {
-				System.out.print(run_avgs[j][i][0]+", ");
-			}
-			for( int j = 0; j < run_avgs.length; j++) {
-				System.out.print(run_avgs[j][i][1]+", ");
-			}
-			for( int j = 0; j < run_avgs.length; j++) {
-				System.out.print(run_avgs[j][i][2]+", ");
+			for( int k = 0; k < NUM_SCORE_MODES; k++) {
+				for( int j = 0; j < run_avgs.length; j++) {
+					System.out.print(run_avgs[j][i][k]+", ");
+				}
 			}
 			System.out.println();
 		}
@@ -766,6 +765,42 @@ public class _RunTests {
 	};
 	*/
 	
+	public static double getMinEntropy() {
+		int last_choice = -1;
+		double last_val = 0;
+		
+		if( choice == last_choice) {
+			return last_val;
+		}
+		choice = last_choice;
+		
+		if( false) {
+			return 0;
+		}
+		
+		//best_cover = scoreAndStuff(entropies,samples.size());
+		//Integer[] ii = bucket(samples,sets[s]);
+		last_val = 0;
+		for( int s : target_cover) {
+			double[] dd = set_actual_thetas[s];
+			for( int i = 0; i < dd.length; i++) {
+				last_val += -dd[i]*FastMath.log(dd[i]);
+			}
+		}
+		return last_val;
+		/*
+		switch(choice) {
+		case 0:
+			return -(10.0-5.0)*Math.log(0.5);
+		case 1:
+			return -(10.0-3.0)*Math.log(0.5);
+		case 2:
+			return -(10.0-4.0)*Math.log(0.5);
+		case 8:
+			return -(10.0-4.0)*Math.log(0.5);
+		}
+		*/	
+	}
 
 	public static boolean[] getSample() {
 		boolean[] sample = new boolean[number_of_bits];
@@ -1066,9 +1101,10 @@ public class _RunTests {
 				entropies[j] = v;
 			}
 			
-			int num0 = 0;
-			int num1 = 0;
-			int num2 = 0;
+			double num0 = 0;
+			double num1 = 0;
+			double num2 = 0;
+			double num3 = 0;
 			if( SCORE_MODE == SCORE_MODE_DISTANCE || DO_ALL_SCORES) {
 				best_cover = scoreAndStuff(entropies,samples.size());
 				double best_e = getTotalEntropy(best_cover,entropies);
@@ -1098,7 +1134,14 @@ public class _RunTests {
 				best_cover = scoreAndStuff(entropies,samples.size());
 				for( int s : best_cover) {
 					Integer[] ii = bucket(samples,sets[s]);
-					num2 += cat.getBayesianActualEntropy(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES);
+					num2 += cat.getBayesianActualEntropy(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES) - getMinEntropy();
+				}
+			}
+			if( SCORE_MODE == SCORE_MODE_FUTURE_ENTROPY2 || (DO_ALL_SCORES && NUM_SCORE_MODES > 3)) {
+				best_cover = scoreAndStuff(entropies,samples.size());
+				for( int s : best_cover) {
+					Integer[] ii = bucket(samples,sets[s]);
+					num3 += cat.getBayesianActualEntropy_old(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES) - getMinEntropy();
 				}
 			}
 			
@@ -1109,9 +1152,11 @@ public class _RunTests {
 			results[i][0] = num0;
 			results[i][1] = num1;
 			results[i][2] = num2;
+			//results[i][3] = num3;
 			run_avg[i][0] += num0;
 			run_avg[i][1] += num1;
 			run_avg[i][2] += num2;
+			//run_avg[i][3] += num3;
 
 			if( num0 == 0) {
 				//System.exit(0);
