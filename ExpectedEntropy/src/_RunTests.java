@@ -28,7 +28,7 @@ public class _RunTests {
 	static double at_percentile = 0;
 	static boolean show_detail = false;
 
-	static final int NUM_SCORE_MODES = 3;
+	static final int NUM_SCORE_MODES = 4;
 	static final int SCORE_MODE_DISTANCE = 0;
 	static final int SCORE_MODE_RANK = 1;
 	static final int SCORE_MODE_FUTURE_ENTROPY = 2;
@@ -765,14 +765,14 @@ public class _RunTests {
 	};
 	*/
 	
+	static int last_choice = -1;
+	static double last_val = 0;
 	public static double getMinEntropy() {
-		int last_choice = -1;
-		double last_val = 0;
 		
 		if( choice == last_choice) {
 			return last_val;
 		}
-		choice = last_choice;
+		last_choice = choice;
 		
 		if( false) {
 			return 0;
@@ -784,9 +784,14 @@ public class _RunTests {
 		for( int s : target_cover) {
 			double[] dd = set_actual_thetas[s];
 			for( int i = 0; i < dd.length; i++) {
+				if( dd[i] == 0) {
+					continue;
+				}
 				last_val += -dd[i]*FastMath.log(dd[i]);
 			}
 		}
+		last_val = Math.abs(last_val);
+		System.out.println("choice "+choice+" min entropy: "+last_val);
 		return last_val;
 		/*
 		switch(choice) {
@@ -1134,14 +1139,19 @@ public class _RunTests {
 				best_cover = scoreAndStuff(entropies,samples.size());
 				for( int s : best_cover) {
 					Integer[] ii = bucket(samples,sets[s]);
-					num2 += cat.getBayesianActualEntropy(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES) - getMinEntropy();
+					double add = cat.getBayesianActualEntropy(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES);
+					if( add < 0) { add = 0; }
+					num2 += add;
 				}
 			}
 			if( SCORE_MODE == SCORE_MODE_FUTURE_ENTROPY2 || (DO_ALL_SCORES && NUM_SCORE_MODES > 3)) {
 				best_cover = scoreAndStuff(entropies,samples.size());
 				for( int s : best_cover) {
 					Integer[] ii = bucket(samples,sets[s]);
-					num3 += cat.getBayesianActualEntropy_old(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES) - getMinEntropy();
+					double add = cat.getBayesianActualEntropy(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES) - getMinEntropy();
+					if( add < 0) { add = 0; }
+					num3 += add;
+					//num3 += cat.getBayesianActualEntropy_old(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES) - getMinEntropy();
 				}
 			}
 			
@@ -1152,11 +1162,11 @@ public class _RunTests {
 			results[i][0] = num0;
 			results[i][1] = num1;
 			results[i][2] = num2;
-			//results[i][3] = num3;
+			results[i][3] = num3;
 			run_avg[i][0] += num0;
 			run_avg[i][1] += num1;
 			run_avg[i][2] += num2;
-			//run_avg[i][3] += num3;
+			run_avg[i][3] += num3;
 
 			if( num0 == 0) {
 				//System.exit(0);
