@@ -18,7 +18,7 @@ public class _RunTests {
 	static boolean adjust_num_params = true;
 	static boolean use_prior_on_p = false;
 	
-	public static boolean DO_ALL_SCORES = true;
+	public static boolean DO_ALL_SCORES = false;
 
 	
 	static int number_of_bits = 10;
@@ -31,12 +31,12 @@ public class _RunTests {
 	static final int NUM_SCORE_MODES = 4;
 	static final int SCORE_MODE_DISTANCE = 0;
 	static final int SCORE_MODE_RANK = 1;
-	static final int SCORE_MODE_FUTURE_ENTROPY = 2;
+	static final int SCORE_MODE_MODEL_COMPLEXITY = 2;
 	static final int SCORE_MODE_FUTURE_ENTROPY2 = 3;
-	static int SCORE_MODE = SCORE_MODE_FUTURE_ENTROPY;
+	static int SCORE_MODE = SCORE_MODE_MODEL_COMPLEXITY;
 	static int ACTUAL_THETA_SAMPLES = 102400;
 	//static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 256;	
-	static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 100;	
+	static int BAYESIAN_ACTUAL_ENTROPY_SAMPLES = 256;	
 	
 	//entropy at percentile
 	//percentile at entropy
@@ -82,13 +82,17 @@ public class _RunTests {
 			
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
-			
-			0.5,0.5,0.5,0.5,
-			0.5,0.5,0.5,0.5,
+			//0.0,0.0,0.0,0.0,
 			
 			1.0,1.0,1.0,1.0,
 			1.0,1.0,1.0,1.0,
+			1.0,1.0,1.0,1.0,
 			
+			0.5,0.5,0.5,0.5,
+			0.5,0.5,0.5,0.5,
+			0.5,0.5,0.5,0.5,
+			
+			2.0,2.0,2.0,2.0,
 			2.0,2.0,2.0,2.0,
 			2.0,2.0,2.0,2.0,
 			
@@ -96,15 +100,20 @@ public class _RunTests {
 	public static int[] choices = new int[]{
 			0,1,2,8,
 			0,1,2,8,
+			//0,1,2,8,
 			
 			0,1,2,8,
 			0,1,2,8,
+			//0,1,2,8,
+			/*
+			0,1,2,8,
+			0,1,2,8,
+			0,1,2,8,
 			
 			0,1,2,8,
 			0,1,2,8,
-			
 			0,1,2,8,
-			0,1,2,8,
+			*/
 			
 			
 			
@@ -155,13 +164,17 @@ public class _RunTests {
 			
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,
 			
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,
 
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
+			0.0,0.0,0.0,0.0,
 
+			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
 			0.0,0.0,0.0,0.0,
 
@@ -191,13 +204,20 @@ public class _RunTests {
 	};
 	public static int[] metrics = new int[]{
 			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
-			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			//METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+			
 			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
-			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			//METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+			
 			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
-			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+			
 			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
-			METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
+			METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
 			//METRIC_BEES_START_WITH_1,METRIC_BEES_START_WITH_1,METRIC_BEES_START_WITH_1,METRIC_BEES_START_WITH_1,
 			//METRIC_AIC,
 			//METRIC_BEES,METRIC_BEES,METRIC_BEES,METRIC_BEES,
@@ -560,7 +580,7 @@ public class _RunTests {
 		if( METRIC == METRIC_BEES_PENALIZED_LOG) {
 			e += FastMath.log(k)*penalty;
 		}
-		if( METRIC == METRIC_BEES_PENALIZED_K_N) {
+		if( METRIC == METRIC_BEES_PENALIZED_K_N || METRIC == METRIC_BEES_PRIOR_NOT_H ) {
 			//if( METRIC == METRIC_BEES || METRIC == METRIC_BEES_PRIOR_NOT_H || METRIC == METRIC_BEES_START_WITH_1) {
 			//max_e -= (p-best_e_param_count)*min_entropy_reduction_per_parameter_for_k_n / N;
 			e += k*penalty;
@@ -1135,24 +1155,21 @@ public class _RunTests {
 			if( SCORE_MODE == SCORE_MODE_RANK || DO_ALL_SCORES) {
 				num1 = getTargetCoverRank(entropies,samples.size());
 			}
-			if( SCORE_MODE == SCORE_MODE_FUTURE_ENTROPY || DO_ALL_SCORES) {
+			if( SCORE_MODE == SCORE_MODE_MODEL_COMPLEXITY || DO_ALL_SCORES) {
 				best_cover = scoreAndStuff(entropies,samples.size());
-				for( int s : best_cover) {
-					Integer[] ii = bucket(samples,sets[s]);
-					double add = cat.getBayesianActualEntropy(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES);
-					if( add < 0) { add = 0; }
-					num2 += add;
-				}
+				num2 = getTotalParams(best_cover);
 			}
 			if( SCORE_MODE == SCORE_MODE_FUTURE_ENTROPY2 || (DO_ALL_SCORES && NUM_SCORE_MODES > 3)) {
 				best_cover = scoreAndStuff(entropies,samples.size());
+				double add = 0;
 				for( int s : best_cover) {
 					Integer[] ii = bucket(samples,sets[s]);
-					double add = cat.getBayesianActualEntropy(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES) - getMinEntropy();
-					if( add < 0) { add = 0; }
-					num3 += add;
+					add += cat.getBayesianActualEntropy(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES);
 					//num3 += cat.getBayesianActualEntropy_old(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES) - getMinEntropy();
 				}
+				add -= getMinEntropy();
+				if( add < 0) { add = 0; }
+				num3 += add;
 			}
 			
 
