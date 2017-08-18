@@ -18,7 +18,7 @@ public class _RunTests {
 	static boolean adjust_num_params = true;
 	static boolean use_prior_on_p = false;
 	
-	public static boolean DO_ALL_SCORES = false;
+	public static boolean DO_ALL_SCORES = true;
 
 	
 	static int number_of_bits = 10;
@@ -61,7 +61,7 @@ public class _RunTests {
 	static final int METRIC_BEES_PENALIZED_MULT = 14;
 	static final int METRIC_BEES_CONSTRAINED = 15;
 	//static double min_entropy_reduction_per_parameter = 0.1;
-
+ 
 	//static double min_e_per_p = 0.1;
 	static double constrained_min_total_e_saved_per_p = 1;
 	
@@ -80,10 +80,11 @@ public class _RunTests {
 			//1.0,1.0,1.0,1.0,
 			//1.0,1.0,1.0,1.0,
 			
-			0.0,0.0,0.0,0.0,
-			0.0,0.0,0.0,0.0,
+			//0.0,0.0,0.0,0.0,
+			//0.0,0.0,0.0,0.0,
 			//0.0,0.0,0.0,0.0,
 			
+			1.0,1.0,1.0,1.0,
 			1.0,1.0,1.0,1.0,
 			1.0,1.0,1.0,1.0,
 			1.0,1.0,1.0,1.0,
@@ -102,8 +103,8 @@ public class _RunTests {
 			0,1,2,8,
 			//0,1,2,8,
 			
-			0,1,2,8,
-			0,1,2,8,
+			//0,1,2,8,
+			//0,1,2,8,
 			//0,1,2,8,
 			/*
 			0,1,2,8,
@@ -203,6 +204,10 @@ public class _RunTests {
 			0.2,0.2,0.2,0.2,//0.2,0.2,0.2,0.2,
 	};
 	public static int[] metrics = new int[]{
+			METRIC_AICc,METRIC_AICc,METRIC_AICc,METRIC_AICc,
+			METRIC_BIC,METRIC_BIC,METRIC_BIC,METRIC_BIC,
+			
+			
 			METRIC_AIC,METRIC_AIC,METRIC_AIC,METRIC_AIC,
 			//METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,METRIC_BEES_PRIOR_NOT_H,
 			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
@@ -1130,8 +1135,17 @@ public class _RunTests {
 			double num1 = 0;
 			double num2 = 0;
 			double num3 = 0;
+			best_cover = scoreAndStuff(entropies,samples.size());
 			if( SCORE_MODE == SCORE_MODE_DISTANCE || DO_ALL_SCORES) {
-				best_cover = scoreAndStuff(entropies,samples.size());
+				double add = 0;
+				for( int s : best_cover) {
+					Integer[] ii = bucket(samples,sets[s]);
+					add += cat.getCrossEntropyOfMLE(ii,set_actual_thetas[s]);
+				}
+				add -= getMinEntropy();
+				if( add < 0) { add = 0; }
+				num0 += add;
+				/*
 				double best_e = getTotalEntropy(best_cover,entropies);
 				
 				num0 = getDistance(best_cover,target_cover);
@@ -1151,20 +1165,19 @@ public class _RunTests {
 					System.out.print(": "+num0);
 					System.out.println();
 				}
+				*/
 			}
 			if( SCORE_MODE == SCORE_MODE_RANK || DO_ALL_SCORES) {
 				num1 = getTargetCoverRank(entropies,samples.size());
 			}
 			if( SCORE_MODE == SCORE_MODE_MODEL_COMPLEXITY || DO_ALL_SCORES) {
-				best_cover = scoreAndStuff(entropies,samples.size());
 				num2 = getTotalParams(best_cover);
 			}
 			if( SCORE_MODE == SCORE_MODE_FUTURE_ENTROPY2 || (DO_ALL_SCORES && NUM_SCORE_MODES > 3)) {
-				best_cover = scoreAndStuff(entropies,samples.size());
 				double add = 0;
 				for( int s : best_cover) {
 					Integer[] ii = bucket(samples,sets[s]);
-					add += cat.getBayesianActualEntropy(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES);
+					add += cat.getCrossEntropyOfPosteriorPredictive(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES);
 					//num3 += cat.getBayesianActualEntropy_old(ii,set_actual_thetas[s],BAYESIAN_ACTUAL_ENTROPY_SAMPLES) - getMinEntropy();
 				}
 				add -= getMinEntropy();
