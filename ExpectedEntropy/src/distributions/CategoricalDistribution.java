@@ -715,7 +715,7 @@ sum(ylnx+y)=0;
 		return rets;
 	}
 
-	public double getBayesianActualEntropy(Integer[] ii, double[] actual_dist, int num_samples) {
+	public double getCrossEntropyOfPosteriorPredictive(Integer[] ii, double[] actual_dist, int num_samples) {
 		if( num_samples == 0) { num_samples = 100; }
 		
 		Vector<double[]> results = new Vector<double[]>();
@@ -770,6 +770,20 @@ sum(ylnx+y)=0;
 		return integrateDiscreteLog(results);
 		//return integrateDiscrete(results);
 		//return integrateSortedEntropyCurve(results);
+	}
+	
+	public double getCrossEntropyOfMLE(Integer[] ii, double[] actual_dist) {
+		double total = 0;
+		double[] thetas = getMLEThetas(ii);
+		for( int j = 0; j < thetas.length; j++) {
+			if( thetas[j] != 0) {
+				total += actual_dist[j] * FastMath.log(thetas[j]);
+				//logp_theta_given_data += ((double)ii[j]) * FastMath.log(thetas[j]);
+			} else if( actual_dist[j] != 0) {
+				//non-zero times log 0 is undefined!
+			}
+		}
+		return total;
 	}
 	
 	public double getBayesianActualEntropy_old(Integer[] ii, double[] actual_dist, int samples) {

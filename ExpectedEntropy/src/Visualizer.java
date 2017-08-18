@@ -44,7 +44,7 @@ public class Visualizer implements Draws {
 	public static boolean shrink_geometrically = false;
 	
 	public static double whitespace_fraction = 0.6666;
-	public static int DEFAULT_ITERATIONS = 160;
+	public static int DEFAULT_ITERATIONS = 160*4;
 	public static boolean shrink_by_area = false;
 	
 	public static void main(String[] args) {
@@ -101,9 +101,13 @@ public class Visualizer implements Draws {
 				0.1,
 				
 		};
+		int num_vars = 3;
+		
+		Is = Visualizer_test_data.Is;
+		num_vars = Visualizer_test_data.num_vars;
 		
 		Visualizer v = new Visualizer();
-		v.init(3,640,DEFAULT_ITERATIONS,Is);
+		v.init(num_vars,640,DEFAULT_ITERATIONS,Is);
 		
 		
 		ToImageFile img = new ToImageFile();
@@ -551,6 +555,9 @@ public class Visualizer implements Draws {
 						c[2] -= minusRGBs[i][2];
 					}
 				}
+				c[0] = c[0] < 0 ? 0 : c[0];
+				c[1] = c[1] < 0 ? 0 : c[1];
+				c[2] = c[2] < 0 ? 0 : c[2];
 				d.setColor(new Color(c[0],c[1],c[2]));
 				d.fillRect(x0, y0, x1-x0, y1-y0);
 			}	
