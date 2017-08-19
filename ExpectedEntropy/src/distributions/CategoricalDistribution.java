@@ -595,6 +595,9 @@ sum(ylnx+y)=0;
 		}
 		//System.out.println("sums "+sumHP+" "+sumP);
 
+		if( sumP == 0) {
+			return 0;
+		}
 		return (sumHP/sumP);/////FastMath.log(2);
 	}	
 	public double getEntropyOfSortedEntropyCurve(Vector<double[]> results) {
@@ -865,7 +868,9 @@ sum(ylnx+y)=0;
 			break;
 			}
 			double[] hxy = getEntropyAndLogProbabilityAtTheta(thetas,data,false);
-		
+			if( hxy[0] != hxy[0] || hxy[1] != hxy[1] ||  Double.isInfinite(hxy[0]) ||  Double.isInfinite(hxy[1])) {
+				continue;
+			}
 		
 			vhxy.add(new Pair<Double,double[]>(hxy[0],hxy));
 		}
@@ -873,20 +878,35 @@ sum(ylnx+y)=0;
 		Vector<double[]> results = new Vector<double[]>();
 		Vector<Pair<Double,double[]>> vp = vhxy;
 		Collections.sort(vp);
+		if( vp.size() == 0) {
+			return results;
+		}
 		//adjust log p arithmetically to max of 0, then take the exponent;
 		double max_log_p = vp.get(0).b[1];
 		for(int i = 0; i < vp.size(); i++) {
-			if( vp.get(i).b[1] > max_log_p) {
+			if( vp.get(i).b[1] != vp.get(i).b[1] || Double.isInfinite(vp.get(i).b[1])) {
+				continue;
+			}
+			if( vp.get(i).b[1] > max_log_p || max_log_p != max_log_p || Double.isInfinite(max_log_p) ) {
 				max_log_p = vp.get(i).b[1];
 			}
 		}
 	
 		for(int i = 0; i < vp.size(); i++) {
+			//System.out.println(vp.get(i).b[0]+", "+vp.get(i).b[1]+", "+max_log_p+", ");
 			vp.get(i).b[1] = FastMath.exp(vp.get(i).b[1] + 0.0 - max_log_p);
+			//System.out.println(vp.get(i).b[0]+", "+vp.get(i).b[1]+", "+max_log_p+", ");
+			
 		}
+		//System.exit(0);
 	
 		//now add all samples to results.
 		for(int i = 0; i < vp.size(); i++) {
+			double[] hxy = vp.get(i).b;
+			if( hxy[0] != hxy[0] || hxy[1] != hxy[1]) {
+				continue;
+			}
+
 			results.add(new double[]{vp.get(i).b[0],vp.get(i).b[1]});
 		}
 		
@@ -1441,6 +1461,9 @@ sum(ylnx+y)=0;
 		double sum = 0;
 		//double tot = 0;
 		for(int i = 0; i < thetas.length; i++) {
+			if( data[i] == 0 || thetas[i] == 0) {
+				continue;
+			}
 			sum += FastMath.log(thetas[i])*(double)data[i];
 			//tot += data[i];
 		}

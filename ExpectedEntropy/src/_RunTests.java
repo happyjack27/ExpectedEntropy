@@ -11,7 +11,7 @@ import util.Pair;
 
 public class _RunTests {
 	static int max_n = 25;
-	static int num_runs = 100;//1000;//25;
+	static int num_runs = 25;//1000;//25;
 	static boolean divide_log_likelihood_by_n = false;
 	static int MONTE_CARLO_RESOLUTION = 100;
 	static double penalty = 1.0;
@@ -83,6 +83,9 @@ public class _RunTests {
 			//0.0,0.0,0.0,0.0,
 			//0.0,0.0,0.0,0.0,
 			//0.0,0.0,0.0,0.0,
+			0.5,0.5,0.5,0.5,
+			0.5,0.5,0.5,0.5,
+			0.5,0.5,0.5,0.5,
 			
 			1.0,1.0,1.0,1.0,
 			1.0,1.0,1.0,1.0,
@@ -100,7 +103,7 @@ public class _RunTests {
 	};
 	public static int[] choices = new int[]{
 			0,1,2,8,
-			0,1,2,8,
+			//0,1,2,8,
 			//0,1,2,8,
 			
 			//0,1,2,8,
@@ -204,6 +207,9 @@ public class _RunTests {
 			0.2,0.2,0.2,0.2,//0.2,0.2,0.2,0.2,
 	};
 	public static int[] metrics = new int[]{
+			METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,METRIC_BEES_PENALIZED_K_N,
+
+			METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED_LOG,METRIC_BEES_PENALIZED_LOG,
 			METRIC_AICc,METRIC_AICc,METRIC_AICc,METRIC_AICc,
 			METRIC_BIC,METRIC_BIC,METRIC_BIC,METRIC_BIC,
 			

@@ -39,12 +39,14 @@ public class Visualizer implements Draws {
 	
 	public static final int TIMES_TO_REPEAT_IF_IMPROVED = 0;
 	
-	public static boolean use_squared_distance = true;
+	//fff
+	//ttf
+	public static boolean use_squared_distance = false;
 	public static boolean divide_by_area = false;
 	public static boolean shrink_geometrically = false;
 	
 	public static double whitespace_fraction = 0.6666;
-	public static int DEFAULT_ITERATIONS = 160*4;
+	public static int DEFAULT_ITERATIONS = 160*2;
 	public static boolean shrink_by_area = false;
 	
 	public static void main(String[] args) {

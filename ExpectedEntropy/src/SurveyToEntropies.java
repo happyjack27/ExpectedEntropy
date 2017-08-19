@@ -11,6 +11,8 @@ public class SurveyToEntropies {
 	public static final int INPUT_FILE = 1;
 	public static final int VARS = 2;
 
+	public static boolean use_bayesian = false;
+	
 	public static String delimiter = "\t";
 	public static int numVars = 10;
 	public static void main(String[] args) {
@@ -19,7 +21,7 @@ public class SurveyToEntropies {
 				args = new String[]{
 						"",
 						"data/first10.txt",
-						""+5
+						""+4
 				};
 			}
 			numVars = Integer.parseInt(args[VARS]);
@@ -54,11 +56,24 @@ public class SurveyToEntropies {
 			System.out.println("read "+answers.size()+" answers");
 			
 			System.out.println("computing entropies...");
-			double[] unions = computeAllJointEntropies(answers);
-			//double[] unions = computeAllJointEntropiesBayeisan(answers);
+			double[] unions = null;
+			if( use_bayesian) {
+				unions = computeAllJointEntropiesBayeisan(answers);
+			} else {
+				unions = computeAllJointEntropies(answers);
+			}
 			System.out.println("converting...");
 			double[] intersections = unionsToIntersections(unions);
+			for( int i = 0; i < intersections.length; i++) {
+				if( Integer.bitCount(i) > 2) {
+					intersections[i] = 0;
+				}
+			}
+
+			
+			unions = unionsToIntersections(intersections);
 			intersections[0] = unions[unions.length-1];
+			
 			System.out.println("intersections");
 			for( int i = 0; i < intersections.length; i++) {
 				System.out.println(intersections[i]+",");
@@ -90,7 +105,8 @@ public class SurveyToEntropies {
 		ret[0] = 0;
 		for( int i = 1; i < size; i++) {
 			Integer[] ii = createJointBin(answers,i);
-			Vector<double[]> curve = cat.getEntropyCurveLogarithmic(ii,200);
+			Vector<double[]> curve = cat.getEntropyCurveLogarithmic(ii,5120);
+			//Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii,512);
 			ret[i] = cat.integrateSortedEntropyCurve(curve);
 		}
 		return ret;
