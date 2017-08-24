@@ -11,17 +11,28 @@ public class SurveyToEntropies {
 	public static final int INPUT_FILE = 1;
 	public static final int VARS = 2;
 
-	public static boolean use_bayesian = false;
+	public static boolean use_bayesian = true;
+	public static boolean full_cats = false;
+	public static boolean prior_is_on_H = false;
+
+	public static boolean cap_at_zero = true;
+	
+	public static boolean permuted = false;
+	
+	public static int bayesian_resolution = 1024;
 	
 	public static String delimiter = "\t";
 	public static int numVars = 10;
+	
+	public static int[] choice_numbers = null;
+	
 	public static void main(String[] args) {
 		try {
 			if( args.length == 0) {
 				args = new String[]{
 						"",
 						"data/first10.txt",
-						""+4
+						""+5
 				};
 			}
 			numVars = Integer.parseInt(args[VARS]);
@@ -34,7 +45,7 @@ public class SurveyToEntropies {
 			for( int i = 0; i < numVars; i++) {
 				choices[i] = new HashMap<String,Integer>();
 			}
-			int[] choice_numbers = new int[numVars];
+			choice_numbers = new int[numVars];
 			
 			
 			System.out.println("reading file...");
@@ -63,15 +74,16 @@ public class SurveyToEntropies {
 				unions = computeAllJointEntropies(answers);
 			}
 			System.out.println("converting...");
+			
 			double[] intersections = unionsToIntersections(unions);
 			for( int i = 0; i < intersections.length; i++) {
 				if( Integer.bitCount(i) > 2) {
-					intersections[i] = 0;
+					//intersections[i] = 0;
 				}
-			}
-
-			
+			}			
 			unions = unionsToIntersections(intersections);
+			intersections = unionsToIntersections(unions);
+			
 			intersections[0] = unions[unions.length-1];
 			
 			System.out.println("intersections");
@@ -100,14 +112,21 @@ public class SurveyToEntropies {
 	}
 	public static double[] computeAllJointEntropiesBayeisan(Vector<int[]> answers) {
 		CategoricalDistribution cat  = new CategoricalDistribution();
+		cat.prior_is_on_H = prior_is_on_H;
 		int size = 0x01 << numVars;
 		double[] ret = new double[size];
 		ret[0] = 0;
 		for( int i = 1; i < size; i++) {
 			Integer[] ii = createJointBin(answers,i);
-			Vector<double[]> curve = cat.getEntropyCurveLogarithmic(ii,5120);
-			//Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii,512);
+			Vector<double[]> curve = cat.getEntropyCurveLogarithmic(ii,bayesian_resolution,permuted);
+			//Vector<double[]> curve = cat.getEntropyCurveMultiplicative(ii,bayesian_resolution);
 			ret[i] = cat.integrateSortedEntropyCurve(curve);
+			if( Double.isInfinite(ret[i]) || Double.isNaN(ret[i]) || curve.size() == 0) {
+				ret[i] = computeEntropyMLE(ii);
+			}
+			if( Double.isInfinite(ret[i]) || Double.isNaN(ret[i])) {
+				ret[i] = 0;
+			}
 		}
 		return ret;
 	}
@@ -126,15 +145,38 @@ public class SurveyToEntropies {
 				}
 			}
 		}
-		for( int i = 1; i < size; i++) {
-			if( ret[i] < 0) {
-				ret[i] = 0;
+		if( cap_at_zero) {
+			for( int i = 1; i < size; i++) {
+				if( ret[i] < 0) {
+					ret[i] = 0;
+				}
 			}
 		}
 		return ret;
 	}
+	
+	public static void populateHashMap(HashMap<String,Integer> bins, int bits, int init_shift, String s) {
+		for( int shift = init_shift; shift < 16 && shift < numVars; shift++) {
+			if( (bits & (0x01 << shift)) != 0) {
+				for( int i = 0; i < choice_numbers[shift]; i++) {
+					String s2 = s+i+",";
+					populateHashMap( bins, bits, shift+1, s2); 
+				}
+				//s+= answer[shift] + ",";
+				return;
+			}
+		}
+		bins.put(s, 0);
+	}
+	
 	public static Integer[] createJointBin(Vector<int[]> answers, int bits) {
 		HashMap<String,Integer> bins = new HashMap<String,Integer>();
+		
+		if( use_bayesian && full_cats) {
+			populateHashMap(bins,bits,0,"");
+		}
+		
+
 		for( int[] answer : answers) {
 			String s = "";
 			for( int shift = 0; shift < 16 && shift < numVars; shift++) {

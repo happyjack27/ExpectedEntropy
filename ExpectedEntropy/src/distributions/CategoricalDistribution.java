@@ -16,6 +16,10 @@ public class CategoricalDistribution implements PosteriorDistribution<double[],d
 
 	public boolean prior_is_on_H = false;
 	public boolean use_prior_for_sampling = false;
+	
+	public static boolean in_sample = false;
+	public static boolean posterior = false;
+
 
 	double[] thetas;
 	int[][] permutations;
@@ -844,7 +848,7 @@ sum(ylnx+y)=0;
 		// TODO Auto-generated method stub
 		return thetas;
 	}
-	public Vector<double[]> getEntropyCurveLogarithmic(Integer[] data, int num_samples) {
+	public Vector<double[]> getEntropyCurveLogarithmic(Integer[] data, int num_samples, boolean permuted) {
 		if( data.length == 0) {
 			return new Vector<double[]>();
 		}
@@ -867,7 +871,8 @@ sum(ylnx+y)=0;
 				thetas = getMLEThetas(data);
 			break;
 			}
-			double[] hxy = getEntropyAndLogProbabilityAtTheta(thetas,data,false);
+			double[] hxy = getEntropyAndLogProbabilityAtTheta(thetas,data,permuted);
+			//double[] hxy = getEntropyAndLogProbabilityAtTheta(thetas,data,false);
 			if( hxy[0] != hxy[0] || hxy[1] != hxy[1] ||  Double.isInfinite(hxy[0]) ||  Double.isInfinite(hxy[1])) {
 				continue;
 			}
@@ -1207,12 +1212,15 @@ sum(ylnx+y)=0;
 	public double[] getEntropyAndProbabilityAtTheta(double[] thetas, Integer[] data, boolean permuted) {
 		
 		double h = getEntropyGivenTheta(thetas);
-		double pDO = 0;
-		if( permuted) {
-			pDO = getProbabilityOfDataGivenThetaPermuted2(thetas, data);
-		} else {
-			pDO = getProbabilityOfDataGivenTheta(thetas, data);
+		double pDO = 1;
+		if( posterior) {
+			if( permuted) {
+				pDO = getProbabilityOfDataGivenThetaPermuted2(thetas, data);
+			} else {
+				pDO = getProbabilityOfDataGivenTheta(thetas, data);
+			}
 		}
+		
 		//double pDO = FastMath.exp(lpDO);
 		
 		
@@ -1248,12 +1256,12 @@ sum(ylnx+y)=0;
 		return new double[]{h,ph,pDO,dHdO,pO};
 	}
 	public double[] getEntropyAndLogProbabilityAtTheta(double[] thetas, Integer[] data, boolean permuted) {
-
 		
 		double h = getEntropyGivenTheta(thetas);
 		double lpDO = 0;
 		if( permuted) {
-			lpDO = FastMath.log(getProbabilityOfDataGivenThetaPermuted2(thetas, data));
+			//lpDO = FastMath.log(getProbabilityOfDataGivenThetaPermuted2(thetas, data));
+			lpDO = getLogProbabilityOfDataGivenThetaPermuted(thetas, data);
 		} else {
 			lpDO = getLogProbabilityOfDataGivenTheta(thetas, data);
 		}
@@ -1261,33 +1269,50 @@ sum(ylnx+y)=0;
 		
 		
 		double[] dHdOs = getDerivsOfEntropyGivenTheta(thetas);
-		double dHdO = 1;//getDerivOfEntropyGivenTheta(thetas);
+		double ldHdO = 0;//getDerivOfEntropyGivenTheta(thetas);
+		boolean zero = false;
 		for( int i = 0; i < dHdOs.length-1; i++) {
-			dHdO *= dHdOs[i];
+			if( dHdOs[i] == 0) {
+				zero = true;
+			}
+			ldHdO += FastMath.log( FastMath.abs(dHdOs[i]));
+			//dHdO *= dHdOs[i];
 		}
 		
 		
 		//double dHdO = determinant(getJacobianGivenTheta(thetas));
-		double lpO = FastMath.log(prior.getPriorProbabilityOfTheta(thetas));
-		double lph = lpDO+lpO - ( prior_is_on_H ? 0 : FastMath.log(FastMath.abs(dHdO)));
+		double lpO = ((DirichletDistribution)prior).getLogPriorProbabilityOfTheta(thetas);
+		//double lpO = FastMath.log(prior.getPriorProbabilityOfTheta(thetas));
+		double lph = lpDO+lpO - ( prior_is_on_H ? 0 : ldHdO);
+
+		return new double[]{h,lph,lpDO,ldHdO,lpO};
+	}
+
+	private double getLogProbabilityOfDataGivenThetaPermuted(double[] theta, Integer[] data) {
+		int bucket_count = theta.length;
+		int[] buckets = new int[bucket_count];
+		for( int i = 0; i < bucket_count; i++) {
+			buckets[i] = i;
+		}
+		permutations = new int[(int)factorial(bucket_count)][];
+		//Double p = new Double(0);
+		generatePermutations(data.length);
+		//permute2(buckets, 0, 0,data, new Double(0),theta);
 		
-		//double l_add = sum_data;//data.length == 0 ? 0 : FastMath.log(data.length)*sum_data;
-		//double l_add = data.length == 0 ? 0 : FastMath.log(data.length)*sum_data;
-		//double l_add = data.length == 0 ? 0 : data.length*sum_data;
-		//l_add -= 1000;
-		//lph += l_add;
 		
-		//double pO = FastMath.exp(lpO);
-		//double ph = FastMath.exp(lph);
-		//System.out.println("dHdO: "+dHdO+" pO: "+pO+" pDO: "+pDO+" ph: "+ph+" h: "+h+" p is on h: "+prior_is_on_H);
-		/*
-		if( prior_is_on_H)
-			pO = prior.getPriorProbabilityOfTheta(h);
-			*/
-		//if( ph == 0) {
-			//System.out.println("ph is zero 25! "+pDO+" "+pO+" "+dHdO+" "+lpO+" "+lph+" "+l_add+" "+(lph+l_add));
-		//}
-		return new double[]{h,lph,lpDO,dHdO,lpO};
+		double p = 0;
+		double[] permuted = new double[theta.length];
+		for( int i = 0; i < permutations.length; i++) {
+			for( int j = 0; j < theta.length; j++) {
+				permuted[j] = theta[permutations[i][j]];
+			}
+			double q = getLogProbabilityOfDataGivenTheta(permuted,data);
+			if( Double.isInfinite(q) || Double.isNaN(q)) {
+				continue;
+			}
+			p += FastMath.exp(q); 
+		}
+		return Math.log(p);	
 	}
 
 	public double getDerivOfEntropyGivenTheta(double[] thetas) {

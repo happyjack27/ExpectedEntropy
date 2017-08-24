@@ -37,7 +37,7 @@ public class Visualizer implements Draws {
 	public static final int ITERATIONS = 4;
 	public static final int IMAGE_SIZE = 5;
 	
-	public static final int TIMES_TO_REPEAT_IF_IMPROVED = 0;
+	public static final int TIMES_TO_REPEAT_IF_IMPROVED = 1;
 	
 	//fff
 	//ttf
@@ -45,7 +45,7 @@ public class Visualizer implements Draws {
 	public static boolean divide_by_area = false;
 	public static boolean shrink_geometrically = false;
 	
-	public static double whitespace_fraction = 0.6666;
+	public static double whitespace_fraction = 0.75;
 	public static int DEFAULT_ITERATIONS = 160*2;
 	public static boolean shrink_by_area = false;
 	
@@ -174,27 +174,39 @@ public class Visualizer implements Draws {
 		}
 		Collections.sort(all_grids);
 		anneal_mult = FastMath.exp((FastMath.log(2.0)-FastMath.log(0.01))/(double)iterations);
-		for( int i = 0; i < iterations; i++) {
-			int[][] grid = all_grids.get(0).b;
-			perturbScored(grid,(double)dot_connections.length);
-			double score = scoreGrid(grid);
-			all_grids.get(0).a = score;
-			if( shrink_by_area) {
-				init_rate = FastMath.sqrt((double)(iterations-i)/(double)iterations);
-			} else {
-				init_rate = (double)(iterations-i)/(double)iterations;
-			}
-			if( shrink_geometrically) {
-				init_rate = 1.0-init_rate;
-				double min = -FastMath.log((double)dot_connections.length/2.0);
-				init_rate = FastMath.exp(min*init_rate);
-			}
-			init_rate *= 1;
-			//init_rate -= 2.0/(double)iterations;//*= anneal_mult;
-			//init_rate *= anneal_mult;
-			//System.out.println(score);
-		}
 		
+		System.out.println("iterations "+iterations);
+		try {
+			for( int i = 0; i < iterations; i++) {
+				System.out.print(".");
+				if( i % 100 == 0)
+					System.out.print(""+i);
+				int[][] grid = all_grids.get(0).b;
+				perturbScored(grid,init_rate);
+				//System.out.print("o");
+				double score = scoreGrid(grid);
+				all_grids.get(0).a = score;
+				if( shrink_by_area) {
+					init_rate = FastMath.sqrt((double)(iterations-i)/(double)iterations);
+				} else {
+					init_rate = (double)(iterations-i)/(double)iterations;
+				}
+				if( shrink_geometrically) {
+					init_rate = 1.0-init_rate;
+					double min = -FastMath.log((double)dot_connections.length/2.0);
+					init_rate = FastMath.exp(min*init_rate);
+				}
+				init_rate *= 1;
+				//init_rate -= 2.0/(double)iterations;//*= anneal_mult;
+				//init_rate *= anneal_mult;
+				//System.out.println(score);
+			}
+		} catch (Exception ex) {
+			System.out.println(ex);;
+			ex.printStackTrace();
+		}
+		System.out.println("done iterations "+iterations);
+		//System.exit(0);;
 		/*
 		while( init_rate*(double)dot_connections.length > 1.0) {
 			for( int g = 0; g < num_grids*3; g++) {
@@ -226,6 +238,7 @@ public class Visualizer implements Draws {
 			}
 			System.out.println();
 		}
+		System.out.println("done sysout");
 	}
 	
 	public int[][] randomGrid(int[] dot_connections) {
@@ -258,11 +271,19 @@ public class Visualizer implements Draws {
 	}
 	
 	public void perturbScored( int[][] dot_grid, double rate) {
+		//rate = Math.sqrt(rate);
 		double[] counts = new double[num_vars];
 		double[][] centers = new double[num_vars][2];
 		long swaps = 9999999;
 		boolean first_time = true;
+		int max_repeats = 4;
+		
 		while(swaps > min_swaps_to_repeat || first_time) {
+			max_repeats--;
+			if( max_repeats == 0) {
+				break;
+			}
+			//System.out.print("s");
 			swaps = 0;
 			first_time = false;
 			
@@ -315,6 +336,7 @@ public class Visualizer implements Draws {
 	
 			int N = (int)rate; //better to poisson estimate this.
 			//for( int n = 0; n < N; n++) {
+			//System.out.println(rate);
 			for( int x1 = 0; x1 < dot_grid.length; x1++) {
 				for( int y1 = 0; y1 < dot_grid.length; y1++) {
 					int repeat = 1;
@@ -322,12 +344,12 @@ public class Visualizer implements Draws {
 						repeat--;
 						//int x1 = (int)((FastMath.random())*(double)dot_grid.length);
 						//int y1 = (int)((FastMath.random())*(double)dot_grid.length);
-						int idx = (int)((FastMath.random()-0.5)*init_rate*(double)dot_grid.length);
-						int idy = (int)((FastMath.random()-0.5)*init_rate*(double)dot_grid.length);
+						int idx = (int)((FastMath.random()-0.5)*rate*(double)dot_grid.length);
+						int idy = (int)((FastMath.random()-0.5)*rate*(double)dot_grid.length);
 						//int x2 = (int)((FastMath.random())*(double)dot_grid.length);
 						//int y2 = (int)((FastMath.random())*(double)dot_grid.length);
-						int x2 = (x1+idx) < 0 ? x1 : (x1+idx) >= dot_grid.length ? x1 : (x1+idx);
-						int y2 = (y1+idy) < 0 ? y1 : (y1+idy) >= dot_grid.length ? y1 : (y1+idy);
+						int x2 = (x1+idx) < 0 ? 0 : (x1+idx) >= dot_grid.length ? dot_grid.length-1 : (x1+idx);
+						int y2 = (y1+idy) < 0 ? 0 : (y1+idy) >= dot_grid.length ? dot_grid.length-1 : (y1+idy);
 						
 						int dot1 = dot_grid[x1][y1];
 						int dot2 = dot_grid[x2][y2];
